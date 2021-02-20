@@ -1,9 +1,9 @@
 import * as React from 'react';
 import EventListItem from './EventListItem';
-import type { Event } from '../../../Shared/Types';
+import type { EventInfo } from '../../../Shared/Types';
 
 type Props = {
-  events: Event[];
+  events: EventInfo[];
 };
 
 const EventList: React.FC<Props> = (props: Props) => {

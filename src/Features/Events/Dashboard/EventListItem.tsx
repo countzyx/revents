@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { Button, Icon, Item, List, Segment } from 'semantic-ui-react';
 import EventListAttendee from './EventListAttendee';
-import type { Event } from '../../../Shared/Types';
+import type { EventInfo } from '../../../Shared/Types';
 
 type Props = {
-  event: Event;
+  event: EventInfo;
 };
 
 const EventListItem: React.FC<Props> = (props: Props) => {

@@ -6,7 +6,7 @@ export type EventAttendee = {
 
 export type EventCategory = 'culture' | 'drinks';
 
-export type Event = {
+export type EventInfo = {
   id: string;
   title: string;
   date: string; // a string for now, needs to be Date maybe?

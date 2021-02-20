@@ -1,6 +1,6 @@
-import type { Event } from '../../Shared/Types';
+import type { EventInfo } from '../../Shared/Types';
 
-export const SampleData: Event[] = [
+export const SampleData: EventInfo[] = [
   {
     id: '1',
     title: 'Trip to Empire State building',
