@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Grid } from 'semantic-ui-react';
+import EventForm from '../Form/EventForm';
 import EventList from './EventsList';
 
 const EventDashboard: React.FC = () => {
@@ -9,7 +10,7 @@ const EventDashboard: React.FC = () => {
         <EventList />
       </Grid.Column>
       <Grid.Column width={6}>
-        <h2>Right Column</h2>
+        <EventForm />
       </Grid.Column>
     </Grid>
   );
