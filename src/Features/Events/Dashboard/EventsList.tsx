@@ -1,13 +1,19 @@
 import * as React from 'react';
 import EventListItem from './EventListItem';
+import type { Event } from '../../../Shared/Types';
 
-const EventList: React.FC = () => {
+type Props = {
+  events: Event[];
+};
+
+const EventList: React.FC<Props> = (props: Props) => {
+  const { events } = props;
+
   return (
     <>
-      <EventListItem />
-      <EventListItem />
-      <EventListItem />
-      <EventListItem />
+      {events.map((e) => (
+        <EventListItem key={e.id} event={e} />
+      ))}
     </>
   );
 };
