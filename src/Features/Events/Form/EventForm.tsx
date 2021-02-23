@@ -1,8 +1,11 @@
 import * as React from 'react';
+import * as _ from 'lodash';
 import { Button, Form, Header, Segment } from 'semantic-ui-react';
+import { EventInfo } from '../../../Shared/Types';
 
 type Props = {
   onCloseEventForm: () => void;
+  onCreateEvent: (event: EventInfo) => void;
 };
 
 type EventFormState = {
@@ -23,12 +26,34 @@ const initialState: EventFormState = {
   date: '',
 };
 
+const blankEvent: EventInfo = {
+  id: '',
+  category: '',
+  city: '',
+  date: '',
+  description: '',
+  hostPhotoUrl: '',
+  hostedBy: '',
+  title: '',
+  venue: '',
+  attendees: [],
+};
+
 const EventForm: React.FC<Props> = (props: Props) => {
-  const { onCloseEventForm } = props;
+  const { onCloseEventForm, onCreateEvent } = props;
   const [formState, setFormState] = React.useState<EventFormState>(initialState);
 
   const onFormSubmitHandler: React.FormEventHandler<HTMLFormElement> = (formEvent) => {
-    console.log(formEvent);
+    formEvent.preventDefault();
+    const newEvent: EventInfo = {
+      ...blankEvent,
+      id: _.uniqueId(),
+      hostedBy: 'Bobbie',
+      hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
+      ...formState,
+    };
+    onCreateEvent(newEvent);
+    onCloseEventForm();
   };
 
   const onInputChangeHandler: React.ChangeEventHandler<HTMLInputElement> = (changeEvent) => {

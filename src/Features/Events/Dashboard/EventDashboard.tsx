@@ -20,14 +20,25 @@ const initialState: State = {
 
 const EventDashboard: React.FC<Props> = (props: Props) => {
   const { isFormOpen, onCloseEventForm } = props;
-  const [eventsState] = React.useState(initialState);
+  const [eventsState, setEventsState] = React.useState(initialState);
+
+  const onCreateEvent = React.useCallback(
+    (newEvent: EventInfo) => {
+      setEventsState((prevState) => {
+        return { events: [...prevState.events, newEvent] };
+      });
+    },
+    [setEventsState],
+  );
 
   return (
     <Grid>
       <Grid.Column width={10}>
         <EventList events={eventsState.events} />
       </Grid.Column>
-      <Grid.Column width={6}>{isFormOpen && <EventForm onCloseEventForm={onCloseEventForm} />}</Grid.Column>
+      <Grid.Column width={6}>
+        {isFormOpen && <EventForm onCloseEventForm={onCloseEventForm} onCreateEvent={onCreateEvent} />}
+      </Grid.Column>
     </Grid>
   );
 };

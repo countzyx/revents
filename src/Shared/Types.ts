@@ -4,13 +4,11 @@ export type EventAttendee = {
   photoUrl: string; // should be URL?
 };
 
-export type EventCategory = 'culture' | 'drinks';
-
 export type EventInfo = {
   id: string;
   title: string;
   date: string; // a string for now, needs to be Date maybe?
-  category: EventCategory;
+  category: string;
   description: string;
   city: string;
   venue: string;
