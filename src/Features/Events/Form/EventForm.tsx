@@ -5,7 +5,8 @@ import { EventInfo } from '../../../Shared/Types';
 
 type Props = {
   onCloseEventForm: () => void;
-  onCreateEvent: (event: EventInfo) => void;
+  onCreateEvent: (newEvent: EventInfo) => void;
+  onUpdateEvent: (updatedEvent: EventInfo) => void;
   selectedEvent: EventInfo | undefined;
 };
 
@@ -41,19 +42,25 @@ const blankEvent: EventInfo = {
 };
 
 const EventForm: React.FC<Props> = (props: Props) => {
-  const { onCloseEventForm, onCreateEvent, selectedEvent } = props;
+  const { onCloseEventForm, onCreateEvent, onUpdateEvent, selectedEvent } = props;
   const [formState, setFormState] = React.useState<EventFormState>(selectedEvent ?? initialState);
 
   const onFormSubmitHandler: React.FormEventHandler<HTMLFormElement> = (formEvent) => {
     formEvent.preventDefault();
-    const newEvent: EventInfo = {
-      ...blankEvent,
-      id: _.uniqueId(),
-      hostedBy: 'Bobbie',
-      hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
-      ...formState,
-    };
-    onCreateEvent(newEvent);
+
+    if (selectedEvent) {
+      const updatedEvent = { ...selectedEvent, ...formState };
+      onUpdateEvent(updatedEvent);
+    } else {
+      const newEvent: EventInfo = {
+        ...blankEvent,
+        id: _.uniqueId(),
+        hostedBy: 'Bobbie',
+        hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
+        ...formState,
+      };
+      onCreateEvent(newEvent);
+    }
     onCloseEventForm();
   };
 

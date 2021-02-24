@@ -33,6 +33,15 @@ const EventDashboard: React.FC<Props> = (props: Props) => {
     [setEventsState],
   );
 
+  const onUpdateEvent = React.useCallback(
+    (updatedEvent: EventInfo) => {
+      setEventsState((prevState) => {
+        return { events: prevState.events.map((e) => (e.id === updatedEvent.id ? updatedEvent : e)) };
+      });
+    },
+    [setEventsState],
+  );
+
   return (
     <Grid>
       <Grid.Column width={10}>
@@ -43,6 +52,7 @@ const EventDashboard: React.FC<Props> = (props: Props) => {
           <EventForm
             onCloseEventForm={onCloseEventForm}
             onCreateEvent={onCreateEvent}
+            onUpdateEvent={onUpdateEvent}
             selectedEvent={selectedEvent}
             key={selectedEvent?.id}
           />
