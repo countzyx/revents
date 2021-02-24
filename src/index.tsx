@@ -8,12 +8,7 @@ import reportWebVitals from './reportWebVitals';
 const rootElement = document.getElementById('root');
 
 function render() {
-  ReactDOM.render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>,
-    rootElement,
-  );
+  ReactDOM.render(<App />, rootElement);
 }
 
 if (rootElement) {
