@@ -35,7 +35,7 @@ export const SampleData: EventInfo[] = [
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.',
     city: 'London, UK',
     venue: 'Punch & Judy, Henrietta Street, London, UK',
-    hostedBy: 'Tom',
+    hostedBy: 'Tony',
     hostPhotoUrl: 'https://randomuser.me/api/portraits/men/40.jpg',
     attendees: [
       {
