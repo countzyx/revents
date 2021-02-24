@@ -6,6 +6,7 @@ import { EventInfo } from '../../../Shared/Types';
 type Props = {
   onCloseEventForm: () => void;
   onCreateEvent: (event: EventInfo) => void;
+  selectedEvent: EventInfo | undefined;
 };
 
 type EventFormState = {
@@ -40,8 +41,8 @@ const blankEvent: EventInfo = {
 };
 
 const EventForm: React.FC<Props> = (props: Props) => {
-  const { onCloseEventForm, onCreateEvent } = props;
-  const [formState, setFormState] = React.useState<EventFormState>(initialState);
+  const { onCloseEventForm, onCreateEvent, selectedEvent } = props;
+  const [formState, setFormState] = React.useState<EventFormState>(selectedEvent ?? initialState);
 
   const onFormSubmitHandler: React.FormEventHandler<HTMLFormElement> = (formEvent) => {
     formEvent.preventDefault();

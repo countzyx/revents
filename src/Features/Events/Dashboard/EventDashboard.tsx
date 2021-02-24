@@ -8,6 +8,8 @@ import type { EventInfo } from '../../../Shared/Types';
 type Props = {
   isFormOpen: boolean;
   onCloseEventForm: () => void;
+  onSelectEvent: (selectedEvent: EventInfo) => void;
+  selectedEvent: EventInfo | undefined;
 };
 
 type State = {
@@ -19,7 +21,7 @@ const initialState: State = {
 };
 
 const EventDashboard: React.FC<Props> = (props: Props) => {
-  const { isFormOpen, onCloseEventForm } = props;
+  const { isFormOpen, onCloseEventForm, onSelectEvent, selectedEvent } = props;
   const [eventsState, setEventsState] = React.useState(initialState);
 
   const onCreateEvent = React.useCallback(
@@ -34,10 +36,12 @@ const EventDashboard: React.FC<Props> = (props: Props) => {
   return (
     <Grid>
       <Grid.Column width={10}>
-        <EventList events={eventsState.events} />
+        <EventList events={eventsState.events} onSelectEvent={onSelectEvent} />
       </Grid.Column>
       <Grid.Column width={6}>
-        {isFormOpen && <EventForm onCloseEventForm={onCloseEventForm} onCreateEvent={onCreateEvent} />}
+        {isFormOpen && (
+          <EventForm onCloseEventForm={onCloseEventForm} onCreateEvent={onCreateEvent} selectedEvent={selectedEvent} />
+        )}
       </Grid.Column>
     </Grid>
   );

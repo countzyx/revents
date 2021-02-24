@@ -2,11 +2,11 @@ import * as React from 'react';
 import { Button, Container, Menu } from 'semantic-ui-react';
 
 type Props = {
-  onOpenEventForm: () => void;
+  onOpenCreateEventForm: () => void;
 };
 
 const NavBar: React.FC<Props> = (props: Props) => {
-  const { onOpenEventForm } = props;
+  const { onOpenCreateEventForm } = props;
 
   return (
     <Menu inverted fixed='top'>
@@ -17,7 +17,7 @@ const NavBar: React.FC<Props> = (props: Props) => {
         </Menu.Item>
         <Menu.Item name='Events' />
         <Menu.Item>
-          <Button positive inverted content='Create Event' onClick={onOpenEventForm} />
+          <Button positive inverted content='Create Event' onClick={onOpenCreateEventForm} />
         </Menu.Item>
         <Menu.Item position='right'>
           <Button basic inverted content='Login' />
