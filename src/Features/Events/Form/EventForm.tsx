@@ -66,7 +66,7 @@ const EventForm: React.FC<Props> = (props: Props) => {
 
   return (
     <Segment clearing>
-      <Header content='Create a new event' />
+      <Header content={selectedEvent ? 'Edit event' : 'Create a new event'} />
       <Form onSubmit={onFormSubmitHandler}>
         <Form.Field>
           <input

@@ -40,7 +40,12 @@ const EventDashboard: React.FC<Props> = (props: Props) => {
       </Grid.Column>
       <Grid.Column width={6}>
         {isFormOpen && (
-          <EventForm onCloseEventForm={onCloseEventForm} onCreateEvent={onCreateEvent} selectedEvent={selectedEvent} />
+          <EventForm
+            onCloseEventForm={onCloseEventForm}
+            onCreateEvent={onCreateEvent}
+            selectedEvent={selectedEvent}
+            key={selectedEvent?.id}
+          />
         )}
       </Grid.Column>
     </Grid>
