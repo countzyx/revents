@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter } from 'react-router-dom';
 import 'semantic-ui-css/semantic.min.css';
 import './index.css';
 import App from './App/Layout/App';
@@ -8,7 +9,12 @@ import reportWebVitals from './reportWebVitals';
 const rootElement = document.getElementById('root');
 
 function render() {
-  ReactDOM.render(<App />, rootElement);
+  ReactDOM.render(
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>,
+    rootElement,
+  );
 }
 
 if (rootElement) {

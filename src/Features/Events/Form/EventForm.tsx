@@ -4,10 +4,8 @@ import { Button, Form, Header, Segment } from 'semantic-ui-react';
 import { EventInfo } from '../../../Shared/Types';
 
 type Props = {
-  onCloseEventForm: () => void;
   onCreateEvent: (newEvent: EventInfo) => void;
   onUpdateEvent: (updatedEvent: EventInfo) => void;
-  selectedEvent: EventInfo | undefined;
 };
 
 type EventFormState = {
@@ -42,14 +40,16 @@ const blankEvent: EventInfo = {
 };
 
 const EventForm: React.FC<Props> = (props: Props) => {
-  const { onCloseEventForm, onCreateEvent, onUpdateEvent, selectedEvent } = props;
+  const { onCreateEvent, onUpdateEvent } = props;
+  const selectedEvent: EventInfo | undefined = undefined;
   const [formState, setFormState] = React.useState<EventFormState>(selectedEvent ?? initialState);
 
   const onFormSubmitHandler: React.FormEventHandler<HTMLFormElement> = (formEvent) => {
     formEvent.preventDefault();
 
     if (selectedEvent) {
-      const updatedEvent = { ...selectedEvent, ...formState };
+      // const updatedEvent: EventInfo = { ...selectedEvent, ...formState };
+      const updatedEvent: EventInfo = { ...blankEvent, ...formState };
       onUpdateEvent(updatedEvent);
     } else {
       const newEvent: EventInfo = {
@@ -61,7 +61,6 @@ const EventForm: React.FC<Props> = (props: Props) => {
       };
       onCreateEvent(newEvent);
     }
-    onCloseEventForm();
   };
 
   const onInputChangeHandler: React.ChangeEventHandler<HTMLInputElement> = (changeEvent) => {
@@ -112,7 +111,7 @@ const EventForm: React.FC<Props> = (props: Props) => {
           <input type='date' name='date' placeholder='Date' value={formState.date} onChange={onInputChangeHandler} />
         </Form.Field>
         <Button type='submit' floated='right' positive content='Submit' />
-        <Button type='submit' floated='right' content='Cancel' onClick={onCloseEventForm} />
+        <Button type='submit' floated='right' content='Cancel' />
       </Form>
     </Segment>
   );

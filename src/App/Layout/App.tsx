@@ -1,40 +1,70 @@
 import * as React from 'react';
+import { Route, Switch } from 'react-router-dom';
 import { Container } from 'semantic-ui-react';
 import EventDashboard from '../../Features/Events/Dashboard/EventDashboard';
+import EventDetails from '../../Features/Events/Details/EventDetails';
+import EventForm from '../../Features/Events/Form/EventForm';
+import HomePage from '../../Features/Home/HomePage';
 import NavBar from '../../Features/Nav/NavBar';
 import type { EventInfo } from '../../Shared/Types';
+import SampleData from '../Api/SampleData';
+
+type EventState = {
+  events: EventInfo[];
+};
+
+const initialEventState: EventState = {
+  events: SampleData,
+};
 
 const App: React.FC = () => {
-  const [isFormOpenState, setIsFormOpenState] = React.useState(false);
-  const [selectedEventState, setSelectedEventState] = React.useState<EventInfo | undefined>(undefined);
+  const [eventsState, setEventsState] = React.useState(initialEventState);
 
-  const onCloseEventFormHandler = React.useCallback(() => {
-    setIsFormOpenState(false);
-  }, [setIsFormOpenState]);
-
-  const onOpenCreateEventFormHandler = React.useCallback(() => {
-    setSelectedEventState(undefined);
-    setIsFormOpenState(true);
-  }, [setIsFormOpenState, setSelectedEventState]);
-
-  const onSelectEvent = React.useCallback(
-    (selectedEvent: EventInfo) => {
-      setSelectedEventState(selectedEvent);
-      setIsFormOpenState(true);
+  const onCreateEvent = React.useCallback(
+    (newEvent: EventInfo) => {
+      setEventsState((prevState) => {
+        return { events: [...prevState.events, newEvent] };
+      });
     },
-    [setIsFormOpenState, setSelectedEventState],
+    [setEventsState],
+  );
+
+  const onDeleteEvent = React.useCallback(
+    (eventId: string) => {
+      setEventsState((prevState) => {
+        return { events: prevState.events.filter((e) => e.id !== eventId) };
+      });
+    },
+    [setEventsState],
+  );
+
+  const onUpdateEvent = React.useCallback(
+    (updatedEvent: EventInfo) => {
+      setEventsState((prevState) => {
+        return { events: prevState.events.map((e) => (e.id === updatedEvent.id ? updatedEvent : e)) };
+      });
+    },
+    [setEventsState],
   );
 
   return (
     <>
-      <NavBar onOpenCreateEventForm={onOpenCreateEventFormHandler} />
+      <NavBar />
       <Container className='main'>
-        <EventDashboard
-          isFormOpen={isFormOpenState}
-          onCloseEventForm={onCloseEventFormHandler}
-          onSelectEvent={onSelectEvent}
-          selectedEvent={selectedEventState}
-        />
+        <Switch>
+          <Route path='/events' exact>
+            <EventDashboard events={eventsState.events} onDeleteEvent={onDeleteEvent} />
+          </Route>
+          <Route path='/events/:id'>
+            <EventDetails />
+          </Route>
+          <Route path='/createEvent'>
+            <EventForm onCreateEvent={onCreateEvent} onUpdateEvent={onUpdateEvent} />
+          </Route>
+          <Route path='/' exact>
+            <HomePage />
+          </Route>
+        </Switch>
       </Container>
     </>
   );
