@@ -5,11 +5,12 @@ import type { EventInfo } from '../../../Shared/Types';
 
 type Props = {
   event: EventInfo;
+  onDeleteEvent: (eventId: string) => void;
   onSelectEvent: (selectedEvent: EventInfo) => void;
 };
 
 const EventListItem: React.FC<Props> = (props: Props) => {
-  const { event, onSelectEvent } = props;
+  const { event, onDeleteEvent, onSelectEvent } = props;
 
   return (
     <Segment.Group>
@@ -39,6 +40,7 @@ const EventListItem: React.FC<Props> = (props: Props) => {
       </Segment>
       <Segment clearing>
         <div>{event.description}</div>
+        <Button color='red' floated='right' content='Delete' onClick={() => onDeleteEvent(event.id)} />
         <Button color='teal' floated='right' content='View' onClick={() => onSelectEvent(event)} />
       </Segment>
     </Segment.Group>

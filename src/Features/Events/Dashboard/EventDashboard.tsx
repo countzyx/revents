@@ -33,6 +33,15 @@ const EventDashboard: React.FC<Props> = (props: Props) => {
     [setEventsState],
   );
 
+  const onDeleteEvent = React.useCallback(
+    (eventId: string) => {
+      setEventsState((prevState) => {
+        return { events: prevState.events.filter((e) => e.id !== eventId) };
+      });
+    },
+    [setEventsState],
+  );
+
   const onUpdateEvent = React.useCallback(
     (updatedEvent: EventInfo) => {
       setEventsState((prevState) => {
@@ -45,7 +54,7 @@ const EventDashboard: React.FC<Props> = (props: Props) => {
   return (
     <Grid>
       <Grid.Column width={10}>
-        <EventList events={eventsState.events} onSelectEvent={onSelectEvent} />
+        <EventList events={eventsState.events} onDeleteEvent={onDeleteEvent} onSelectEvent={onSelectEvent} />
       </Grid.Column>
       <Grid.Column width={6}>
         {isFormOpen && (
