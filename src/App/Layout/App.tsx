@@ -49,23 +49,25 @@ const App: React.FC = () => {
 
   return (
     <>
-      <NavBar />
-      <Container className='main'>
-        <Switch>
-          <Route path='/events' exact>
-            <EventDashboard events={eventsState.events} onDeleteEvent={onDeleteEvent} />
-          </Route>
-          <Route path='/events/:id'>
-            <EventDetails />
-          </Route>
-          <Route path='/createEvent'>
-            <EventForm onCreateEvent={onCreateEvent} onUpdateEvent={onUpdateEvent} />
-          </Route>
-          <Route path='/' exact>
-            <HomePage />
-          </Route>
-        </Switch>
-      </Container>
+      <Switch>
+        <Route path='/' exact>
+          <HomePage />
+        </Route>
+        <Route path='/(.+)'>
+          <NavBar />
+          <Container className='main'>
+            <Route path='/events' exact>
+              <EventDashboard events={eventsState.events} onDeleteEvent={onDeleteEvent} />
+            </Route>
+            <Route path='/events/:id'>
+              <EventDetails />
+            </Route>
+            <Route path='/createEvent'>
+              <EventForm onCreateEvent={onCreateEvent} onUpdateEvent={onUpdateEvent} />
+            </Route>
+          </Container>
+        </Route>{' '}
+      </Switch>
     </>
   );
 };
