@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useHistory } from 'react-router-dom';
 import { Button, Container, Menu } from 'semantic-ui-react';
 import SignedInMenu from './SignedInMenu';
 import SignedOutMenu from './SignedOutMenu';
 
 const NavBar: React.FC = () => {
   const [isAuthedState, setIsAuthedState] = React.useState(false);
+  const history = useHistory();
 
   const onSignIn = React.useCallback(() => {
     setIsAuthedState(true);
@@ -13,6 +14,7 @@ const NavBar: React.FC = () => {
 
   const onSignOut = React.useCallback(() => {
     setIsAuthedState(false);
+    history.push('/');
   }, [setIsAuthedState]);
 
   return (
