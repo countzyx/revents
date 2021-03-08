@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 import { Button, Form, Header, Segment } from 'semantic-ui-react';
-import { EventInfo } from '../../../Shared/Types';
+import type { EventInfo } from '../../../App/Shared/Types';
 
 type Props = {
   onCreateEvent: (newEvent: EventInfo) => void;

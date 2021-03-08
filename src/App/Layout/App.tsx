@@ -6,7 +6,7 @@ import EventDetails from '../../Features/Events/Details/EventDetails';
 import EventForm from '../../Features/Events/Form/EventForm';
 import HomePage from '../../Features/Home/HomePage';
 import NavBar from '../../Features/Nav/NavBar';
-import type { EventInfo } from '../../Shared/Types';
+import type { EventInfo } from '../Shared/Types';
 import SampleData from '../Api/SampleData';
 
 type EventState = {

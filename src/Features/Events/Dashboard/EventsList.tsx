@@ -1,6 +1,6 @@
 import * as React from 'react';
 import EventListItem from './EventListItem';
-import type { EventInfo } from '../../../Shared/Types';
+import type { EventInfo } from '../../../App/Shared/Types';
 
 type Props = {
   events: EventInfo[];

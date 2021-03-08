@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Button, Icon, Item, List, Segment } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import EventListAttendee from './EventListAttendee';
-import type { EventInfo } from '../../../Shared/Types';
+import type { EventInfo } from '../../../App/Shared/Types';
 
 type Props = {
   event: EventInfo;

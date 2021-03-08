@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import type { EventInfo } from '../../Shared/Types';
+import type { EventInfo } from '../Shared/Types';
 
 export const SampleData: EventInfo[] = [
   {

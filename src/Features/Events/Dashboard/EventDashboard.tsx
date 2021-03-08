@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Grid } from 'semantic-ui-react';
 import EventList from './EventsList';
-import type { EventInfo } from '../../../Shared/Types';
+import type { EventInfo } from '../../../App/Shared/Types';
 
 type Props = {
   events: EventInfo[];

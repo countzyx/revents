@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Image, List } from 'semantic-ui-react';
-import type { EventAttendee } from '../../../Shared/Types';
+import type { EventAttendee } from '../../../App/Shared/Types';
 
 type Props = {
   attendee: EventAttendee;
