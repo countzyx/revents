@@ -1,21 +1,28 @@
 import * as React from 'react';
 import { Button, Header, Image, Item, Segment } from 'semantic-ui-react';
+import { EventInfo } from '../../../App/Shared/Types';
 import styles from './EventDetailsHeader.module.css';
 
-const EventDetailsHeader: React.FC = () => {
+type Props = {
+  event: EventInfo;
+};
+
+const EventDetailsHeader: React.FC<Props> = (props: Props) => {
+  const { event } = props;
+
   return (
     <Segment.Group>
       <Segment basic attached='top' style={{ padding: '0' }}>
-        <Image src='/assets/categoryImages/drinks.jpg' fluid className={styles.eventImage} />
+        <Image src={`/assets/categoryImages/${event.category}.jpg`} fluid className={styles.eventImage} />
 
         <Segment basic className={styles.eventImageText}>
           <Item.Group>
             <Item>
               <Item.Content>
-                <Header size='huge' content='Event Title' style={{ color: 'white' }} />
-                <p>Event Date</p>
+                <Header size='huge' content={event.title} style={{ color: 'white' }} />
+                <p>{event.date}</p>
                 <p>
-                  Hosted by <strong>Bob</strong>
+                  Hosted by <strong>{event.hostedBy}</strong>
                 </p>
               </Item.Content>
             </Item>
