@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { createAction, createReducer, PayloadAction } from '@reduxjs/toolkit';
 
 const DECREMENT_DATA = 'DECREMENT_DATA';
