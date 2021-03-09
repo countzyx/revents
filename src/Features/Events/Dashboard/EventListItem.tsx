@@ -3,14 +3,16 @@ import { Button, Icon, Item, List, Segment } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import EventListAttendee from './EventListAttendee';
 import type { EventInfo } from '../../../App/Shared/Types';
+import { useAppDispatch } from '../../../App/Store/hooks';
+import { deleteEvent } from '../eventsSlice';
 
 type Props = {
   event: EventInfo;
-  onDeleteEvent: (eventId: string) => void;
 };
 
 const EventListItem: React.FC<Props> = (props: Props) => {
-  const { event, onDeleteEvent } = props;
+  const { event } = props;
+  const dispatch = useAppDispatch();
 
   return (
     <Segment.Group>
@@ -40,7 +42,7 @@ const EventListItem: React.FC<Props> = (props: Props) => {
       </Segment>
       <Segment clearing>
         <div>{event.description}</div>
-        <Button color='red' floated='right' content='Delete' onClick={() => onDeleteEvent(event.id)} />
+        <Button color='red' floated='right' content='Delete' onClick={() => dispatch(deleteEvent(event.id))} />
         <Button color='teal' floated='right' content='View' as={Link} to={`/events/${event.id}`} />
       </Segment>
     </Segment.Group>

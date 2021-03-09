@@ -23,6 +23,6 @@ export const sandboxSlice = createSlice({
 });
 
 export const { decrement, increment } = sandboxSlice.actions;
-export const selectSandboxData = (state: RootState): number => state.data;
+export const selectSandboxData = (state: RootState): number => state.sandbox.data;
 
 export default sandboxSlice.reducer;

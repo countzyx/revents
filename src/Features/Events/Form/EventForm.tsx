@@ -1,12 +1,9 @@
 import * as React from 'react';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { Button, Form, Header, Segment } from 'semantic-ui-react';
 import type { EventInfo } from '../../../App/Shared/Types';
-
-type Props = {
-  onCreateEvent: (newEvent: EventInfo) => void;
-  onUpdateEvent: (updatedEvent: EventInfo) => void;
-};
+import { useAppDispatch } from '../../../App/Store/hooks';
+import { createEvent, updateEvent } from '../eventsSlice';
 
 type EventFormState = {
   title: string;
@@ -39,8 +36,8 @@ const blankEvent: EventInfo = {
   attendees: [],
 };
 
-const EventForm: React.FC<Props> = (props: Props) => {
-  const { onCreateEvent, onUpdateEvent } = props;
+const EventForm: React.FC = () => {
+  const dispatch = useAppDispatch();
   const selectedEvent: EventInfo | undefined = undefined;
   const [formState, setFormState] = React.useState<EventFormState>(selectedEvent ?? initialState);
 
@@ -48,9 +45,8 @@ const EventForm: React.FC<Props> = (props: Props) => {
     formEvent.preventDefault();
 
     if (selectedEvent) {
-      // const updatedEvent: EventInfo = { ...selectedEvent, ...formState };
       const updatedEvent: EventInfo = { ...blankEvent, ...formState };
-      onUpdateEvent(updatedEvent);
+      dispatch(updateEvent(updatedEvent));
     } else {
       const newEvent: EventInfo = {
         ...blankEvent,
@@ -59,7 +55,7 @@ const EventForm: React.FC<Props> = (props: Props) => {
         hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
         ...formState,
       };
-      onCreateEvent(newEvent);
+      dispatch(createEvent(newEvent));
     }
   };
 

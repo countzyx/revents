@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '../../App/Store/hooks';
 import { decrement, increment } from './sandboxSlice';
 
 const Sandbox: React.FC = () => {
-  const data = useAppSelector((state) => state.data);
+  const data = useAppSelector((state) => state.sandbox.data);
   const dispatch = useAppDispatch();
 
   return (
