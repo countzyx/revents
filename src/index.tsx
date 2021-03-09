@@ -8,11 +8,13 @@ import { Store } from '@reduxjs/toolkit';
 import App from './App/Layout/App';
 import reportWebVitals from './reportWebVitals';
 import store from './App/Store/store';
+import ScrollToTop from './App/Layout/ScrollToTop';
 
 function render(reduxStore: Store, element: HTMLElement) {
   ReactDOM.render(
     <Provider store={reduxStore}>
       <BrowserRouter>
+        <ScrollToTop />
         <App />
       </BrowserRouter>
     </Provider>,
