@@ -1,8 +1,12 @@
 import * as _ from 'lodash';
-import { Action } from '@reduxjs/toolkit';
+import { createAction, createReducer, PayloadAction } from '@reduxjs/toolkit';
 
-export const DECREMENT_DATA = 'DECREMENT_DATA';
-export const INCREMENT_DATA = 'INCREMENT_DATA';
+const DECREMENT_DATA = 'DECREMENT_DATA';
+const INCREMENT_DATA = 'INCREMENT_DATA';
+
+export const decrementAction = createAction<number>(DECREMENT_DATA);
+export const incrementAction = createAction<number>(INCREMENT_DATA);
+
 export type TestState = {
   data: number;
 };
@@ -11,24 +15,14 @@ const initialState: TestState = {
   data: 42,
 };
 
-const reducer = (state: TestState = initialState, action: Action): TestState => {
-  const newState = _.cloneDeep(state);
-
-  switch (action.type) {
-    case DECREMENT_DATA: {
-      newState.data -= 1;
-      break;
-    }
-    case INCREMENT_DATA: {
-      newState.data += 1;
-      break;
-    }
-    default: {
-      return state;
-    }
-  }
-
-  return newState;
-};
+const reducer = createReducer(initialState, (builder) => {
+  builder
+    .addCase(incrementAction, (state, action: PayloadAction<number>) => {
+      return { ...state, data: state.data + action.payload };
+    })
+    .addCase(decrementAction, (state, action: PayloadAction<number>) => {
+      return { ...state, data: state.data - action.payload };
+    });
+});
 
 export default reducer;
