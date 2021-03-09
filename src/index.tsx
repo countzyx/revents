@@ -7,7 +7,7 @@ import { Provider } from 'react-redux';
 import { Store } from '@reduxjs/toolkit';
 import App from './App/Layout/App';
 import reportWebVitals from './reportWebVitals';
-import configureStore from './App/Store/configureStore';
+import makeStore from './App/Store/makeStore';
 
 function render(reduxStore: Store, element: HTMLElement) {
   ReactDOM.render(
@@ -26,7 +26,7 @@ if (rootElement) {
     module.hot.accept('./App/Layout/App', () => setTimeout(render));
   }
 
-  const store = configureStore();
+  const store = makeStore();
   render(store, rootElement);
 }
 
