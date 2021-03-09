@@ -3,26 +3,31 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import 'semantic-ui-css/semantic.min.css';
 import './index.css';
+import { Provider } from 'react-redux';
+import { Store } from '@reduxjs/toolkit';
 import App from './App/Layout/App';
 import reportWebVitals from './reportWebVitals';
+import configureStore from './App/Store/configureStore';
 
-const rootElement = document.getElementById('root');
-
-function render() {
+function render(reduxStore: Store, element: HTMLElement) {
   ReactDOM.render(
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>,
-    rootElement,
+    <Provider store={reduxStore}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </Provider>,
+    element,
   );
 }
 
+const rootElement = document.getElementById('root');
 if (rootElement) {
   if (module.hot) {
     module.hot.accept('./App/Layout/App', () => setTimeout(render));
   }
 
-  render();
+  const store = configureStore();
+  render(store, rootElement);
 }
 
 // If you want to start measuring performance in your app, pass a function
