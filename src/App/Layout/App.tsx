@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, useLocation } from 'react-router-dom';
 import { Container } from 'semantic-ui-react';
 import EventDashboard from '../../Features/Events/Dashboard/EventDashboard';
 import EventDetails from '../../Features/Events/Details/EventDetails';
@@ -9,6 +9,8 @@ import NavBar from '../../Features/Nav/NavBar';
 import Sandbox from '../../Features/Sandbox/Sandbox';
 
 const App: React.FC = () => {
+  const location = useLocation();
+
   return (
     <>
       <Switch>
@@ -18,7 +20,7 @@ const App: React.FC = () => {
         <Route path='/(.+)'>
           <NavBar />
           <Container className='main'>
-            <Route path='/createEvent'>
+            <Route path={['/createEvent', '/editEvent/:id']} key={location.key}>
               <EventForm />
             </Route>
             <Route path='/events' exact>

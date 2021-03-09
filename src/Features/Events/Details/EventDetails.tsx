@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { useParams, withRouter } from 'react-router-dom';
 import { Grid } from 'semantic-ui-react';
 import { useAppSelector } from '../../../App/Store/hooks';
 import EventDetailsChat from './EventDetailsChat';
@@ -11,11 +11,8 @@ type EventDetailsParams = {
   id: string;
 };
 
-type Props = RouteComponentProps<EventDetailsParams>;
-
-const EventDetails: React.FC<Props> = (props: Props) => {
-  const { match } = props;
-  const eventId = match.params.id;
+const EventDetails: React.FC = () => {
+  const eventId = useParams<EventDetailsParams>().id;
   const event = useAppSelector((state) => state.events.events.find((e) => e.id === eventId));
   if (!event) {
     return <h1>No event found</h1>;

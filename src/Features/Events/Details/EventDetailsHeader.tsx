@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import { Button, Header, Image, Item, Segment } from 'semantic-ui-react';
 import { EventInfo } from '../../../App/Shared/Types';
 import styles from './EventDetailsHeader.module.css';
@@ -34,7 +35,7 @@ const EventDetailsHeader: React.FC<Props> = (props: Props) => {
         <Button>Cancel My Place</Button>
         <Button color='teal'>JOIN THIS EVENT</Button>
 
-        <Button color='orange' floated='right'>
+        <Button as={Link} to={`/editEvent/${event.id}`} color='orange' floated='right'>
           Manage Event
         </Button>
       </Segment>

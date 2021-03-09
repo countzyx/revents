@@ -1,8 +1,9 @@
 import * as React from 'react';
 import _ from 'lodash';
 import { Button, Form, Header, Segment } from 'semantic-ui-react';
+import { useHistory, useParams, withRouter } from 'react-router-dom';
 import type { EventInfo } from '../../../App/Shared/Types';
-import { useAppDispatch } from '../../../App/Store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { createEvent, updateEvent } from '../eventsSlice';
 
 type EventFormState = {
@@ -36,9 +37,16 @@ const blankEvent: EventInfo = {
   attendees: [],
 };
 
+type EditEventParams = {
+  id: string;
+};
+
 const EventForm: React.FC = () => {
+  const history = useHistory();
+  const eventId = useParams<EditEventParams>().id;
   const dispatch = useAppDispatch();
-  const selectedEvent: EventInfo | undefined = undefined;
+  const events = useAppSelector((state) => state.events.events);
+  const selectedEvent = eventId ? events.find((e) => e.id === eventId) : undefined;
   const [formState, setFormState] = React.useState<EventFormState>(selectedEvent ?? initialState);
 
   const onFormSubmitHandler: React.FormEventHandler<HTMLFormElement> = (formEvent) => {
@@ -47,6 +55,7 @@ const EventForm: React.FC = () => {
     if (selectedEvent) {
       const updatedEvent: EventInfo = { ...blankEvent, ...formState };
       dispatch(updateEvent(updatedEvent));
+      history.push(`/events/${updatedEvent.id}`);
     } else {
       const newEvent: EventInfo = {
         ...blankEvent,
@@ -56,6 +65,15 @@ const EventForm: React.FC = () => {
         ...formState,
       };
       dispatch(createEvent(newEvent));
+      history.push(`/events/${newEvent.id}`);
+    }
+  };
+
+  const onCancel = () => {
+    if (selectedEvent) {
+      history.push(`/events/${selectedEvent.id}`);
+    } else {
+      history.push('/events');
     }
   };
 
@@ -107,10 +125,10 @@ const EventForm: React.FC = () => {
           <input type='date' name='date' placeholder='Date' value={formState.date} onChange={onInputChangeHandler} />
         </Form.Field>
         <Button type='submit' floated='right' positive content='Submit' />
-        <Button type='submit' floated='right' content='Cancel' />
+        <Button floated='right' content='Cancel' onClick={onCancel} />
       </Form>
     </Segment>
   );
 };
 
-export default EventForm;
+export default withRouter(EventForm);
