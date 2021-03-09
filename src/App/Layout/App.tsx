@@ -8,6 +8,7 @@ import HomePage from '../../Features/Home/HomePage';
 import NavBar from '../../Features/Nav/NavBar';
 import type { EventInfo } from '../Shared/Types';
 import SampleData from '../Api/SampleData';
+import Sandbox from '../Store/Sandbox';
 
 type EventState = {
   events: EventInfo[];
@@ -56,14 +57,17 @@ const App: React.FC = () => {
         <Route path='/(.+)'>
           <NavBar />
           <Container className='main'>
+            <Route path='/createEvent'>
+              <EventForm onCreateEvent={onCreateEvent} onUpdateEvent={onUpdateEvent} />
+            </Route>
             <Route path='/events' exact>
               <EventDashboard events={eventsState.events} onDeleteEvent={onDeleteEvent} />
             </Route>
             <Route path='/events/:id'>
               <EventDetails />
             </Route>
-            <Route path='/createEvent'>
-              <EventForm onCreateEvent={onCreateEvent} onUpdateEvent={onUpdateEvent} />
+            <Route path='/sandbox'>
+              <Sandbox />
             </Route>
           </Container>
         </Route>{' '}
