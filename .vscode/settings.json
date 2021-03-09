@@ -27,5 +27,6 @@
   "diffEditor.codeLens": true,
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnPaste": true
+  "editor.formatOnPaste": true,
+  "material-icon-theme.activeIconPack": "react_redux"
 }

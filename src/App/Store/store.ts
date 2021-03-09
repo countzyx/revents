@@ -1,0 +1,9 @@
+import { configureStore } from '@reduxjs/toolkit';
+import sandboxReducer from '../../Features/Sandbox/sandboxSlice';
+
+const store = configureStore({ reducer: sandboxReducer });
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+
+export default store;

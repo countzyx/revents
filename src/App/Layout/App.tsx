@@ -8,7 +8,7 @@ import HomePage from '../../Features/Home/HomePage';
 import NavBar from '../../Features/Nav/NavBar';
 import type { EventInfo } from '../Shared/Types';
 import SampleData from '../Api/SampleData';
-import Sandbox from '../Store/Sandbox';
+import Sandbox from '../../Features/Sandbox/Sandbox';
 
 type EventState = {
   events: EventInfo[];
