@@ -36,6 +36,7 @@ rules:
         - '**/*.test.ts'
         - '**/test.tsx'
         - '**/test.ts'
+  indent: 'off'
   no-use-before-define: 'off'
   no-unused-vars: 'off'
   react/jsx-filename-extension:
@@ -45,10 +46,9 @@ rules:
         - .jsx
         - .ts
         - .tsx
+  react/jsx-indent: 'off'
   react/jsx-one-expression-per-line: 'off'
-  '@typescript-eslint/indent':
-    - 2
-    - 2
+  '@typescript-eslint/indent': 'off'
   '@typescript-eslint/no-empty-function':
     - error
     - allow:
