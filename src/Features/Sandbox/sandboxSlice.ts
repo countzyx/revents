@@ -13,12 +13,14 @@ export const sandboxSlice = createSlice({
   name: 'sandbox',
   initialState,
   reducers: {
-    decrement: (state, action: PayloadAction<number>) => {
-      return { ...state, data: state.data - action.payload };
-    },
-    increment: (state, action: PayloadAction<number>) => {
-      return { ...state, data: state.data + action.payload };
-    },
+    decrement: (state, action: PayloadAction<number>) => ({
+      ...state,
+      data: state.data - action.payload,
+    }),
+    increment: (state, action: PayloadAction<number>) => ({
+      ...state,
+      data: state.data + action.payload,
+    }),
   },
 });
 

@@ -15,12 +15,12 @@ export const eventsSlice = createSlice({
   name: 'events',
   initialState,
   reducers: {
-    createEvent: (state, action: PayloadAction<EventInfo>) => {
-      return { events: [...state.events, action.payload] };
-    },
-    deleteEvent: (state, action: PayloadAction<string>) => {
-      return { events: state.events.filter((e) => e.id !== action.payload) };
-    },
+    createEvent: (state, action: PayloadAction<EventInfo>) => ({
+      events: [...state.events, action.payload],
+    }),
+    deleteEvent: (state, action: PayloadAction<string>) => ({
+      events: state.events.filter((e) => e.id !== action.payload),
+    }),
     updateEvent: (state, action: PayloadAction<EventInfo>) => {
       const updatedEvent = action.payload;
       return { events: state.events.map((e) => (e.id === updatedEvent.id ? updatedEvent : e)) };
