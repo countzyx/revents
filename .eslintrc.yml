@@ -36,6 +36,11 @@ rules:
         - '**/test.tsx'
         - '**/test.ts'
   indent: 'off'
+  jsx-a11y/label-has-associated-control:
+    - 2
+    - controlComponents:
+        - Field # This is for Formik fields
+      depth: 3
   no-use-before-define: 'off'
   no-unused-vars: 'off'
   react/jsx-filename-extension:
