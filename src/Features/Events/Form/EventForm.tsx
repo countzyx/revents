@@ -1,9 +1,9 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import * as React from 'react';
 import _ from 'lodash';
-import { Button, Form, Header, Segment } from 'semantic-ui-react';
+import { Button, FormField, Header, Segment } from 'semantic-ui-react';
 import { useHistory, useParams, withRouter } from 'react-router-dom';
-import { Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import type { EventInfo } from '../../../App/Shared/Types';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { createEvent, updateEvent } from '../eventsSlice';
@@ -17,7 +17,7 @@ type EventFormValues = {
   date: string;
 };
 
-const initialValues: EventFormValues = {
+const defaultValues: EventFormValues = {
   title: '',
   category: '',
   description: '',
@@ -49,6 +49,7 @@ const EventForm: React.FC = () => {
   const dispatch = useAppDispatch();
   const events = useAppSelector((state) => state.events.events);
   const selectedEvent = eventId ? events.find((e) => e.id === eventId) : undefined;
+  const initialValues: EventFormValues = selectedEvent ? { ...selectedEvent } : defaultValues;
 
   const onFormSubmitHandler = (formValues: EventFormValues) => {
     if (selectedEvent) {
@@ -88,34 +89,28 @@ const EventForm: React.FC = () => {
           }, 400);
         }}
       >
-        {(formik) => (
-          <Form onSubmit={formik.handleSubmit}>
-            <Form.Field>
-              <input type='text' placeholder='Event title' {...formik.getFieldProps('title')} />
-            </Form.Field>
-            <Form.Field>
-              <input type='text' placeholder='Category' {...formik.getFieldProps('category')} />
-            </Form.Field>
-            <Form.Field>
-              <input
-                type='text'
-                placeholder='Description'
-                {...formik.getFieldProps('description')}
-              />
-            </Form.Field>
-            <Form.Field>
-              <input type='text' placeholder='City' {...formik.getFieldProps('city')} />
-            </Form.Field>
-            <Form.Field>
-              <input type='text' placeholder='Venue' {...formik.getFieldProps('venue')} />
-            </Form.Field>
-            <Form.Field>
-              <input type='date' placeholder='Date' {...formik.getFieldProps('date')} />
-            </Form.Field>
-            <Button type='submit' floated='right' positive content='Submit' />
-            <Button floated='right' content='Cancel' onClick={onCancel} />
-          </Form>
-        )}
+        <Form className='ui form'>
+          <FormField>
+            <Field type='text' name='title' placeholder='Event title' />
+          </FormField>
+          <FormField>
+            <Field type='text' name='category' placeholder='Category' />
+          </FormField>
+          <FormField>
+            <Field type='text' name='description' placeholder='Description' />
+          </FormField>
+          <FormField>
+            <Field type='text' name='city' placeholder='City' />
+          </FormField>
+          <FormField>
+            <Field type='text' name='venue' placeholder='Venue' />
+          </FormField>
+          <FormField>
+            <Field type='date' name='date' placeholder='Date' />
+          </FormField>
+          <Button type='submit' floated='right' positive content='Submit' />
+          <Button floated='right' content='Cancel' onClick={onCancel} />
+        </Form>
       </Formik>
     </Segment>
   );
