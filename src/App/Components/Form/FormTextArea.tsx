@@ -5,19 +5,19 @@ import { FormField, Label } from 'semantic-ui-react';
 
 type OwnProps = {
   label?: string;
-  rows?: number;
 };
 
-type Props = OwnProps & FieldHookConfig<string>;
+type Props = OwnProps & React.TextareaHTMLAttributes<HTMLTextAreaElement> & FieldHookConfig<string>;
 
 const FormTextArea: React.FC<Props> = (props: Props) => {
   const [field, meta] = useField(props);
-  const { id, label, name, placeholder, rows } = props;
+  const { id, label, name } = props;
+  const textAreaProps: React.TextareaHTMLAttributes<HTMLTextAreaElement> = props;
 
   return (
     <FormField error={meta.touched && !!meta.error}>
       {label ? <label htmlFor={id || name}>{label}</label> : null}
-      <textarea {...field} placeholder={placeholder} rows={rows} />
+      <textarea {...textAreaProps} {...field} />
       {meta.touched && !!meta.error ? (
         <Label basic color='red'>
           {meta.error}
@@ -27,6 +27,6 @@ const FormTextArea: React.FC<Props> = (props: Props) => {
   );
 };
 
-FormTextArea.defaultProps = { label: undefined, rows: undefined };
+FormTextArea.defaultProps = { label: undefined };
 
 export default FormTextArea;
