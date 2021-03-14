@@ -8,8 +8,10 @@ import * as Yup from 'yup';
 import type { EventInfo } from '../../../App/Shared/Types';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { createEvent, updateEvent } from '../eventsSlice';
-import FormTextInput from '../../../App/Components/Form/FormTextInput';
+import FormSelect from '../../../App/Components/Form/FormSelect';
 import FormTextArea from '../../../App/Components/Form/FormTextArea';
+import FormTextInput from '../../../App/Components/Form/FormTextInput';
+import CategoryData from '../../../App/Api/CategoryData';
 
 type EventFormValues = {
   title: string;
@@ -104,7 +106,7 @@ const EventForm: React.FC = () => {
         <Form className='ui form'>
           <Header sub color='teal' content='Event Details' />
           <FormTextInput type='text' name='title' placeholder='Event Title' />
-          <FormTextInput type='text' name='category' placeholder='Event Category' />
+          <FormSelect name='category' placeholder='Event Category' options={CategoryData} />
           <FormTextArea type='text' name='description' placeholder='Description' rows={3} />
           <Header sub color='teal' content='Location Details' />
           <FormTextInput type='text' name='city' placeholder='City' />
