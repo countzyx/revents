@@ -4,6 +4,12 @@ export type EventAttendee = {
   photoUrl: string; // should be URL?
 };
 
+export type Category = {
+  key: string;
+  text: string;
+  value: string;
+};
+
 export type EventInfo = {
   id: string;
   title: string;
