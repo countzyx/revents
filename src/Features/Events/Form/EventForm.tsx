@@ -1,9 +1,9 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import * as React from 'react';
 import _ from 'lodash';
-import { Button, FormField, Header, Label, Segment } from 'semantic-ui-react';
+import { Button, Header, Segment } from 'semantic-ui-react';
 import { useHistory, useParams, withRouter } from 'react-router-dom';
-import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import type { EventInfo } from '../../../App/Shared/Types';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
