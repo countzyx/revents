@@ -8,6 +8,7 @@ import * as Yup from 'yup';
 import type { EventInfo } from '../../../App/Shared/Types';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { createEvent, updateEvent } from '../eventsSlice';
+import FormTextInput from '../../../App/Components/Form/FormTextInput';
 
 type EventFormValues = {
   title: string;
@@ -89,7 +90,6 @@ const EventForm: React.FC = () => {
 
   return (
     <Segment clearing>
-      <Header content={selectedEvent ? 'Edit event' : 'Create a new event'} />
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -101,42 +101,14 @@ const EventForm: React.FC = () => {
         }}
       >
         <Form className='ui form'>
-          <FormField>
-            <Field type='text' name='title' placeholder='Event title' />
-            <ErrorMessage name='title'>
-              {(error) => <Label basic color='red' content={error} />}
-            </ErrorMessage>
-          </FormField>
-          <FormField>
-            <Field type='text' name='category' placeholder='Category' />
-            <ErrorMessage name='category'>
-              {(error) => <Label basic color='red' content={error} />}
-            </ErrorMessage>
-          </FormField>
-          <FormField>
-            <Field type='text' name='description' placeholder='Description' />
-            <ErrorMessage name='description'>
-              {(error) => <Label basic color='red' content={error} />}
-            </ErrorMessage>
-          </FormField>
-          <FormField>
-            <Field type='text' name='city' placeholder='City' />
-            <ErrorMessage name='city'>
-              {(error) => <Label basic color='red' content={error} />}
-            </ErrorMessage>
-          </FormField>
-          <FormField>
-            <Field type='text' name='venue' placeholder='Venue' />
-            <ErrorMessage name='venue'>
-              {(error) => <Label basic color='red' content={error} />}
-            </ErrorMessage>
-          </FormField>
-          <FormField>
-            <Field type='date' name='date' placeholder='Date' />
-            <ErrorMessage name='date'>
-              {(error) => <Label basic color='red' content={error} />}
-            </ErrorMessage>
-          </FormField>
+          <Header sub color='teal' content='Event Details' />
+          <FormTextInput type='text' name='title' placeholder='Event Title' />
+          <FormTextInput type='text' name='category' placeholder='Event Category' />
+          <FormTextInput type='text' name='description' placeholder='Description' />
+          <Header sub color='teal' content='Location Details' />
+          <FormTextInput type='text' name='city' placeholder='City' />
+          <FormTextInput type='text' name='venue' placeholder='Venue' />
+          <FormTextInput type='date' name='date' placeholder='Date' />
           <Button type='submit' floated='right' positive content='Submit' />
           <Button floated='right' content='Cancel' onClick={onCancel} />
         </Form>
