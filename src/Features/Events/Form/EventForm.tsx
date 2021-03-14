@@ -1,12 +1,14 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import * as React from 'react';
 import _ from 'lodash';
 import { Button, Form, Header, Segment } from 'semantic-ui-react';
 import { useHistory, useParams, withRouter } from 'react-router-dom';
+import { Formik } from 'formik';
 import type { EventInfo } from '../../../App/Shared/Types';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { createEvent, updateEvent } from '../eventsSlice';
 
-type EventFormState = {
+type EventFormValues = {
   title: string;
   category: string;
   description: string;
@@ -15,7 +17,7 @@ type EventFormState = {
   date: string;
 };
 
-const initialState: EventFormState = {
+const initialValues: EventFormValues = {
   title: '',
   category: '',
   description: '',
@@ -47,13 +49,10 @@ const EventForm: React.FC = () => {
   const dispatch = useAppDispatch();
   const events = useAppSelector((state) => state.events.events);
   const selectedEvent = eventId ? events.find((e) => e.id === eventId) : undefined;
-  const [formState, setFormState] = React.useState<EventFormState>(selectedEvent ?? initialState);
 
-  const onFormSubmitHandler: React.FormEventHandler<HTMLFormElement> = (formEvent) => {
-    formEvent.preventDefault();
-
+  const onFormSubmitHandler = (formValues: EventFormValues) => {
     if (selectedEvent) {
-      const updatedEvent: EventInfo = { ...blankEvent, ...formState };
+      const updatedEvent: EventInfo = { ...blankEvent, ...formValues };
       dispatch(updateEvent(updatedEvent));
       history.push(`/events/${updatedEvent.id}`);
     } else {
@@ -62,7 +61,7 @@ const EventForm: React.FC = () => {
         id: _.uniqueId(),
         hostedBy: 'Bobbie',
         hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
-        ...formState,
+        ...formValues,
       };
       dispatch(createEvent(newEvent));
       history.push(`/events/${newEvent.id}`);
@@ -77,56 +76,47 @@ const EventForm: React.FC = () => {
     }
   };
 
-  const onInputChangeHandler: React.ChangeEventHandler<HTMLInputElement> = (changeEvent) => {
-    const { name, value } = changeEvent.target;
-    setFormState((prevState) => {
-      return { ...prevState, [name]: value };
-    });
-  };
-
   return (
     <Segment clearing>
       <Header content={selectedEvent ? 'Edit event' : 'Create a new event'} />
-      <Form onSubmit={onFormSubmitHandler}>
-        <Form.Field>
-          <input
-            type='text'
-            name='title'
-            placeholder='Event title'
-            value={formState.title}
-            onChange={onInputChangeHandler}
-          />
-        </Form.Field>
-        <Form.Field>
-          <input
-            type='text'
-            name='category'
-            placeholder='Category'
-            value={formState.category}
-            onChange={onInputChangeHandler}
-          />
-        </Form.Field>
-        <Form.Field>
-          <input
-            type='text'
-            name='description'
-            placeholder='Description'
-            value={formState.description}
-            onChange={onInputChangeHandler}
-          />
-        </Form.Field>
-        <Form.Field>
-          <input type='text' name='city' placeholder='City' value={formState.city} onChange={onInputChangeHandler} />
-        </Form.Field>
-        <Form.Field>
-          <input type='text' name='venue' placeholder='Venue' value={formState.venue} onChange={onInputChangeHandler} />
-        </Form.Field>
-        <Form.Field>
-          <input type='date' name='date' placeholder='Date' value={formState.date} onChange={onInputChangeHandler} />
-        </Form.Field>
-        <Button type='submit' floated='right' positive content='Submit' />
-        <Button floated='right' content='Cancel' onClick={onCancel} />
-      </Form>
+      <Formik
+        initialValues={initialValues}
+        onSubmit={(values, { setSubmitting }) => {
+          setTimeout(() => {
+            onFormSubmitHandler(values);
+            setSubmitting(false);
+          }, 400);
+        }}
+      >
+        {(formik) => (
+          <Form onSubmit={formik.handleSubmit}>
+            <Form.Field>
+              <input type='text' placeholder='Event title' {...formik.getFieldProps('title')} />
+            </Form.Field>
+            <Form.Field>
+              <input type='text' placeholder='Category' {...formik.getFieldProps('category')} />
+            </Form.Field>
+            <Form.Field>
+              <input
+                type='text'
+                placeholder='Description'
+                {...formik.getFieldProps('description')}
+              />
+            </Form.Field>
+            <Form.Field>
+              <input type='text' placeholder='City' {...formik.getFieldProps('city')} />
+            </Form.Field>
+            <Form.Field>
+              <input type='text' placeholder='Venue' {...formik.getFieldProps('venue')} />
+            </Form.Field>
+            <Form.Field>
+              <input type='date' placeholder='Date' {...formik.getFieldProps('date')} />
+            </Form.Field>
+            <Button type='submit' floated='right' positive content='Submit' />
+            <Button floated='right' content='Cancel' onClick={onCancel} />
+          </Form>
+        )}
+      </Formik>
     </Segment>
   );
 };
