@@ -9,6 +9,7 @@ import type { EventInfo } from '../../../App/Shared/Types';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { createEvent, updateEvent } from '../eventsSlice';
 import FormTextInput from '../../../App/Components/Form/FormTextInput';
+import FormTextArea from '../../../App/Components/Form/FormTextArea';
 
 type EventFormValues = {
   title: string;
@@ -104,7 +105,7 @@ const EventForm: React.FC = () => {
           <Header sub color='teal' content='Event Details' />
           <FormTextInput type='text' name='title' placeholder='Event Title' />
           <FormTextInput type='text' name='category' placeholder='Event Category' />
-          <FormTextInput type='text' name='description' placeholder='Description' />
+          <FormTextArea type='text' name='description' placeholder='Description' rows={3} />
           <Header sub color='teal' content='Location Details' />
           <FormTextInput type='text' name='city' placeholder='City' />
           <FormTextInput type='text' name='venue' placeholder='Venue' />
