@@ -7,16 +7,17 @@ type OwnProps = {
   label?: string;
 };
 
-type Props = OwnProps & FieldHookConfig<string>;
+type Props = OwnProps & React.InputHTMLAttributes<HTMLInputElement> & FieldHookConfig<string>;
 
 const FormTextInput: React.FC<Props> = (props: Props) => {
   const [field, meta] = useField(props);
-  const { id, label, name, placeholder } = props;
+  const { id, label, name } = props;
+  const inputProps: React.InputHTMLAttributes<HTMLInputElement> = props;
 
   return (
     <FormField error={meta.touched && !!meta.error}>
       {label ? <label htmlFor={id || name}>{label}</label> : null}
-      <input {...field} placeholder={placeholder} />
+      <input {...inputProps} {...field} />
       {meta.touched && !!meta.error ? (
         <Label basic color='red'>
           {meta.error}
