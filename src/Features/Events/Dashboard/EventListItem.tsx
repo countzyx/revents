@@ -1,10 +1,12 @@
 import * as React from 'react';
 import { Button, Icon, Item, List, Segment } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
+import format from 'date-fns/format';
 import EventListAttendee from './EventListAttendee';
 import type { EventInfo } from '../../../App/Shared/Types';
 import { useAppDispatch } from '../../../App/Store/hooks';
 import { deleteEvent } from '../eventsSlice';
+import kDateFormat from '../../../App/Shared/Constants';
 
 type Props = {
   event: EventInfo;
@@ -29,7 +31,7 @@ const EventListItem: React.FC<Props> = (props: Props) => {
       </Segment>
       <Segment>
         <span>
-          <Icon name='clock' /> {event.date}
+          <Icon name='clock' /> {event.date && format(event.date, kDateFormat)}
           <Icon name='marker' /> {event.venue}
         </span>
       </Segment>
@@ -42,7 +44,12 @@ const EventListItem: React.FC<Props> = (props: Props) => {
       </Segment>
       <Segment clearing>
         <div>{event.description}</div>
-        <Button color='red' floated='right' content='Delete' onClick={() => dispatch(deleteEvent(event.id))} />
+        <Button
+          color='red'
+          floated='right'
+          content='Delete'
+          onClick={() => dispatch(deleteEvent(event.id))}
+        />
         <Button color='teal' floated='right' content='View' as={Link} to={`/events/${event.id}`} />
       </Segment>
     </Segment.Group>

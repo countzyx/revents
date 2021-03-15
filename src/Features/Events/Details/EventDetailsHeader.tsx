@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Header, Image, Item, Segment } from 'semantic-ui-react';
+import format from 'date-fns/format';
 import { EventInfo } from '../../../App/Shared/Types';
 import styles from './EventDetailsHeader.module.css';
+import kDateFormat from '../../../App/Shared/Constants';
 
 type Props = {
   event: EventInfo;
@@ -14,14 +16,18 @@ const EventDetailsHeader: React.FC<Props> = (props: Props) => {
   return (
     <Segment.Group>
       <Segment basic attached='top' style={{ padding: '0' }}>
-        <Image src={`/assets/categoryImages/${event.category}.jpg`} fluid className={styles.eventImage} />
+        <Image
+          src={`/assets/categoryImages/${event.category}.jpg`}
+          fluid
+          className={styles.eventImage}
+        />
 
         <Segment basic className={styles.eventImageText}>
           <Item.Group>
             <Item>
               <Item.Content>
                 <Header size='huge' content={event.title} style={{ color: 'white' }} />
-                <p>{event.date}</p>
+                <p>{event.date && format(event.date, kDateFormat)}</p>
                 <p>
                   Hosted by <strong>{event.hostedBy}</strong>
                 </p>

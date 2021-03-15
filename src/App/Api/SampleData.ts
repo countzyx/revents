@@ -5,7 +5,7 @@ export const SampleData: EventInfo[] = [
   {
     id: _.uniqueId(),
     title: 'Trip to Empire State building',
-    date: '2018-03-21',
+    date: new Date('2021-07-21 6:30 PM'),
     category: 'culture',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.',
@@ -29,7 +29,7 @@ export const SampleData: EventInfo[] = [
   {
     id: _.uniqueId(),
     title: 'Trip to Punch and Judy Pub',
-    date: '2018-03-18',
+    date: new Date('2021-06-18 7:00 PM'),
     category: 'drinks',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.',

@@ -33,7 +33,7 @@ const App: React.FC = () => {
               <Sandbox />
             </Route>
           </Container>
-        </Route>{' '}
+        </Route>
       </Switch>
     </>
   );
