@@ -113,18 +113,32 @@ const EventForm: React.FC = () => {
           }, 400);
         }}
       >
-        <Form className='ui form'>
-          <Header sub color='teal' content='Event Details' />
-          <FormTextInput type='text' name='title' placeholder='Event Title' />
-          <FormSelect name='category' placeholder='Event Category' options={CategoryData} />
-          <FormTextArea type='text' name='description' placeholder='Description' rows={3} />
-          <Header sub color='teal' content='Location Details' />
-          <FormTextInput type='text' name='city' placeholder='City' />
-          <FormTextInput type='text' name='venue' placeholder='Venue' />
-          <FormDate name='date' placeholder='Date' />
-          <Button type='submit' floated='right' positive content='Submit' />
-          <Button floated='right' content='Cancel' onClick={onCancel} />
-        </Form>
+        {(formik) => (
+          <Form className='ui form'>
+            <Header sub color='teal' content='Event Details' />
+            <FormTextInput type='text' name='title' placeholder='Event Title' />
+            <FormSelect name='category' placeholder='Event Category' options={CategoryData} />
+            <FormTextArea type='text' name='description' placeholder='Description' rows={3} />
+            <Header sub color='teal' content='Location Details' />
+            <FormTextInput type='text' name='city' placeholder='City' />
+            <FormTextInput type='text' name='venue' placeholder='Venue' />
+            <FormDate name='date' placeholder='Date' />
+            <Button
+              content='Submit'
+              disabled={!(formik.isValid && formik.dirty && !formik.isSubmitting)}
+              floated='right'
+              loading={formik.isSubmitting}
+              positive
+              type='submit'
+            />
+            <Button
+              content='Cancel'
+              disabled={formik.isSubmitting}
+              floated='right'
+              onClick={onCancel}
+            />
+          </Form>
+        )}
       </Formik>
     </Segment>
   );
