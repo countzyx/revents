@@ -1,12 +1,10 @@
 import * as React from 'react';
 import { Button, Icon, Item, List, Segment } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
-import format from 'date-fns/format';
 import EventListAttendee from './EventListAttendee';
 import type { EventInfo } from '../../../App/Shared/Types';
 import { useAppDispatch } from '../../../App/Store/hooks';
 import { deleteEvent } from '../eventsSlice';
-import kDateFormat from '../../../App/Shared/Constants';
 
 type Props = {
   event: EventInfo;
@@ -31,7 +29,7 @@ const EventListItem: React.FC<Props> = (props: Props) => {
       </Segment>
       <Segment>
         <span>
-          <Icon name='clock' /> {event.date && format(event.date, kDateFormat)}
+          <Icon name='clock' /> {event.date}
           <Icon name='marker' /> {event.venue}
         </span>
       </Segment>

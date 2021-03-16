@@ -4,6 +4,7 @@ import { Button, Header, Segment } from 'semantic-ui-react';
 import { useHistory, useParams, withRouter } from 'react-router-dom';
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
+import { format } from 'date-fns';
 import type { EventInfo } from '../../../App/Shared/Types';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { createEvent, updateEvent } from '../eventsSlice';
@@ -12,6 +13,7 @@ import FormTextArea from '../../../App/Components/Form/FormTextArea';
 import FormTextInput from '../../../App/Components/Form/FormTextInput';
 import CategoryData from '../../../App/Api/CategoryData';
 import FormDate from '../../../App/Components/Form/FormDate';
+import kDateFormat from '../../../App/Shared/Constants';
 
 type EventFormValues = {
   title: string;
@@ -19,7 +21,7 @@ type EventFormValues = {
   description: string;
   city: string;
   venue: string;
-  date: Date | null;
+  date: string;
 };
 
 const defaultValues: EventFormValues = {
@@ -28,7 +30,7 @@ const defaultValues: EventFormValues = {
   description: '',
   city: '',
   venue: '',
-  date: null,
+  date: '',
 };
 
 const validationSchema: Yup.SchemaOf<EventFormValues> = Yup.object({
@@ -37,14 +39,14 @@ const validationSchema: Yup.SchemaOf<EventFormValues> = Yup.object({
   description: Yup.string().required(),
   city: Yup.string().required(),
   venue: Yup.string().required(),
-  date: Yup.date().required(),
+  date: Yup.string().required(),
 });
 
 const blankEvent: EventInfo = {
   id: '',
   category: '',
   city: '',
-  date: null,
+  date: '',
   description: '',
   hostPhotoUrl: '',
   hostedBy: '',
@@ -70,6 +72,7 @@ const EventForm: React.FC = () => {
       const updatedEvent: EventInfo = {
         ...blankEvent,
         ...formValues,
+        date: format(new Date(formValues.date), kDateFormat), // FormDate sets value as Date instead of string, fooling Typescript
       };
       dispatch(updateEvent(updatedEvent));
       history.push(`/events/${updatedEvent.id}`);
@@ -80,6 +83,7 @@ const EventForm: React.FC = () => {
         hostedBy: 'Bobbie',
         hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
         ...formValues,
+        date: format(new Date(formValues.date), kDateFormat), // FormDate sets value as Date instead of string, fooling Typescript
       };
       dispatch(createEvent(newEvent));
       history.push(`/events/${newEvent.id}`);

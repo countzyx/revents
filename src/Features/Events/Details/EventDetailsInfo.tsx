@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { Button, Grid, Icon, Segment } from 'semantic-ui-react';
-import format from 'date-fns/format';
 import { EventInfo } from '../../../App/Shared/Types';
-import kDateFormat from '../../../App/Shared/Constants';
 
 type Props = {
   event: EventInfo;
@@ -29,7 +27,7 @@ const EventDetailsInfo: React.FC<Props> = (props: Props) => {
             <Icon name='calendar' size='large' color='teal' />
           </Grid.Column>
           <Grid.Column width={15}>
-            <span>{event.date && format(event.date, kDateFormat)}</span>
+            <span>{event.date}</span>
           </Grid.Column>
         </Grid>
       </Segment>

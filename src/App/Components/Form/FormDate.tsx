@@ -4,7 +4,7 @@ import { FieldHookConfig, FieldInputProps, useField, useFormikContext } from 'fo
 import { FormField, Label } from 'semantic-ui-react';
 import DatePicker, { ReactDatePickerProps } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { parse } from 'date-fns';
+import { isValid, parse } from 'date-fns';
 import { kDateFormat } from '../../Shared/Constants';
 
 type OwnProps = {
@@ -24,8 +24,11 @@ const FormDate: React.FC<Props> = (props: Props) => {
 
     if (value) {
       date = new Date(value);
-      if (Number.isNaN(date.getTime())) {
+      if (!isValid(date)) {
         date = parse(value, kDateFormat, new Date());
+        if (!isValid(date)) {
+          date = null;
+        }
       }
     }
 

@@ -13,7 +13,7 @@ export type Category = {
 export type EventInfo = {
   id: string;
   title: string;
-  date: Date | null;
+  date: string;
   category: string;
   description: string;
   city: string;
