@@ -1,11 +1,13 @@
 import * as _ from 'lodash';
+import parse from 'date-fns/parse';
 import type { EventInfo } from '../Shared/Types';
+import kDateFormat from '../Shared/Constants';
 
 export const SampleData: EventInfo[] = [
   {
     id: _.uniqueId(),
     title: 'Trip to Empire State building',
-    date: new Date('2021-07-21 6:30 PM'),
+    date: parse('2021-07-21 6:30 PM', kDateFormat, new Date()),
     category: 'culture',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.',
@@ -29,7 +31,7 @@ export const SampleData: EventInfo[] = [
   {
     id: _.uniqueId(),
     title: 'Trip to Punch and Judy Pub',
-    date: new Date('2021-06-18 7:00 PM'),
+    date: parse('2021-06-18 7:00 PM', kDateFormat, new Date()),
     category: 'drinks',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.',

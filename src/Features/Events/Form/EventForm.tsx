@@ -1,11 +1,9 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import * as React from 'react';
 import _ from 'lodash';
 import { Button, Header, Segment } from 'semantic-ui-react';
 import { useHistory, useParams, withRouter } from 'react-router-dom';
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
-import format from 'date-fns/format';
 import type { EventInfo } from '../../../App/Shared/Types';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { createEvent, updateEvent } from '../eventsSlice';
@@ -14,7 +12,6 @@ import FormTextArea from '../../../App/Components/Form/FormTextArea';
 import FormTextInput from '../../../App/Components/Form/FormTextInput';
 import CategoryData from '../../../App/Api/CategoryData';
 import FormDate from '../../../App/Components/Form/FormDate';
-import kDateFormat from '../../../App/Shared/Constants';
 
 type EventFormValues = {
   title: string;
@@ -22,7 +19,7 @@ type EventFormValues = {
   description: string;
   city: string;
   venue: string;
-  date: string;
+  date: Date | null;
 };
 
 const defaultValues: EventFormValues = {
@@ -31,7 +28,7 @@ const defaultValues: EventFormValues = {
   description: '',
   city: '',
   venue: '',
-  date: '',
+  date: null,
 };
 
 const validationSchema: Yup.SchemaOf<EventFormValues> = Yup.object({
@@ -40,7 +37,7 @@ const validationSchema: Yup.SchemaOf<EventFormValues> = Yup.object({
   description: Yup.string().required(),
   city: Yup.string().required(),
   venue: Yup.string().required(),
-  date: Yup.string().required(),
+  date: Yup.date().required(),
 });
 
 const blankEvent: EventInfo = {
@@ -66,16 +63,13 @@ const EventForm: React.FC = () => {
   const dispatch = useAppDispatch();
   const events = useAppSelector((state) => state.events.events);
   const selectedEvent = eventId ? events.find((e) => e.id === eventId) : undefined;
-  const initialValues: EventFormValues = selectedEvent
-    ? { ...selectedEvent, date: selectedEvent.date ? format(selectedEvent.date, kDateFormat) : '' }
-    : defaultValues;
+  const initialValues: EventFormValues = selectedEvent || defaultValues;
 
   const onFormSubmitHandler = (formValues: EventFormValues) => {
     if (selectedEvent) {
       const updatedEvent: EventInfo = {
         ...blankEvent,
         ...formValues,
-        date: formValues.date ? new Date(formValues.date) : null,
       };
       dispatch(updateEvent(updatedEvent));
       history.push(`/events/${updatedEvent.id}`);
@@ -86,7 +80,6 @@ const EventForm: React.FC = () => {
         hostedBy: 'Bobbie',
         hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
         ...formValues,
-        date: formValues.date ? new Date(formValues.date) : null,
       };
       dispatch(createEvent(newEvent));
       history.push(`/events/${newEvent.id}`);
