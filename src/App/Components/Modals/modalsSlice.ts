@@ -2,20 +2,18 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ModalProps } from 'semantic-ui-react';
 import { RootState } from '../../Store/store';
 
-export type ModalsState =
-  | {
-      modalProps: ModalProps;
-      modalType: string;
-    }
-  | undefined;
+export type ModalsState = {
+  modalProps: ModalProps;
+  modalType: string;
+} | null;
 
-const initialState: ModalsState = undefined;
+const initialState: ModalsState = null;
 
 export const modalsSlice = createSlice({
   name: 'modals',
   initialState: initialState as ModalsState, // Need to explicitly type because initial value is undefined
   reducers: {
-    closeModal: () => undefined,
+    closeModal: () => null,
     openModal: (_0, action: PayloadAction<ModalsState>) => action.payload,
   },
 });

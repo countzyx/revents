@@ -3,7 +3,7 @@ import { Modal, ModalProps } from 'semantic-ui-react';
 import { useAppDispatch } from '../../Store/hooks';
 import { closeModal } from './modalsSlice';
 
-const ModalWrapper: React.FC = (props: ModalProps) => {
+const ModalWrapper: React.FC<ModalProps> = (props: ModalProps) => {
   const { children, header, size } = props;
   const dispatch = useAppDispatch();
 

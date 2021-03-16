@@ -7,12 +7,14 @@ import EventForm from '../../Features/Events/Form/EventForm';
 import HomePage from '../../Features/Home/HomePage';
 import NavBar from '../../Features/Nav/NavBar';
 import Sandbox from '../../Features/Sandbox/Sandbox';
+import ModalManager from '../Components/Modals/ModalManager';
 
 const App: React.FC = () => {
   const location = useLocation();
 
   return (
     <>
+      <ModalManager />
       <Switch>
         <Route path='/' exact>
           <HomePage />
