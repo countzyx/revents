@@ -1,13 +1,13 @@
-export type EventAttendee = {
-  id: string;
-  name: string;
-  photoUrl: string; // should be URL?
-};
-
 export type Category = {
   key: string;
   text: string;
   value: string;
+};
+
+export type EventAttendee = {
+  id: string;
+  name: string;
+  photoUrl: string;
 };
 
 export type EventInfo = {
@@ -19,6 +19,16 @@ export type EventInfo = {
   city: string;
   venue: string;
   hostedBy: string;
-  hostPhotoUrl: string; // should be URL?
+  hostPhotoUrl: string;
   attendees?: EventAttendee[];
+};
+
+export type User = {
+  email: string;
+  photoUrl: string;
+};
+
+export type UserCredentials = {
+  email: string;
+  password: string;
 };

@@ -1,22 +1,28 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Dropdown, Image, Menu } from 'semantic-ui-react';
+import { useAppDispatch, useAppSelector } from '../../App/Store/hooks';
+import { signOutUser } from '../Auth/authSlice';
 
-type Props = {
-  onSignOut: () => void;
-};
+const SignedInMenu: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const auth = useAppSelector((state) => state.auth);
+  const { currentUser } = auth;
+  const history = useHistory();
 
-const SignedInMenu: React.FC<Props> = (props: Props) => {
-  const { onSignOut } = props;
+  const onSignOut = () => {
+    dispatch(signOutUser());
+    history.push('/');
+  };
 
   return (
     <Menu.Item position='right'>
-      <Image avatar spaced='right' src='/assets/user.png' />
-      <Dropdown pointing='top left' text='Bobbie'>
+      <Image avatar spaced='right' src={currentUser?.photoUrl || '/assets/user.png'} />
+      <Dropdown pointing='top left' text={currentUser?.email || 'Guest'}>
         <Dropdown.Menu>
           <Dropdown.Item as={Link} to='/createEvent' text='Create Event' icon='plus' />
           <Dropdown.Item text='My Profile' icon='user' />
-          <Dropdown.Item text='Sign out' icon='power' onClick={onSignOut} />
+          <Dropdown.Item icon='power' onClick={onSignOut} text='Sign out' />
         </Dropdown.Menu>
       </Dropdown>
     </Menu.Item>

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Modal, ModalProps } from 'semantic-ui-react';
+import { Modal, ModalProps } from 'semantic-ui-react';
 import { useAppDispatch } from '../../Store/hooks';
 import { closeModal } from './modalsSlice';
 

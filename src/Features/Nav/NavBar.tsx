@@ -1,21 +1,13 @@
 import * as React from 'react';
-import { NavLink, useHistory } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { Button, Container, Menu } from 'semantic-ui-react';
+import { useAppSelector } from '../../App/Store/hooks';
 import SignedInMenu from './SignedInMenu';
 import SignedOutMenu from './SignedOutMenu';
 
 const NavBar: React.FC = () => {
-  const [isAuthedState, setIsAuthedState] = React.useState(false);
-  const history = useHistory();
-
-  const onSignIn = React.useCallback(() => {
-    setIsAuthedState(true);
-  }, [setIsAuthedState]);
-
-  const onSignOut = React.useCallback(() => {
-    setIsAuthedState(false);
-    history.push('/');
-  }, [setIsAuthedState]);
+  const auth = useAppSelector((state) => state.auth);
+  const { isAuth } = auth;
 
   return (
     <Menu inverted fixed='top'>
@@ -27,12 +19,12 @@ const NavBar: React.FC = () => {
         <Menu.Item as={NavLink} to='/events' name='Events' />
         <Menu.Item as={NavLink} to='/sandbox' name='Sandbox' />
 
-        {isAuthedState && (
+        {isAuth && (
           <Menu.Item as={NavLink} to='/createEvent'>
             <Button positive inverted content='Create Event' />
           </Menu.Item>
         )}
-        {isAuthedState ? <SignedInMenu onSignOut={onSignOut} /> : <SignedOutMenu onSignIn={onSignIn} />}
+        {isAuth ? <SignedInMenu /> : <SignedOutMenu />}
       </Container>
     </Menu>
   );

@@ -3,7 +3,7 @@ import { ModalProps } from 'semantic-ui-react';
 import { RootState } from '../../Store/store';
 
 export type ModalsState = {
-  modalProps: ModalProps;
+  modalProps?: ModalProps | undefined;
   modalType: string;
 } | null;
 
