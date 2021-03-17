@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Modal, ModalProps } from 'semantic-ui-react';
+import { Button, Modal, ModalProps } from 'semantic-ui-react';
 import { useAppDispatch } from '../../Store/hooks';
 import { closeModal } from './modalsSlice';
 
@@ -10,7 +10,7 @@ const ModalWrapper: React.FC<ModalProps> = (props: ModalProps) => {
   return (
     <Modal
       onClose={() => {
-        dispatch(closeModal);
+        dispatch(closeModal());
       }}
       open
       size={size}
