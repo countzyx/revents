@@ -13,7 +13,7 @@ import FormTextArea from '../../../App/Components/Form/FormTextArea';
 import FormTextInput from '../../../App/Components/Form/FormTextInput';
 import CategoryData from '../../../App/Api/CategoryData';
 import FormDate from '../../../App/Components/Form/FormDate';
-import kDateFormat from '../../../App/Shared/Constants';
+import { kDateFormat } from '../../../App/Shared/Constants';
 
 type EventFormValues = {
   title: string;

@@ -1,3 +1,3 @@
+export const GoogleMapsApiKey: string | undefined = process.env.REACT_APP_GOOGLE_API_KEY;
 export const kDateFormat = 'yyyy-MM-dd h:mm a';
-
-export default kDateFormat;
+console.log('api key', GoogleMapsApiKey);
