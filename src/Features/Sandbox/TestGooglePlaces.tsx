@@ -1,5 +1,7 @@
+/* eslint-disable no-console */
 /* eslint-disable react/jsx-props-no-spreading */
 // This API relies on spreading helper function outputs; this linter rule makes the code less maintainable.
+// This is a sandbox component, so console logging is needed for easy developer validation of state
 import * as React from 'react';
 import PlacesAutoComplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 
