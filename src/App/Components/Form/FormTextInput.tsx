@@ -1,4 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
+// Formik API is designed around props spreading into components; no spreading would make this a lot harder to maintain
 import * as React from 'react';
 import { FieldHookConfig, useField } from 'formik';
 import { FormField, Label } from 'semantic-ui-react';
