@@ -38,7 +38,7 @@ const TestGooglePlaces: React.FC = () => {
                 ? { backgroundColor: '#fafafa', cursor: 'pointer' }
                 : { backgroundColor: '#ffffff', cursor: 'pointer' };
               return (
-                // The key is actually return in the spread, but the linter can't figure that out, so we have to disable jsx-key
+                // The key is actually returned in the spread, but the linter can't figure that out, so we have to disable jsx-key
                 // eslint-disable-next-line react/jsx-key
                 <div
                   {...getSuggestionItemProps(suggestion, {
