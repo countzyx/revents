@@ -4,8 +4,8 @@ import { FieldHookConfig, FieldInputProps, useField, useFormikContext } from 'fo
 import { FormField, Label } from 'semantic-ui-react';
 import DatePicker, { ReactDatePickerProps } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { isValid, parse } from 'date-fns';
 import { kDateFormat } from '../../Shared/Constants';
+import getDateFromString from '../../Shared/Utils';
 
 type OwnProps = {
   label?: string;
@@ -18,21 +18,9 @@ const FormDate: React.FC<Props> = (props: Props) => {
   const [field, meta] = useField(props);
   const { id, label, name, placeholder } = props;
 
-  const getDate = (f: FieldInputProps<string>): Date | null => {
+  const getFieldDate = (f: FieldInputProps<string>): Date | null => {
     const { value } = f;
-    let date: Date | null = null;
-
-    if (value) {
-      date = new Date(value);
-      if (!isValid(date)) {
-        date = parse(value, kDateFormat, new Date());
-        if (!isValid(date)) {
-          date = null;
-        }
-      }
-    }
-
-    return date;
+    return getDateFromString(value) || null;
   };
 
   return (
@@ -51,7 +39,7 @@ const FormDate: React.FC<Props> = (props: Props) => {
           setFieldValue(field.name, value);
         }}
         placeholderText={placeholder}
-        selected={getDate(field)}
+        selected={getFieldDate(field)}
         showTimeSelect
         timeCaption='time'
         timeFormat='HH:mm'
