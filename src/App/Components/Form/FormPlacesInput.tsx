@@ -8,23 +8,31 @@ import PlacesAutoComplete, {
   getLatLng,
   PropTypes,
 } from 'react-places-autocomplete';
+import type { PlacesInfo } from '../../Shared/Types';
 
 type OwnProps = {
   label?: string;
   searchOptions?: PropTypes['searchOptions'];
 };
 
-type InputState = {
-  address: string;
-  latLng: google.maps.LatLngLiteral;
-};
-
-type Props = OwnProps & React.InputHTMLAttributes<HTMLInputElement> & FieldHookConfig<InputState>;
+type Props = OwnProps & React.InputHTMLAttributes<HTMLInputElement> & FieldHookConfig<PlacesInfo>;
 
 const FormPlacesInput: React.FC<Props> = (props: Props) => {
   const [field, meta, helpers] = useField(props);
-  const { id, label, name, searchOptions } = props;
-  const inputProps: React.InputHTMLAttributes<HTMLInputElement> = props;
+  const { searchOptions, ...otherProps } = props; // Need to remove searchOptions from the props added to
+  const { id, label, name } = otherProps;
+  const inputProps: React.InputHTMLAttributes<HTMLInputElement> = otherProps;
+
+  const handleBlur = (event: React.FocusEvent) => {
+    field.onBlur(event);
+    if (!field.value.latLng) {
+      helpers.setValue({ address: '', latLng: undefined });
+    }
+  };
+
+  const handleChange = (address: string) => {
+    helpers.setValue({ address, latLng: undefined });
+  };
 
   const handleSelect = (address: string) => {
     geocodeByAddress(address)
@@ -36,17 +44,20 @@ const FormPlacesInput: React.FC<Props> = (props: Props) => {
   return (
     <PlacesAutoComplete
       value={field.value.address}
-      onChange={(value) => helpers.setValue({ ...field.value, address: value })}
-      onSelect={(value) => handleSelect(value)}
+      onChange={handleChange}
+      onSelect={handleSelect}
       searchOptions={searchOptions}
     >
       {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
         <FormField error={meta.touched && !!meta.error}>
           {label ? <label htmlFor={id || name}>{label}</label> : null}
-          <input {...getInputProps({ ...inputProps })} {...field} value={field.value.address} />
+          <input
+            {...getInputProps({ ...inputProps, name: field.name, onBlur: handleBlur })}
+            value={field.value.address}
+          />
           {meta.touched && !!meta.error ? (
             <Label basic color='red'>
-              {meta.error}
+              {typeof meta.error === 'object' ? `${field.name} is a required field` : meta.error}
             </Label>
           ) : null}
           {suggestions?.length > 0 && (
@@ -58,7 +69,12 @@ const FormPlacesInput: React.FC<Props> = (props: Props) => {
                 {suggestions.map((suggestion) => (
                   // The key is actually returned in the spread, but the linter can't figure that out, so we have to disable jsx-key
                   // eslint-disable-next-line react/jsx-key
-                  <List.Item {...getSuggestionItemProps(suggestion)}>
+                  <List.Item
+                    {...{
+                      ...getSuggestionItemProps(suggestion),
+                      key: suggestion.placeId,
+                    }}
+                  >
                     <List.Header>{suggestion.formattedSuggestion.mainText}</List.Header>
                     <List.Description>
                       {suggestion.formattedSuggestion.secondaryText}

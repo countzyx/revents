@@ -30,7 +30,7 @@ const EventListItem: React.FC<Props> = (props: Props) => {
       <Segment>
         <span>
           <Icon name='clock' /> {event.date}
-          <Icon name='marker' /> {event.venue}
+          <Icon name='marker' /> {event.venue.address}
         </span>
       </Segment>
       <Segment secondary>

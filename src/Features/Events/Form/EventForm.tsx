@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as React from 'react';
 import _ from 'lodash';
 import { Button, Header, Segment } from 'semantic-ui-react';
@@ -5,22 +6,24 @@ import { useHistory, useParams, withRouter } from 'react-router-dom';
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { format } from 'date-fns';
-import type { EventInfo } from '../../../App/Shared/Types';
+import type { EventInfo, PlacesInfo } from '../../../App/Shared/Types';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { createEvent, updateEvent } from '../eventsSlice';
+import FormPlacesInput from '../../../App/Components/Form/FormPlacesInput';
 import FormSelect from '../../../App/Components/Form/FormSelect';
 import FormTextArea from '../../../App/Components/Form/FormTextArea';
 import FormTextInput from '../../../App/Components/Form/FormTextInput';
 import CategoryData from '../../../App/Api/CategoryData';
 import FormDate from '../../../App/Components/Form/FormDate';
 import { kDateFormat } from '../../../App/Shared/Constants';
+import getDateFromString from '../../../App/Shared/Utils';
 
 type EventFormValues = {
   title: string;
   category: string;
   description: string;
-  city: string;
-  venue: string;
+  city: PlacesInfo;
+  venue: PlacesInfo;
   date: string;
 };
 
@@ -28,30 +31,52 @@ const defaultValues: EventFormValues = {
   title: '',
   category: '',
   description: '',
-  city: '',
-  venue: '',
+  city: {
+    address: '',
+    latLng: undefined,
+  },
+  venue: {
+    address: '',
+    latLng: undefined,
+  },
   date: '',
 };
+
+const latLngSchema: Yup.SchemaOf<google.maps.LatLngLiteral> = Yup.object({
+  lat: Yup.number().required(),
+  lng: Yup.number().required(),
+});
+
+const placesInfoSchema: Yup.SchemaOf<PlacesInfo> = Yup.object({
+  address: Yup.string().required(),
+  latLng: latLngSchema.required(),
+});
 
 const validationSchema: Yup.SchemaOf<EventFormValues> = Yup.object({
   title: Yup.string().required(),
   category: Yup.string().required(),
+  city: placesInfoSchema.required(),
   description: Yup.string().required(),
-  city: Yup.string().required(),
-  venue: Yup.string().required(),
   date: Yup.string().required(),
+  venue: placesInfoSchema.required(),
 });
 
 const blankEvent: EventInfo = {
   id: '',
   category: '',
-  city: '',
+  city: {
+    address: '',
+    latLng: undefined,
+  },
   date: '',
   description: '',
   hostPhotoUrl: '',
   hostedBy: '',
   title: '',
-  venue: '',
+  venue: {
+    address: '',
+    latLng: undefined,
+  },
   attendees: [],
 };
 
@@ -72,7 +97,7 @@ const EventForm: React.FC = () => {
       const updatedEvent: EventInfo = {
         ...blankEvent,
         ...formValues,
-        date: format(new Date(formValues.date), kDateFormat), // FormDate sets value as Date instead of string, fooling Typescript
+        date: format(getDateFromString(formValues.date)!, kDateFormat), // FormDate is inconsistent with date string, need to fix
       };
       dispatch(updateEvent(updatedEvent));
       history.push(`/events/${updatedEvent.id}`);
@@ -83,7 +108,7 @@ const EventForm: React.FC = () => {
         hostedBy: 'Bobbie',
         hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
         ...formValues,
-        date: format(new Date(formValues.date), kDateFormat), // FormDate sets value as Date instead of string, fooling Typescript
+        date: format(getDateFromString(formValues.date)!, kDateFormat), // FormDate is inconsistent with date string, need to fix
       };
       dispatch(createEvent(newEvent));
       history.push(`/events/${newEvent.id}`);
@@ -117,8 +142,8 @@ const EventForm: React.FC = () => {
             <FormSelect name='category' placeholder='Event Category' options={CategoryData} />
             <FormTextArea type='text' name='description' placeholder='Description' rows={3} />
             <Header sub color='teal' content='Location Details' />
-            <FormTextInput type='text' name='city' placeholder='City' />
-            <FormTextInput type='text' name='venue' placeholder='Venue' />
+            <FormPlacesInput name='city' placeholder='City' />
+            <FormPlacesInput name='venue' placeholder='Venue' />
             <FormDate name='date' placeholder='Date' />
             <Button
               content='Submit'

@@ -16,11 +16,16 @@ export type EventInfo = {
   date: string;
   category: string;
   description: string;
-  city: string;
-  venue: string;
+  city: PlacesInfo;
+  venue: PlacesInfo;
   hostedBy: string;
   hostPhotoUrl: string;
   attendees?: EventAttendee[];
+};
+
+export type PlacesInfo = {
+  address: string;
+  latLng?: google.maps.LatLngLiteral;
 };
 
 export type User = {

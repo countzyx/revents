@@ -37,7 +37,7 @@ const EventDetailsInfo: React.FC<Props> = (props: Props) => {
             <Icon name='marker' size='large' color='teal' />
           </Grid.Column>
           <Grid.Column width={11}>
-            <span>{event.venue}</span>
+            <span>{event.venue.address}</span>
           </Grid.Column>
           <Grid.Column width={4}>
             <Button color='teal' size='tiny' content='Show Map' />

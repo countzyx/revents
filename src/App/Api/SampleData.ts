@@ -9,8 +9,20 @@ export const SampleData: EventInfo[] = [
     category: 'culture',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.',
-    city: 'NY, USA',
-    venue: 'Empire State Building, 5th Avenue, New York, NY, USA',
+    city: {
+      address: 'New York, NY, USA',
+      latLng: {
+        lat: 40.71090786786135,
+        lng: -74.00663895067672,
+      },
+    },
+    venue: {
+      address: 'Empire State Building, West 34th Street, New York, NY, USA',
+      latLng: {
+        lat: 40.748594910787375,
+        lng: -73.98568585932333,
+      },
+    },
     hostedBy: 'Bobbie',
     hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
     attendees: [
@@ -33,8 +45,20 @@ export const SampleData: EventInfo[] = [
     category: 'drinks',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.',
-    city: 'London, UK',
-    venue: 'Punch & Judy, Henrietta Street, London, UK',
+    city: {
+      address: 'London, UK',
+      latLng: {
+        lat: 51.51488646433931,
+        lng: -0.1256364611675684,
+      },
+    },
+    venue: {
+      address: 'Punch & Judy, Henrietta Street, London, UK',
+      latLng: {
+        lat: 51.51203367851523,
+        lng: -0.12295318602565862,
+      },
+    },
     hostedBy: 'Tony',
     hostPhotoUrl: 'https://randomuser.me/api/portraits/men/40.jpg',
     attendees: [
