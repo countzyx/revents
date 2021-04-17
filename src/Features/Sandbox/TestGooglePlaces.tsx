@@ -41,10 +41,13 @@ const TestGooglePlaces: React.FC = () => {
                 // The key is actually returned in the spread, but the linter can't figure that out, so we have to disable jsx-key
                 // eslint-disable-next-line react/jsx-key
                 <div
-                  {...getSuggestionItemProps(suggestion, {
-                    className,
-                    style,
-                  })}
+                  {...{
+                    ...getSuggestionItemProps(suggestion, {
+                      className,
+                      style,
+                    }),
+                    key: suggestion.placeId,
+                  }}
                 >
                   <span>{suggestion.description}</span>
                 </div>
