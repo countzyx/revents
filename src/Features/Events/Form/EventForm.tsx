@@ -142,8 +142,22 @@ const EventForm: React.FC = () => {
             <FormSelect name='category' placeholder='Event Category' options={CategoryData} />
             <FormTextArea type='text' name='description' placeholder='Description' rows={3} />
             <Header sub color='teal' content='Location Details' />
-            <FormPlacesInput name='city' placeholder='City' />
-            <FormPlacesInput name='venue' placeholder='Venue' />
+            <FormPlacesInput
+              name='city'
+              placeholder='City'
+              searchOptions={{ types: ['(cities)'] }}
+            />
+            <FormPlacesInput
+              disabled={formik.values.city.latLng === undefined}
+              name='venue'
+              placeholder='Venue'
+              searchOptions={{
+                location:
+                  formik.values.city.latLng && new google.maps.LatLng(formik.values.city.latLng),
+                radius: 10000,
+                types: ['establishment'],
+              }}
+            />
             <FormDate name='date' placeholder='Date' />
             <Button
               content='Submit'
