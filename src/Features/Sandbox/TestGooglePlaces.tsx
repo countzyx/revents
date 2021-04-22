@@ -5,22 +5,31 @@
 import * as React from 'react';
 import PlacesAutoComplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 
+type State = {
+  address: string;
+  latLng?: google.maps.LatLngLiteral;
+};
+
+const initialState: State = {
+  address: '',
+  latLng: undefined,
+};
+
 const TestGooglePlaces: React.FC = () => {
-  const [addressState, setAddressState] = React.useState('');
+  const [placeState, setPlaceState] = React.useState(initialState);
   const handleChange = (address: string) => {
-    setAddressState(address);
+    setPlaceState({ address, latLng: undefined });
   };
 
   const handleSelect = (address: string, _: string) => {
     geocodeByAddress(address)
       .then((results) => getLatLng(results[0]))
-      .then((latLng) => console.log('Success', latLng))
+      .then((latLng) => setPlaceState({ address, latLng }))
       .catch((error) => console.error('Error', error));
-    setAddressState(address);
   };
 
   return (
-    <PlacesAutoComplete value={addressState} onChange={handleChange} onSelect={handleSelect}>
+    <PlacesAutoComplete value={placeState.address} onChange={handleChange} onSelect={handleSelect}>
       {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
         <div>
           <input
