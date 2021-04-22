@@ -3,6 +3,7 @@ import { Button } from 'semantic-ui-react';
 import { openModal } from '../../App/Components/Modals/modalsSlice';
 import { useAppDispatch, useAppSelector } from '../../App/Store/hooks';
 import { decrement, increment } from './sandboxSlice';
+import TestGoogleMaps from './TestGoogleMaps';
 import TestGooglePlaces from './TestGooglePlaces';
 
 const Sandbox: React.FC = () => {
@@ -21,6 +22,7 @@ const Sandbox: React.FC = () => {
         onClick={() => dispatch(openModal({ modalType: 'TestModal', modalProps: { data } }))}
       />
       <TestGooglePlaces />
+      <TestGoogleMaps />
     </>
   );
 };
