@@ -18,7 +18,7 @@ const TestGoogleMaps: React.FC<Props> = (props: Props) => {
 
   return (
     <div className={styles.Map}>
-      <GoogleMapReact bootstrapURLKeys={{ key }} defaultCenter={center} defaultZoom={zoom} />
+      <GoogleMapReact bootstrapURLKeys={{ key }} center={center} zoom={zoom} />
     </div>
   );
 };

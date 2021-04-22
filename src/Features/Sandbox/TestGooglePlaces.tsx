@@ -4,32 +4,26 @@
 // This is a sandbox component, so console logging is needed for easy developer validation of state
 import * as React from 'react';
 import PlacesAutoComplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
-
-type State = {
-  address: string;
-  latLng?: google.maps.LatLngLiteral;
-};
-
-const initialState: State = {
-  address: '',
-  latLng: undefined,
-};
+import { useAppDispatch, useAppSelector } from '../../App/Store/hooks';
+import { setAddress, setPlace } from './sandboxSlice';
 
 const TestGooglePlaces: React.FC = () => {
-  const [placeState, setPlaceState] = React.useState(initialState);
+  const place = useAppSelector((state) => state.sandbox.place);
+  const dispatch = useAppDispatch();
+
   const handleChange = (address: string) => {
-    setPlaceState({ address, latLng: undefined });
+    dispatch(setAddress(address));
   };
 
   const handleSelect = (address: string, _: string) => {
     geocodeByAddress(address)
       .then((results) => getLatLng(results[0]))
-      .then((latLng) => setPlaceState({ address, latLng }))
+      .then((latLng) => dispatch(setPlace({ address, latLng })))
       .catch((error) => console.error('Error', error));
   };
 
   return (
-    <PlacesAutoComplete value={placeState.address} onChange={handleChange} onSelect={handleSelect}>
+    <PlacesAutoComplete value={place.address} onChange={handleChange} onSelect={handleSelect}>
       {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
         <div>
           <input

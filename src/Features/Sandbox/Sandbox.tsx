@@ -8,6 +8,7 @@ import TestGooglePlaces from './TestGooglePlaces';
 
 const Sandbox: React.FC = () => {
   const data = useAppSelector((state) => state.sandbox.data);
+  const place = useAppSelector((state) => state.sandbox.place);
   const dispatch = useAppDispatch();
 
   return (
@@ -22,7 +23,7 @@ const Sandbox: React.FC = () => {
         onClick={() => dispatch(openModal({ modalType: 'TestModal', modalProps: { data } }))}
       />
       <TestGooglePlaces />
-      <TestGoogleMaps />
+      <TestGoogleMaps center={place.latLng} />
     </>
   );
 };
