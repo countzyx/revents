@@ -5,7 +5,7 @@ import { FormField, Label } from 'semantic-ui-react';
 import DatePicker, { ReactDatePickerProps } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { kDateFormat } from '../../Shared/Constants';
-import getDateFromString from '../../Shared/Utils';
+import { getDateFromString } from '../../Shared/Utils';
 
 type OwnProps = {
   label?: string;

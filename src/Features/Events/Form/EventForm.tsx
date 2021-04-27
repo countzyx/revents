@@ -16,7 +16,7 @@ import FormTextInput from '../../../App/Components/Form/FormTextInput';
 import CategoryData from '../../../App/Api/CategoryData';
 import FormDate from '../../../App/Components/Form/FormDate';
 import { kDateFormat } from '../../../App/Shared/Constants';
-import getDateFromString from '../../../App/Shared/Utils';
+import { getDateFromString } from '../../../App/Shared/Utils';
 
 type EventFormValues = {
   title: string;
