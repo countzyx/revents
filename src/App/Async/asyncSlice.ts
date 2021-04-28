@@ -1,13 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../Store/store';
-
-type AsyncState = {
-  loading: boolean;
-  error?: Error;
-};
+import type { AsyncState } from '../Shared/Types';
 
 const initialState: AsyncState = {
-  loading: false,
+  isLoading: false,
   error: undefined,
 };
 
@@ -17,16 +13,16 @@ export const asyncSlice = createSlice({
   reducers: {
     asyncError: (state, action: PayloadAction<Error>) => ({
       ...state,
-      loading: false,
+      isLoading: false,
       error: action.payload,
     }),
     asyncFinish: (state) => ({
       ...state,
-      loading: false,
+      isLoading: false,
     }),
     asyncStart: (state) => ({
       ...state,
-      loading: true,
+      isLoading: true,
       error: undefined,
     }),
   },

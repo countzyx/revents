@@ -1,3 +1,8 @@
+export type AsyncState = {
+  error?: Error;
+  isLoading: boolean;
+};
+
 export type Category = {
   key: string;
   text: string;
