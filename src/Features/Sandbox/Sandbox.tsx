@@ -17,6 +17,7 @@ const Sandbox: React.FC = () => {
   const isLoading = useAppSelector(selectSandboxIsLoading);
   const place = useAppSelector(selectSandboxPlace);
   const dispatch = useAppDispatch();
+  const [targetName, setTargetName] = React.useState('');
 
   return (
     <>
@@ -25,14 +26,22 @@ const Sandbox: React.FC = () => {
       <Button
         color='green'
         content='Increment'
-        loading={isLoading}
-        onClick={() => dispatch(increment(10))}
+        loading={isLoading && targetName === 'increment'}
+        name='increment'
+        onClick={(e) => {
+          dispatch(increment(10));
+          setTargetName(e.currentTarget.name);
+        }}
       />
       <Button
         color='red'
         content='Decrement'
-        loading={isLoading}
-        onClick={() => dispatch(decrement(5))}
+        loading={isLoading && targetName === 'decrement'}
+        name='decrement'
+        onClick={(e) => {
+          dispatch(decrement(5));
+          setTargetName(e.currentTarget.name);
+        }}
       />
       <Button
         color='teal'
