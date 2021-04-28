@@ -1,9 +1,10 @@
 import * as React from 'react';
 import EventListItem from './EventListItem';
 import { useAppSelector } from '../../../App/Store/hooks';
+import { selectEvents } from '../eventsSlice';
 
 const EventList: React.FC = () => {
-  const events = useAppSelector((state) => state.events.events);
+  const events = useAppSelector(selectEvents);
 
   return (
     <>

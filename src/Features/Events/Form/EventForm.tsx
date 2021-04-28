@@ -8,7 +8,7 @@ import * as Yup from 'yup';
 import { format } from 'date-fns';
 import type { EventInfo, PlacesInfo } from '../../../App/Shared/Types';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
-import { createEvent, updateEvent } from '../eventsSlice';
+import { createEvent, selectEvents, updateEvent } from '../eventsSlice';
 import FormPlacesInput from '../../../App/Components/Form/FormPlacesInput';
 import FormSelect from '../../../App/Components/Form/FormSelect';
 import FormTextArea from '../../../App/Components/Form/FormTextArea';
@@ -88,7 +88,7 @@ const EventForm: React.FC = () => {
   const history = useHistory();
   const eventId = useParams<EditEventParams>().id;
   const dispatch = useAppDispatch();
-  const events = useAppSelector((state) => state.events.events);
+  const events = useAppSelector(selectEvents);
   const selectedEvent = eventId ? events.find((e) => e.id === eventId) : undefined;
   const initialValues: EventFormValues = selectedEvent || defaultValues;
 
