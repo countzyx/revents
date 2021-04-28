@@ -28,5 +28,8 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnPaste": true,
-  "material-icon-theme.activeIconPack": "react_redux"
+  "material-icon-theme.activeIconPack": "react_redux",
+  "material-icon-theme.folders.associations": {
+    "firebase": "^Firebase$"
+  }
 }
