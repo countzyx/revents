@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import fetchSampleData from '../../App/Api/MockApi';
+
 import type { AsyncState, EventInfo } from '../../App/Shared/Types';
 import { RootState } from '../../App/Store/store';
 
@@ -13,8 +13,10 @@ const initialState: EventState = {
   isLoading: false,
 };
 
-export const fetchEvents = createAsyncThunk('events/fetchEvents', async (thunkApi) =>
-  fetchSampleData(),
+export const fetchEvents = createAsyncThunk(
+  'events/fetchEvents',
+  async (events: (EventInfo | undefined)[], thunkApi) =>
+    events.filter((e) => e !== undefined) as EventInfo[],
 );
 
 export const eventsSlice = createSlice({

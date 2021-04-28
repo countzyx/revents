@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Grid } from 'semantic-ui-react';
+import { docToEventInfo, getEventsFromFirestore } from '../../../App/Firebase/FirestoreService';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { fetchEvents, selectEventsIsLoading } from '../eventsSlice';
 import EventFilters from './EventFilters';
@@ -11,7 +12,14 @@ const EventDashboard: React.FC = () => {
   const dispatch = useAppDispatch();
 
   React.useEffect(() => {
-    dispatch(fetchEvents());
+    const unsubscribed = getEventsFromFirestore({
+      next: (snapshot) => {
+        dispatch(fetchEvents(snapshot.docs.map((doc) => docToEventInfo(doc))));
+      },
+      error: (err) => console.error(err),
+    });
+
+    return unsubscribed;
   }, [dispatch]);
 
   return (
