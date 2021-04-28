@@ -4,7 +4,7 @@ import type { EventInfo } from '../Shared/Types';
 export const SampleData: EventInfo[] = [
   {
     id: _.uniqueId(),
-    title: 'Trip to Empire State building',
+    title: 'Trip to Empire State Building',
     date: '2021-07-21 6:30 PM',
     category: 'culture',
     description:
