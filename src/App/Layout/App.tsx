@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Route, Switch, useLocation } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import { Container } from 'semantic-ui-react';
 import EventDashboard from '../../Features/Events/Dashboard/EventDashboard';
 import EventDetails from '../../Features/Events/Details/EventDetails';
@@ -15,6 +16,7 @@ const App: React.FC = () => {
   return (
     <>
       <ModalManager />
+      <ToastContainer position='bottom-right' />
       <Switch>
         <Route path='/' exact>
           <HomePage />
