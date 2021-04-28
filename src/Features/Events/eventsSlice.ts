@@ -60,5 +60,7 @@ export const eventsSlice = createSlice({
 
 export const { createEvent, deleteEvent, updateEvent } = eventsSlice.actions;
 export const selectEvents = (state: RootState): EventInfo[] => state.events.events;
+export const selectEventsError = (state: RootState): Error | undefined => state.events.error;
+export const selectEventsIsLoading = (state: RootState): boolean => state.events.isLoading;
 
 export default eventsSlice.reducer;
