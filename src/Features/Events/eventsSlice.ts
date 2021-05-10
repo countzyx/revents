@@ -1,7 +1,8 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { docToEventInfo, getEventsFromFirestore } from '../../App/Firebase/FirestoreService';
 
 import type { AsyncState, EventInfo } from '../../App/Shared/Types';
-import { RootState } from '../../App/Store/store';
+import { AppDispatch, RootState } from '../../App/Store/store';
 
 type EventState = {
   events: EventInfo[];
@@ -13,11 +14,20 @@ const initialState: EventState = {
   isLoading: false,
 };
 
-export const fetchEvents = createAsyncThunk(
-  'events/fetchEvents',
-  async (events: (EventInfo | undefined)[], thunkApi) =>
-    events.filter((e) => e !== undefined) as EventInfo[],
-);
+export const fetchEvents = (dispatch: AppDispatch): (() => void) => {
+  const { fetchEventsPending, fetchEventsFulfilled, fetchEventsRejected } = eventsSlice.actions;
+  const unsubscribed = getEventsFromFirestore({
+    next: (snapshot) => {
+      dispatch(fetchEventsPending());
+      const fetchedEvents = snapshot.docs.map((doc) => docToEventInfo(doc));
+      const events = fetchedEvents.filter((e) => e !== undefined) as EventInfo[];
+      dispatch(fetchEventsFulfilled(events));
+    },
+    error: (err) => dispatch(fetchEventsRejected(err)),
+  });
+
+  return unsubscribed;
+};
 
 export const eventsSlice = createSlice({
   name: 'events',
@@ -31,6 +41,22 @@ export const eventsSlice = createSlice({
       ...state,
       events: state.events.filter((e) => e.id !== action.payload),
     }),
+    fetchEventsFulfilled: (state, action: PayloadAction<EventInfo[]>) => ({
+      ...state,
+      error: undefined,
+      events: action.payload,
+      isLoading: false,
+    }),
+    fetchEventsPending: (state) => ({
+      ...state,
+      error: undefined,
+      isLoading: true,
+    }),
+    fetchEventsRejected: (state, action: PayloadAction<Error>) => ({
+      ...state,
+      error: action.payload,
+      isLoading: false,
+    }),
     updateEvent: (state, action: PayloadAction<EventInfo>) => {
       const updatedEvent = action.payload;
       return {
@@ -38,25 +64,6 @@ export const eventsSlice = createSlice({
         events: state.events.map((e) => (e.id === updatedEvent.id ? updatedEvent : e)),
       };
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchEvents.fulfilled, (state, action) => ({
-        ...state,
-        error: undefined,
-        events: action.payload,
-        isLoading: false,
-      }))
-      .addCase(fetchEvents.pending, (state) => ({
-        ...state,
-        error: undefined,
-        isLoading: true,
-      }))
-      .addCase(fetchEvents.rejected, (state, action) => ({
-        ...state,
-        error: action.error as Error,
-        isLoading: false,
-      }));
   },
 });
 
