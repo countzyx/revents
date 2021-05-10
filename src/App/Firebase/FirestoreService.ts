@@ -7,10 +7,10 @@ const kEvents = 'events';
 
 const db = firebase.firestore();
 
-type Observer = {
+export type Observer = {
   next?: (snapshot: firebase.firestore.QuerySnapshot) => void;
   error?: (error: firebase.firestore.FirestoreError) => void;
-  complete?: () => void;
+  complete?: () => void; // Never gets executed by Firestore.
 };
 
 export const docToEventInfo = (
