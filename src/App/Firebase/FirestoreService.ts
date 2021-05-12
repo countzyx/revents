@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { kDateFormat } from '../Shared/Constants';
 import { EventInfo } from '../Shared/Types';
-import firebase from './Firebase';
+import firebase from './firebase';
 
 const kEvents = 'events';
 
