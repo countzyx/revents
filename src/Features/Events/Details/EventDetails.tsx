@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { useParams, withRouter } from 'react-router-dom';
 import { Grid } from 'semantic-ui-react';
-import { useAppSelector } from '../../../App/Store/hooks';
+import LoadingComponent from '../../../App/Layout/LoadingComponent';
+import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
+import { fetchSingleEvent } from '../eventsSlice';
 import EventDetailsChat from './EventDetailsChat';
 import EventDetailsHeader from './EventDetailsHeader';
 import EventDetailsInfo from './EventDetailsInfo';
@@ -13,10 +15,21 @@ type EventDetailsParams = {
 
 const EventDetails: React.FC = () => {
   const eventId = useParams<EventDetailsParams>().id;
+  const isLoading = useAppSelector((state) => state.events.isLoading);
   const event = useAppSelector((state) => state.events.events.find((e) => e.id === eventId));
+  const dispatch = useAppDispatch();
+  React.useEffect(() => {
+    if (event) return undefined;
+
+    const unsubscribed = fetchSingleEvent(dispatch, eventId);
+    return unsubscribed;
+  }, [dispatch, event, eventId]);
+
   if (!event) {
     return <h1>No event found</h1>;
   }
+
+  if (isLoading && !event) return <LoadingComponent />;
 
   return (
     <Grid>

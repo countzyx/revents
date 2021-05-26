@@ -7,15 +7,19 @@ const kEvents = 'events';
 
 const db = firebase.firestore();
 
-export type Observer = {
+export type CollectionObserver = {
   next?: (snapshot: firebase.firestore.QuerySnapshot) => void;
   error?: (error: firebase.firestore.FirestoreError) => void;
   complete?: () => void; // Never gets executed by Firestore.
 };
 
-export const docToEventInfo = (
-  doc: firebase.firestore.QueryDocumentSnapshot,
-): EventInfo | undefined => {
+export type DocumentObserver = {
+  next?: (snapshot: firebase.firestore.DocumentSnapshot) => void;
+  error?: (error: firebase.firestore.FirestoreError) => void;
+  complete?: () => void; // Never gets executed by Firestore.
+};
+
+export const docToEventInfo = (doc: firebase.firestore.DocumentSnapshot): EventInfo | undefined => {
   if (!doc.exists) return undefined;
   const data = doc.data();
 
@@ -34,5 +38,10 @@ export const docToEventInfo = (
   } as EventInfo;
 };
 
-export const getEventsFromFirestore = (observer: Observer): (() => void) =>
+export const getAllEventsFromFirestore = (observer: CollectionObserver): (() => void) =>
   db.collection(kEvents).onSnapshot(observer);
+
+export const getSingleEventFromFirestore = (
+  observer: DocumentObserver,
+  eventId: string,
+): (() => void) => db.collection(kEvents).doc(eventId).onSnapshot(observer);
