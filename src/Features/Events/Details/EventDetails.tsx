@@ -25,11 +25,11 @@ const EventDetails: React.FC = () => {
     return unsubscribed;
   }, [dispatch, event, eventId]);
 
+  if (isLoading && !event) return <LoadingComponent />;
+
   if (!event) {
     return <h1>No event found</h1>;
   }
-
-  if (isLoading && !event) return <LoadingComponent />;
 
   return (
     <Grid>

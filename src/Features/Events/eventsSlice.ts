@@ -15,7 +15,7 @@ type EventState = {
 const initialState: EventState = {
   error: undefined,
   events: [],
-  isLoading: false,
+  isLoading: true,
 };
 
 export const fetchSingleEvent = (dispatch: AppDispatch, eventId: string): (() => void) => {
