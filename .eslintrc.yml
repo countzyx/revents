@@ -32,11 +32,7 @@ rules:
       tsx: never
   import/no-extraneous-dependencies:
     - 2
-    - devDependencies:
-        - '**/*.test.tsx'
-        - '**/*.test.ts'
-        - '**/test.tsx'
-        - '**/test.ts'
+    - devDependencies: true
   indent: 'off'
   jsx-a11y/label-has-associated-control:
     - 2
