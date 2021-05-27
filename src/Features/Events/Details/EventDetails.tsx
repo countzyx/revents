@@ -3,7 +3,7 @@ import { useParams, withRouter } from 'react-router-dom';
 import { Grid } from 'semantic-ui-react';
 import LoadingComponent from '../../../App/Layout/LoadingComponent';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
-import { fetchSingleEvent } from '../eventsSlice';
+import { fetchSingleEvent, selectEventsIsLoading } from '../eventsSlice';
 import EventDetailsChat from './EventDetailsChat';
 import EventDetailsHeader from './EventDetailsHeader';
 import EventDetailsInfo from './EventDetailsInfo';
@@ -15,8 +15,8 @@ type EventDetailsParams = {
 
 const EventDetails: React.FC = () => {
   const eventId = useParams<EventDetailsParams>().id;
-  const isLoading = useAppSelector((state) => state.events.isLoading);
   const event = useAppSelector((state) => state.events.events.find((e) => e.id === eventId));
+  const isLoading = useAppSelector(selectEventsIsLoading);
   const dispatch = useAppDispatch();
   React.useEffect(() => {
     if (event) return undefined;
