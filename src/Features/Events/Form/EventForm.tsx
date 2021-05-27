@@ -8,7 +8,7 @@ import * as Yup from 'yup';
 import { format } from 'date-fns';
 import type { EventInfo, PlacesInfo } from '../../../App/Shared/Types';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
-import { createEvent, selectEvents, updateEvent } from '../eventsSlice';
+import { createEvent, fetchSingleEvent, selectEventsIsLoading, updateEvent } from '../eventsSlice';
 import FormPlacesInput from '../../../App/Components/Form/FormPlacesInput';
 import FormSelect from '../../../App/Components/Form/FormSelect';
 import FormTextArea from '../../../App/Components/Form/FormTextArea';
@@ -17,6 +17,7 @@ import CategoryData from '../../../App/Api/CategoryData';
 import FormDate from '../../../App/Components/Form/FormDate';
 import { kDateFormat } from '../../../App/Shared/Constants';
 import { getDateFromString } from '../../../App/Shared/Utils';
+import LoadingComponent from '../../../App/Layout/LoadingComponent';
 
 type EventFormValues = {
   title: string;
@@ -87,10 +88,19 @@ type EditEventParams = {
 const EventForm: React.FC = () => {
   const history = useHistory();
   const eventId = useParams<EditEventParams>().id;
+  const selectedEvent = useAppSelector((state) =>
+    state.events.events.find((e) => e.id === eventId),
+  );
+  const isLoading = useAppSelector(selectEventsIsLoading);
   const dispatch = useAppDispatch();
-  const events = useAppSelector(selectEvents);
-  const selectedEvent = eventId ? events.find((e) => e.id === eventId) : undefined;
   const initialValues: EventFormValues = selectedEvent || defaultValues;
+
+  React.useEffect(() => {
+    if (selectedEvent) return undefined;
+
+    const unsubscribed = fetchSingleEvent(dispatch, eventId);
+    return unsubscribed;
+  }, [dispatch, selectedEvent, eventId]);
 
   const onFormSubmitHandler = (formValues: EventFormValues) => {
     if (selectedEvent) {
@@ -122,6 +132,8 @@ const EventForm: React.FC = () => {
       history.push('/events');
     }
   };
+
+  if (isLoading) return <LoadingComponent />;
 
   return (
     <Segment clearing>
