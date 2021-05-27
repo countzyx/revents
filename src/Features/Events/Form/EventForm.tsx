@@ -2,13 +2,19 @@
 import * as React from 'react';
 import _ from 'lodash';
 import { Button, Header, Segment } from 'semantic-ui-react';
-import { useHistory, useParams, withRouter } from 'react-router-dom';
+import { Redirect, useHistory, useParams, withRouter } from 'react-router-dom';
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { format } from 'date-fns';
 import type { EventInfo, PlacesInfo } from '../../../App/Shared/Types';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
-import { createEvent, fetchSingleEvent, selectEventsIsLoading, updateEvent } from '../eventsSlice';
+import {
+  createEvent,
+  fetchSingleEvent,
+  selectEventsError,
+  selectEventsIsLoading,
+  updateEvent,
+} from '../eventsSlice';
 import FormPlacesInput from '../../../App/Components/Form/FormPlacesInput';
 import FormSelect from '../../../App/Components/Form/FormSelect';
 import FormTextArea from '../../../App/Components/Form/FormTextArea';
@@ -91,6 +97,7 @@ const EventForm: React.FC = () => {
   const selectedEvent = useAppSelector((state) =>
     state.events.events.find((e) => e.id === eventId),
   );
+  const error = useAppSelector(selectEventsError);
   const isLoading = useAppSelector(selectEventsIsLoading);
   const dispatch = useAppDispatch();
   const initialValues: EventFormValues = selectedEvent || defaultValues;
@@ -134,6 +141,8 @@ const EventForm: React.FC = () => {
   };
 
   if (isLoading) return <LoadingComponent />;
+
+  if (error) return <Redirect to={{ pathname: '/error', state: { error } }} />;
 
   return (
     <Segment clearing>

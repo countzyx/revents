@@ -8,6 +8,7 @@ import EventForm from '../../Features/Events/Form/EventForm';
 import HomePage from '../../Features/Home/HomePage';
 import NavBar from '../../Features/Nav/NavBar';
 import Sandbox from '../../Features/Sandbox/Sandbox';
+import Error from '../Components/Error/Error';
 import ModalManager from '../Components/Modals/ModalManager';
 
 const App: React.FC = () => {
@@ -35,6 +36,9 @@ const App: React.FC = () => {
             </Route>
             <Route path='/sandbox'>
               <Sandbox />
+            </Route>
+            <Route path='/error'>
+              <Error />
             </Route>
           </Container>
         </Route>

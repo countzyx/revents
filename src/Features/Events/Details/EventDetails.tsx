@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { useParams, withRouter } from 'react-router-dom';
+import { Redirect, useParams, withRouter } from 'react-router-dom';
 import { Grid } from 'semantic-ui-react';
 import LoadingComponent from '../../../App/Layout/LoadingComponent';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
-import { fetchSingleEvent, selectEventsIsLoading } from '../eventsSlice';
+import { fetchSingleEvent, selectEventsError, selectEventsIsLoading } from '../eventsSlice';
 import EventDetailsChat from './EventDetailsChat';
 import EventDetailsHeader from './EventDetailsHeader';
 import EventDetailsInfo from './EventDetailsInfo';
@@ -16,6 +16,7 @@ type EventDetailsParams = {
 const EventDetails: React.FC = () => {
   const eventId = useParams<EventDetailsParams>().id;
   const event = useAppSelector((state) => state.events.events.find((e) => e.id === eventId));
+  const error = useAppSelector(selectEventsError);
   const isLoading = useAppSelector(selectEventsIsLoading);
   const dispatch = useAppDispatch();
   React.useEffect(() => {
@@ -26,6 +27,8 @@ const EventDetails: React.FC = () => {
   }, [dispatch, event, eventId]);
 
   if (isLoading) return <LoadingComponent />;
+
+  if (error) return <Redirect to={{ pathname: '/error', state: { error } }} />;
 
   if (!event) {
     return <h1>No event found</h1>;
