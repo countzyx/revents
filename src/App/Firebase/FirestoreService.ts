@@ -38,6 +38,27 @@ export const docToEventInfo = (doc: firebase.firestore.DocumentSnapshot): EventI
   } as EventInfo;
 };
 
+export const addEventToFirestore = (
+  event: EventInfo,
+): Promise<firebase.firestore.DocumentReference<firebase.firestore.DocumentData>> =>
+  db.collection(kEvents).add({
+    ...event,
+    hostedBy: 'Bobbie',
+    hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
+    attendees: firebase.firestore.FieldValue.arrayUnion(
+      {
+        id: 'a',
+        name: 'Bobbie',
+        photoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
+      },
+      {
+        id: 'b',
+        name: 'Tony',
+        photoUrl: 'https://randomuser.me/api/portraits/men/40.jpg',
+      },
+    ),
+  });
+
 export const getAllEventsFromFirestore = (observer: CollectionObserver): (() => void) =>
   db.collection(kEvents).onSnapshot(observer);
 
@@ -45,3 +66,6 @@ export const getSingleEventFromFirestore = (
   observer: DocumentObserver,
   eventId: string,
 ): (() => void) => db.collection(kEvents).doc(eventId).onSnapshot(observer);
+
+export const updateEventInFirestore = (event: EventInfo): Promise<void> =>
+  db.collection(kEvents).doc(event.id).update(event);

@@ -6,15 +6,10 @@ import { Redirect, useHistory, useParams, withRouter } from 'react-router-dom';
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { format } from 'date-fns';
+import { toast } from 'react-toastify';
 import type { EventInfo, PlacesInfo } from '../../../App/Shared/Types';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
-import {
-  createEvent,
-  fetchSingleEvent,
-  selectEventsError,
-  selectEventsIsLoading,
-  updateEvent,
-} from '../eventsSlice';
+import { fetchSingleEvent, selectEventsError, selectEventsIsLoading } from '../eventsSlice';
 import FormPlacesInput from '../../../App/Components/Form/FormPlacesInput';
 import FormSelect from '../../../App/Components/Form/FormSelect';
 import FormTextArea from '../../../App/Components/Form/FormTextArea';
@@ -24,6 +19,10 @@ import FormDate from '../../../App/Components/Form/FormDate';
 import { kDateFormat } from '../../../App/Shared/Constants';
 import { getDateFromString } from '../../../App/Shared/Utils';
 import LoadingComponent from '../../../App/Layout/LoadingComponent';
+import {
+  addEventToFirestore,
+  updateEventInFirestore,
+} from '../../../App/Firebase/firestoreService';
 
 type EventFormValues = {
   title: string;
@@ -109,26 +108,36 @@ const EventForm: React.FC = () => {
     return unsubscribed;
   }, [dispatch, selectedEvent, eventId]);
 
-  const onFormSubmitHandler = (formValues: EventFormValues) => {
-    if (selectedEvent) {
-      const updatedEvent: EventInfo = {
-        ...blankEvent,
-        ...formValues,
-        date: format(getDateFromString(formValues.date)!, kDateFormat), // FormDate is inconsistent with date string, need to fix
-      };
-      dispatch(updateEvent(updatedEvent));
-      history.push(`/events/${updatedEvent.id}`);
-    } else {
-      const newEvent: EventInfo = {
-        ...blankEvent,
-        id: _.uniqueId(),
-        hostedBy: 'Bobbie',
-        hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
-        ...formValues,
-        date: format(getDateFromString(formValues.date)!, kDateFormat), // FormDate is inconsistent with date string, need to fix
-      };
-      dispatch(createEvent(newEvent));
-      history.push(`/events/${newEvent.id}`);
+  const onFormSubmitHandler = async (
+    formValues: EventFormValues,
+    setSubmitting: (isSubmitting: boolean) => void,
+  ) => {
+    try {
+      if (selectedEvent) {
+        const updatedEvent: EventInfo = {
+          ...blankEvent,
+          ...formValues,
+          date: format(getDateFromString(formValues.date)!, kDateFormat), // FormDate is inconsistent with date string, need to fix
+        };
+        await updateEventInFirestore(updatedEvent);
+        setSubmitting(false);
+        history.push(`/events/${updatedEvent.id}`);
+      } else {
+        const newEvent: EventInfo = {
+          ...blankEvent,
+          id: _.uniqueId(),
+          hostedBy: 'Bobbie',
+          hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
+          ...formValues,
+          date: format(getDateFromString(formValues.date)!, kDateFormat), // FormDate is inconsistent with date string, need to fix
+        };
+        await addEventToFirestore(newEvent);
+        setSubmitting(false);
+        history.push(`/events/${newEvent.id}`);
+      }
+    } catch (err) {
+      toast.error(err.message);
+      setSubmitting(false);
     }
   };
 
@@ -151,8 +160,7 @@ const EventForm: React.FC = () => {
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting }) => {
           setTimeout(() => {
-            onFormSubmitHandler(values);
-            setSubmitting(false);
+            onFormSubmitHandler(values, setSubmitting);
           }, 400);
         }}
       >
