@@ -135,8 +135,13 @@ const EventForm: React.FC = () => {
         setSubmitting(false);
         history.push(`/events/${newEvent.id}`);
       }
-    } catch (err) {
-      toast.error(err.message);
+    } catch (anyErr) {
+      const err = anyErr as Error;
+      if (err) {
+        toast.error(err.message);
+      } else {
+        toast.error(String(anyErr));
+      }
       setSubmitting(false);
     }
   };
