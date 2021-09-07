@@ -84,6 +84,7 @@ const blankEvent: EventInfo = {
     latLng: undefined,
   },
   attendees: [],
+  isCancelled: false,
 };
 
 type EditEventParams = {
@@ -146,7 +147,7 @@ const EventForm: React.FC = () => {
     }
   };
 
-  const onCancel = () => {
+  const onExit = () => {
     if (selectedEvent) {
       history.push(`/events/${selectedEvent.id}`);
     } else {
@@ -193,6 +194,7 @@ const EventForm: React.FC = () => {
               }}
             />
             <FormDate name='date' placeholder='Date' />
+            {selectedEvent && <Button content={selectedEvent.isCancelled} />}
             <Button
               content='Submit'
               disabled={!(formik.isValid && formik.dirty && !formik.isSubmitting)}
@@ -202,10 +204,10 @@ const EventForm: React.FC = () => {
               type='submit'
             />
             <Button
-              content='Cancel'
+              content='Exit'
               disabled={formik.isSubmitting}
               floated='right'
-              onClick={onCancel}
+              onClick={onExit}
             />
           </Form>
         )}

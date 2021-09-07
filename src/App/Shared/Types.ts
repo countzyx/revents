@@ -26,6 +26,7 @@ export type EventInfo = {
   hostedBy: string;
   hostPhotoUrl: string;
   attendees?: EventAttendee[];
+  isCancelled: boolean;
 };
 
 export type PlacesInfo = {

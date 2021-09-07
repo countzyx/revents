@@ -37,6 +37,7 @@ export const SampleData: EventInfo[] = [
         photoUrl: 'https://randomuser.me/api/portraits/men/40.jpg',
       },
     ],
+    isCancelled: false,
   },
   {
     id: _.uniqueId(),
@@ -73,6 +74,7 @@ export const SampleData: EventInfo[] = [
         photoUrl: 'https://randomuser.me/api/portraits/men/40.jpg',
       },
     ],
+    isCancelled: false,
   },
 ];
 
