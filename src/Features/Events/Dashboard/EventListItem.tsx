@@ -3,8 +3,7 @@ import { Button, Icon, Item, List, Segment } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import EventListAttendee from './EventListAttendee';
 import type { EventInfo } from '../../../App/Shared/Types';
-import { useAppDispatch } from '../../../App/Store/hooks';
-import { deleteEvent } from '../eventsSlice';
+import { deleteEventInFirestore } from '../../../App/Firebase/firestoreService';
 
 type Props = {
   event: EventInfo;
@@ -12,7 +11,6 @@ type Props = {
 
 const EventListItem: React.FC<Props> = (props: Props) => {
   const { event } = props;
-  const dispatch = useAppDispatch();
 
   return (
     <Segment.Group>
@@ -46,7 +44,7 @@ const EventListItem: React.FC<Props> = (props: Props) => {
           color='red'
           floated='right'
           content='Delete'
-          onClick={() => dispatch(deleteEvent(event.id))}
+          onClick={() => deleteEventInFirestore(event.id)}
         />
         <Button color='teal' floated='right' content='View' as={Link} to={`/events/${event.id}`} />
       </Segment>

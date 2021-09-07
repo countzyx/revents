@@ -19,25 +19,6 @@ export type DocumentObserver = {
   complete?: () => void; // Never gets executed by Firestore.
 };
 
-export const docToEventInfo = (doc: firebase.firestore.DocumentSnapshot): EventInfo | undefined => {
-  if (!doc.exists) return undefined;
-  const data = doc.data();
-
-  for (const prop in data) {
-    // eslint-disable-next-line no-prototype-builtins
-    if (data.hasOwnProperty(prop)) {
-      if (data[prop] instanceof firebase.firestore.Timestamp) {
-        data[prop] = format(data[prop].toDate(), kDateFormat);
-      }
-    }
-  }
-
-  return {
-    ...data,
-    id: doc.id,
-  } as EventInfo;
-};
-
 export const addEventToFirestore = (
   event: EventInfo,
 ): Promise<firebase.firestore.DocumentReference<firebase.firestore.DocumentData>> =>
@@ -58,6 +39,28 @@ export const addEventToFirestore = (
       },
     ),
   });
+
+export const deleteEventInFirestore = (eventId: string): Promise<void> =>
+  db.collection(kEvents).doc(eventId).delete();
+
+export const docToEventInfo = (doc: firebase.firestore.DocumentSnapshot): EventInfo | undefined => {
+  if (!doc.exists) return undefined;
+  const data = doc.data();
+
+  for (const prop in data) {
+    // eslint-disable-next-line no-prototype-builtins
+    if (data.hasOwnProperty(prop)) {
+      if (data[prop] instanceof firebase.firestore.Timestamp) {
+        data[prop] = format(data[prop].toDate(), kDateFormat);
+      }
+    }
+  }
+
+  return {
+    ...data,
+    id: doc.id,
+  } as EventInfo;
+};
 
 export const getAllEventsFromFirestore = (observer: CollectionObserver): (() => void) =>
   db.collection(kEvents).orderBy('date').onSnapshot(observer);
