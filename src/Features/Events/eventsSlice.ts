@@ -54,14 +54,6 @@ export const eventsSlice = createSlice({
   name: 'events',
   initialState,
   reducers: {
-    createEvent: (state, action: PayloadAction<EventInfo>) => ({
-      ...state,
-      events: [...state.events, action.payload],
-    }),
-    deleteEvent: (state, action: PayloadAction<string>) => ({
-      ...state,
-      events: state.events.filter((e) => e.id !== action.payload),
-    }),
     fetchEventsFulfilled: (state, action: PayloadAction<EventInfo[]>) => ({
       ...state,
       error: undefined,
@@ -78,17 +70,10 @@ export const eventsSlice = createSlice({
       error: action.payload,
       isLoading: false,
     }),
-    updateEvent: (state, action: PayloadAction<EventInfo>) => {
-      const updatedEvent = action.payload;
-      return {
-        ...state,
-        events: state.events.map((e) => (e.id === updatedEvent.id ? updatedEvent : e)),
-      };
-    },
   },
 });
 
-export const { createEvent, deleteEvent, updateEvent } = eventsSlice.actions;
+// export const {} = eventsSlice.actions;
 export const selectEvents = (state: RootState): EventInfo[] => state.events.events;
 export const selectEventsError = (state: RootState): Error | undefined => state.events.error;
 export const selectEventsIsLoading = (state: RootState): boolean => state.events.isLoading;
