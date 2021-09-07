@@ -60,7 +60,7 @@ export const addEventToFirestore = (
   });
 
 export const getAllEventsFromFirestore = (observer: CollectionObserver): (() => void) =>
-  db.collection(kEvents).onSnapshot(observer);
+  db.collection(kEvents).orderBy('date').onSnapshot(observer);
 
 export const getSingleEventFromFirestore = (
   observer: DocumentObserver,
