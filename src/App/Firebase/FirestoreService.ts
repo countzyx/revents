@@ -46,11 +46,9 @@ export const deleteEventInFirestore = (eventId: string): Promise<void> =>
 export const docToEventInfo = (doc: firebase.firestore.DocumentSnapshot): EventInfo | undefined => {
   if (!doc.exists) return undefined;
   const data = doc.data();
-  console.log(data);
 
   for (const prop in data) {
     if (Object.prototype.hasOwnProperty.call(data, prop)) {
-      console.log(prop);
       if (data[prop] instanceof firebase.firestore.Timestamp) {
         data[prop] = format(data[prop].toDate(), kDateFormat);
       }
