@@ -21,6 +21,7 @@ import { getDateFromString } from '../../../App/Shared/Utils';
 import LoadingComponent from '../../../App/Layout/LoadingComponent';
 import {
   addEventToFirestore,
+  toggleCancelEventInFirestore,
   updateEventInFirestore,
 } from '../../../App/Firebase/firestoreService';
 
@@ -31,6 +32,7 @@ type EventFormValues = {
   city: PlacesInfo;
   venue: PlacesInfo;
   date: string;
+  isCancelled: boolean;
 };
 
 const defaultValues: EventFormValues = {
@@ -46,6 +48,7 @@ const defaultValues: EventFormValues = {
     latLng: undefined,
   },
   date: '',
+  isCancelled: false,
 };
 
 const latLngSchema: Yup.SchemaOf<google.maps.LatLngLiteral> = Yup.object({
@@ -65,6 +68,7 @@ const validationSchema: Yup.SchemaOf<EventFormValues> = Yup.object({
   description: Yup.string().required(),
   date: Yup.string().required(),
   venue: placesInfoSchema.required(),
+  isCancelled: Yup.boolean().required(),
 });
 
 const blankEvent: EventInfo = {
@@ -103,11 +107,11 @@ const EventForm: React.FC = () => {
   const initialValues: EventFormValues = selectedEvent || defaultValues;
 
   React.useEffect(() => {
-    if (selectedEvent) return undefined;
+    if (!eventId) return undefined;
 
     const unsubscribed = fetchSingleEvent(dispatch, eventId);
     return unsubscribed;
-  }, [dispatch, selectedEvent, eventId]);
+  }, [dispatch, eventId]);
 
   const onFormSubmitHandler = async (
     formValues: EventFormValues,
@@ -194,7 +198,15 @@ const EventForm: React.FC = () => {
               }}
             />
             <FormDate name='date' placeholder='Date' />
-            {selectedEvent && <Button content={selectedEvent.isCancelled} />}
+            {selectedEvent && (
+              <Button
+                color={selectedEvent.isCancelled ? 'green' : 'red'}
+                content={selectedEvent.isCancelled ? 'Reactivate event' : 'Cancel event'}
+                floated='left'
+                onClick={() => toggleCancelEventInFirestore(selectedEvent)}
+                type='button'
+              />
+            )}
             <Button
               content='Submit'
               disabled={!(formik.isValid && formik.dirty && !formik.isSubmitting)}
