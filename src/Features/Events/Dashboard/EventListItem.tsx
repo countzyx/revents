@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Icon, Item, List, Segment } from 'semantic-ui-react';
+import { Button, Icon, Item, Label, List, Segment } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import EventListAttendee from './EventListAttendee';
 import type { EventInfo } from '../../../App/Shared/Types';
@@ -21,6 +21,14 @@ const EventListItem: React.FC<Props> = (props: Props) => {
             <Item.Content>
               <Item.Header content={event.title} />
               <Item.Description>Hosted by {event.hostedBy}</Item.Description>
+              {event.isCancelled && (
+                <Label
+                  color='red'
+                  content='This event has been cancelled'
+                  ribbon='right'
+                  style={{ top: '-40px' }}
+                />
+              )}
             </Item.Content>
           </Item>
         </Item.Group>

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Header, Image, Item, Segment } from 'semantic-ui-react';
+import { Button, Header, Image, Item, Label, Segment } from 'semantic-ui-react';
 import { EventInfo } from '../../../App/Shared/Types';
 import styles from './EventDetailsHeader.module.css';
 
@@ -19,7 +19,14 @@ const EventDetailsHeader: React.FC<Props> = (props: Props) => {
           fluid
           className={styles.eventImage}
         />
-
+        {event.isCancelled && (
+          <Label
+            color='red'
+            content='This event has been cancelled'
+            ribbon='right'
+            style={{ position: 'absolute', transform: 'translateX(-15.5rem) translateY(-4rem)' }}
+          />
+        )}
         <Segment basic className={styles.eventImageText}>
           <Item.Group>
             <Item>
