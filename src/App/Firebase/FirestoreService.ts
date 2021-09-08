@@ -3,8 +3,31 @@ import { kDateFormat } from '../Shared/Constants';
 import { EventInfo } from '../Shared/Types';
 import firebase from './firebase';
 
+const eventConverter = {
+  fromFirestore: (doc: firebase.firestore.DocumentSnapshot): EventInfo => {
+    const data = doc.data();
+
+    for (const prop in data) {
+      if (Object.prototype.hasOwnProperty.call(data, prop)) {
+        if (data[prop] instanceof firebase.firestore.Timestamp) {
+          data[prop] = format(data[prop].toDate(), kDateFormat);
+        }
+      }
+    }
+
+    if (data && !Object.prototype.hasOwnProperty.call(data, 'isCancelled')) {
+      data.isCancelled = false;
+    }
+
+    return {
+      ...data,
+      id: doc.id,
+    } as EventInfo;
+  },
+  toFirestore: (event: EventInfo) => event,
+};
 const db = firebase.firestore();
-const eventsCollection = db.collection('events');
+const eventsCollection = db.collection('events').withConverter(eventConverter);
 
 export type CollectionObserver = {
   next?: (snapshot: firebase.firestore.QuerySnapshot) => void;
@@ -25,7 +48,7 @@ export const addEventToFirestore = (
     ...event,
     hostedBy: 'Bobbie',
     hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
-    attendees: firebase.firestore.FieldValue.arrayUnion(
+    attendees: [
       {
         id: 'a',
         name: 'Bobbie',
@@ -36,34 +59,12 @@ export const addEventToFirestore = (
         name: 'Tony',
         photoUrl: 'https://randomuser.me/api/portraits/men/40.jpg',
       },
-    ),
+    ],
     isCancelled: false,
   });
 
 export const deleteEventInFirestore = (eventId: string): Promise<void> =>
   eventsCollection.doc(eventId).delete();
-
-export const docToEventInfo = (doc: firebase.firestore.DocumentSnapshot): EventInfo | undefined => {
-  if (!doc.exists) return undefined;
-  const data = doc.data();
-
-  for (const prop in data) {
-    if (Object.prototype.hasOwnProperty.call(data, prop)) {
-      if (data[prop] instanceof firebase.firestore.Timestamp) {
-        data[prop] = format(data[prop].toDate(), kDateFormat);
-      }
-    }
-  }
-
-  if (data && !Object.prototype.hasOwnProperty.call(data, 'isCancelled')) {
-    data.isCancelled = false;
-  }
-
-  return {
-    ...data,
-    id: doc.id,
-  } as EventInfo;
-};
 
 export const getAllEventsFromFirestore = (observer: CollectionObserver): (() => void) =>
   eventsCollection.orderBy('date').onSnapshot(observer);
