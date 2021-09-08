@@ -23,7 +23,7 @@ import {
   addEventToFirestore,
   toggleCancelEventInFirestore,
   updateEventInFirestore,
-} from '../../../App/Firebase/firestoreService';
+} from '../../../App/Firebase/FirestoreService';
 
 type EventFormValues = {
   title: string;

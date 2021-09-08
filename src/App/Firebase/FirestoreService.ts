@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { kDateFormat } from '../Shared/Constants';
 import { EventInfo } from '../Shared/Types';
-import firebase from './firebase';
+import firebase from './Firebase';
 
 const eventConverter = {
   fromFirestore: (doc: firebase.firestore.DocumentSnapshot): EventInfo => {

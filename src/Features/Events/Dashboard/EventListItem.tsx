@@ -3,7 +3,7 @@ import { Button, Icon, Item, Label, List, Segment } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import EventListAttendee from './EventListAttendee';
 import type { EventInfo } from '../../../App/Shared/Types';
-import { deleteEventInFirestore } from '../../../App/Firebase/firestoreService';
+import { deleteEventInFirestore } from '../../../App/Firebase/FirestoreService';
 
 type Props = {
   event: EventInfo;

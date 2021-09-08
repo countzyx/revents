@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   getAllEventsFromFirestore,
   getSingleEventFromFirestore,
-} from '../../App/Firebase/firestoreService';
+} from '../../App/Firebase/FirestoreService';
 
 import type { AsyncState, EventInfo } from '../../App/Shared/Types';
 import { AppDispatch, RootState } from '../../App/Store/store';
