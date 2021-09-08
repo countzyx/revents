@@ -19,24 +19,24 @@ const initialState: EventState = {
 
 export const fetchSingleEvent = (dispatch: AppDispatch, eventId: string): (() => void) => {
   const { fetchEventsPending, fetchEventsFulfilled, fetchEventsRejected } = eventsSlice.actions;
-  const unsubscribed = getSingleEventFromFirestore(
+  const unsubscribe = getSingleEventFromFirestore(
     {
       next: async (snapshot) => {
         dispatch(fetchEventsPending());
         const fetchedEvent = snapshot.data() as EventInfo;
-        dispatch(fetchEventsFulfilled(fetchedEvent ? [fetchedEvent] : []));
+        dispatch(fetchEventsFulfilled([fetchedEvent]));
       },
       error: async (err) => dispatch(fetchEventsRejected(err)),
     },
     eventId,
   );
 
-  return unsubscribed;
+  return unsubscribe;
 };
 
 export const fetchAllEvents = (dispatch: AppDispatch): (() => void) => {
   const { fetchEventsPending, fetchEventsFulfilled, fetchEventsRejected } = eventsSlice.actions;
-  const unsubscribed = getAllEventsFromFirestore({
+  const unsubscribe = getAllEventsFromFirestore({
     next: async (snapshot) => {
       dispatch(fetchEventsPending());
       const fetchedEvents = snapshot.docs.map((docResult) => docResult.data());
@@ -46,7 +46,7 @@ export const fetchAllEvents = (dispatch: AppDispatch): (() => void) => {
     error: async (err) => dispatch(fetchEventsRejected(err)),
   });
 
-  return unsubscribed;
+  return unsubscribe;
 };
 
 export const eventsSlice = createSlice({
