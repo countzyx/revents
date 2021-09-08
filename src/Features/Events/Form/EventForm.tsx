@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as React from 'react';
 import _ from 'lodash';
-import { Button, Header, Segment } from 'semantic-ui-react';
+import { Button, Confirm, Header, Segment } from 'semantic-ui-react';
 import { Redirect, useHistory, useParams, withRouter } from 'react-router-dom';
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
@@ -104,6 +104,8 @@ const EventForm: React.FC = () => {
   const error = useAppSelector(selectEventsError);
   const isLoading = useAppSelector(selectEventsIsLoading);
   const dispatch = useAppDispatch();
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [loadingCancelChange, setLoadingCancelChange] = React.useState(false);
   const initialValues: EventFormValues = selectedEvent || defaultValues;
 
   React.useEffect(() => {
@@ -148,6 +150,20 @@ const EventForm: React.FC = () => {
         toast.error(String(anyErr));
       }
       setSubmitting(false);
+    }
+  };
+
+  const onConfirmCancel = async () => {
+    setConfirmOpen(false);
+    if (!selectedEvent) return;
+
+    setLoadingCancelChange(true);
+    try {
+      await toggleCancelEventInFirestore(selectedEvent);
+    } catch (err) {
+      toast.error(String(err));
+    } finally {
+      setLoadingCancelChange(false);
     }
   };
 
@@ -203,7 +219,8 @@ const EventForm: React.FC = () => {
                 color={selectedEvent.isCancelled ? 'green' : 'red'}
                 content={selectedEvent.isCancelled ? 'Reactivate event' : 'Cancel event'}
                 floated='left'
-                onClick={() => toggleCancelEventInFirestore(selectedEvent)}
+                loading={loadingCancelChange}
+                onClick={() => setConfirmOpen(true)}
                 type='button'
               />
             )}
@@ -224,6 +241,16 @@ const EventForm: React.FC = () => {
           </Form>
         )}
       </Formik>
+      <Confirm
+        content={
+          selectedEvent?.isCancelled
+            ? 'This will reactivate the event - are you sure?'
+            : 'This will cancel the event - are you sure?'
+        }
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={() => onConfirmCancel()}
+        open={confirmOpen}
+      />
     </Segment>
   );
 };
