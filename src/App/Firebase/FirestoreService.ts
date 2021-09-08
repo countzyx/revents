@@ -74,5 +74,10 @@ export const getSingleEventFromFirestore = (
   eventId: string,
 ): (() => void) => eventsCollection.doc(eventId).onSnapshot(observer);
 
+export const toggleCancelEventInFirestore = (event: EventInfo): Promise<void> =>
+  eventsCollection.doc(event.id).update({
+    isCancelled: !event.isCancelled,
+  });
+
 export const updateEventInFirestore = (event: EventInfo): Promise<void> =>
   eventsCollection.doc(event.id).update(event);
