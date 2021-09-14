@@ -17,7 +17,7 @@ const SignedInMenu: React.FC = () => {
 
   return (
     <Menu.Item position='right'>
-      <Image avatar spaced='right' src={currentUser?.photoUrl || '/assets/user.png'} />
+      <Image avatar spaced='right' src={currentUser?.photoURL || '/assets/user.png'} />
       <Dropdown pointing='top left' text={currentUser?.email || 'Guest'}>
         <Dropdown.Menu>
           <Dropdown.Item as={Link} to='/createEvent' text='Create Event' icon='plus' />
