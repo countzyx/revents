@@ -63,7 +63,7 @@ export const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(signInUser.pending, (state) => initialState)
+      .addCase(signInUser.pending, () => authSlice.caseReducers.unauthUser())
       .addCase(signInUser.rejected, (state, action) => ({
         ...initialState,
         error: action.error as Error,
