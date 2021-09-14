@@ -1,15 +1,34 @@
 import { format } from 'date-fns';
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  setDoc,
+  Timestamp,
+  updateDoc,
+} from 'firebase/firestore';
+import type {
+  DocumentReference,
+  DocumentSnapshot,
+  FirestoreError,
+  QuerySnapshot,
+  Unsubscribe,
+} from 'firebase/firestore';
 import { kDateFormat } from '../Shared/Constants';
 import { EventInfo } from '../Shared/Types';
-import firebase from './Firebase';
+import { db } from './Firebase';
 
 const eventConverter = {
-  fromFirestore: (doc: firebase.firestore.DocumentSnapshot): EventInfo => {
-    const data = doc.data();
+  fromFirestore: (docSnap: DocumentSnapshot): EventInfo => {
+    const data = docSnap.data();
 
     for (const prop in data) {
       if (Object.prototype.hasOwnProperty.call(data, prop)) {
-        if (data[prop] instanceof firebase.firestore.Timestamp) {
+        if (data[prop] instanceof Timestamp) {
           data[prop] = format(data[prop].toDate(), kDateFormat);
         }
       }
@@ -21,30 +40,30 @@ const eventConverter = {
 
     return {
       ...data,
-      id: doc.id,
+      id: docSnap.id,
     } as EventInfo;
   },
   toFirestore: (event: EventInfo) => event,
 };
-const db = firebase.firestore();
-const eventsCollection = db.collection('events').withConverter(eventConverter);
+
+const eventsCollection = collection(db, 'events').withConverter(eventConverter);
 
 export type CollectionObserver = {
-  next?: (snapshot: firebase.firestore.QuerySnapshot) => void;
-  error?: (error: firebase.firestore.FirestoreError) => void;
+  next?: (snapshot: QuerySnapshot) => void;
+  error?: (error: FirestoreError) => void;
   complete?: () => void; // Never gets executed by Firestore.
 };
 
 export type DocumentObserver = {
-  next?: (snapshot: firebase.firestore.DocumentSnapshot) => void;
-  error?: (error: firebase.firestore.FirestoreError) => void;
+  next?: (snapshot: DocumentSnapshot) => void;
+  error?: (error: FirestoreError) => void;
   complete?: () => void; // Never gets executed by Firestore.
 };
 
-export const addEventToFirestore = (
+export const addEventToFirestore = async (
   event: EventInfo,
-): Promise<firebase.firestore.DocumentReference<firebase.firestore.DocumentData>> =>
-  eventsCollection.add({
+): Promise<DocumentReference<EventInfo>> =>
+  addDoc(eventsCollection, {
     ...event,
     hostedBy: 'Bobbie',
     hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
@@ -63,21 +82,21 @@ export const addEventToFirestore = (
     isCancelled: false,
   });
 
-export const deleteEventInFirestore = (eventId: string): Promise<void> =>
-  eventsCollection.doc(eventId).delete();
+export const deleteEventInFirestore = async (eventId: string): Promise<void> =>
+  deleteDoc(doc(eventsCollection, eventId));
 
-export const getAllEventsFromFirestore = (observer: CollectionObserver): (() => void) =>
-  eventsCollection.orderBy('date').onSnapshot(observer);
+export const getAllEventsFromFirestore = (observer: CollectionObserver): Unsubscribe =>
+  onSnapshot(query(eventsCollection, orderBy('date')), observer);
 
 export const getSingleEventFromFirestore = (
   observer: DocumentObserver,
   eventId: string,
-): (() => void) => eventsCollection.doc(eventId).onSnapshot(observer);
+): Unsubscribe => onSnapshot(doc(eventsCollection, eventId), observer);
 
-export const toggleCancelEventInFirestore = (event: EventInfo): Promise<void> =>
-  eventsCollection.doc(event.id).update({
+export const toggleCancelEventInFirestore = async (event: EventInfo): Promise<void> =>
+  updateDoc(doc(eventsCollection, event.id), {
     isCancelled: !event.isCancelled,
   });
 
-export const updateEventInFirestore = (event: EventInfo): Promise<void> =>
-  eventsCollection.doc(event.id).update(event);
+export const updateEventInFirestore = async (event: EventInfo): Promise<void> =>
+  setDoc(doc(eventsCollection, event.id), event);
