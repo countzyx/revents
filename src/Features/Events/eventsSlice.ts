@@ -1,3 +1,4 @@
+import { Unsubscribe } from 'firebase/firestore';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   getAllEventsFromFirestore,
@@ -17,7 +18,7 @@ const initialState: EventState = {
   isLoading: true,
 };
 
-export const fetchSingleEvent = (dispatch: AppDispatch, eventId: string): (() => void) => {
+export const fetchSingleEvent = (dispatch: AppDispatch, eventId: string): Unsubscribe => {
   const { fetchEventsPending, fetchEventsFulfilled, fetchEventsRejected } = eventsSlice.actions;
   const unsubscribe = getSingleEventFromFirestore(
     {
@@ -34,7 +35,7 @@ export const fetchSingleEvent = (dispatch: AppDispatch, eventId: string): (() =>
   return unsubscribe;
 };
 
-export const fetchAllEvents = (dispatch: AppDispatch): (() => void) => {
+export const fetchAllEvents = (dispatch: AppDispatch): Unsubscribe => {
   const { fetchEventsPending, fetchEventsFulfilled, fetchEventsRejected } = eventsSlice.actions;
   const unsubscribe = getAllEventsFromFirestore({
     next: async (snapshot) => {

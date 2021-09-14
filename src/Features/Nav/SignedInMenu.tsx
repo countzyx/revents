@@ -10,8 +10,8 @@ const SignedInMenu: React.FC = () => {
   const { currentUser } = auth;
   const history = useHistory();
 
-  const onSignOut = () => {
-    dispatch(signOutUser());
+  const onSignOut = async () => {
+    await dispatch(signOutUser());
     history.push('/');
   };
 

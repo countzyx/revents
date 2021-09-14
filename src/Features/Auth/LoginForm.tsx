@@ -29,8 +29,8 @@ const LoginForm: React.FC = () => {
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={(formValues, actions) => {
-          dispatch(signInUser(formValues));
+        onSubmit={async (formValues, actions) => {
+          await dispatch(signInUser(formValues));
           actions.setSubmitting(false);
           dispatch(closeModal());
         }}

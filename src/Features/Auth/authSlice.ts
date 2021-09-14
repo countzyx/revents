@@ -1,10 +1,17 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import firebase from 'firebase';
+import { Unsubscribe } from 'firebase/firestore';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  User,
+} from 'firebase/auth';
 import type { UserCredentials } from '../../App/Shared/Types';
-import { RootState } from '../../App/Store/store';
+import { AppDispatch, RootState } from '../../App/Store/store';
 
 export type AuthState = {
-  currentUser?: firebase.User;
+  currentUser?: User;
   error?: Error;
   isAuth: boolean;
 };
@@ -15,11 +22,11 @@ const initialState: AuthState = {
   isAuth: false,
 };
 
-export const signInUser = createAsyncThunk<firebase.User, UserCredentials>(
+export const signInUser = createAsyncThunk<User, UserCredentials>(
   'auth/signInUser',
   async (creds, thunkApi) => {
-    const auth = firebase.auth();
-    const authResult = await auth.signInWithEmailAndPassword(creds.email, creds.password);
+    const auth = getAuth();
+    const authResult = await signInWithEmailAndPassword(auth, creds.email, creds.password);
     if (!authResult.user) {
       return thunkApi.rejectWithValue(new Error('null user'));
     }
@@ -27,19 +34,35 @@ export const signInUser = createAsyncThunk<firebase.User, UserCredentials>(
   },
 );
 
+export const signOutUser = createAsyncThunk('auth/signOutUser', async (thunkApi) => {
+  const auth = getAuth();
+  await signOut(auth);
+});
+
+export const verifyAuth = (dispatch: AppDispatch): Unsubscribe => {
+  const auth = getAuth();
+  return onAuthStateChanged(auth, (user) => {
+    if (user) {
+      dispatch(authSlice.actions.authUser(user));
+    } else {
+      dispatch(authSlice.actions.unauthUser());
+    }
+  });
+};
+
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    signOutUser: () => initialState,
+    authUser: (state, action: PayloadAction<User>) => ({
+      ...state,
+      currentUser: action.payload,
+      isAuth: true,
+    }),
+    unauthUser: () => initialState,
   },
   extraReducers: (builder) => {
     builder
-      .addCase(signInUser.fulfilled, (state, action) => ({
-        ...state,
-        currentUser: action.payload,
-        isAuth: true,
-      }))
       .addCase(signInUser.pending, (state) => initialState)
       .addCase(signInUser.rejected, (state, action) => ({
         ...initialState,
@@ -48,9 +71,7 @@ export const authSlice = createSlice({
   },
 });
 
-export const { signOutUser } = authSlice.actions;
-export const selectCurrentUser = (state: RootState): firebase.User | undefined =>
-  state.auth.currentUser;
+export const selectCurrentUser = (state: RootState): User | undefined => state.auth.currentUser;
 export const selectIsAuth = (state: RootState): boolean => state.auth.isAuth;
 
 export default authSlice.reducer;
