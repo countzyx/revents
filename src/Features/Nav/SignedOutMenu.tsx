@@ -10,13 +10,21 @@ const SignedOutMenu: React.FC = () => {
     <Menu.Item position='right'>
       <Button
         basic
-        inverted
         content='Login'
+        inverted
         onClick={() => {
           dispatch(openModal({ modalType: 'LoginForm' }));
         }}
       />
-      <Button basic inverted content='Register' style={{ marginLeft: '0.5em' }} />
+      <Button
+        basic
+        content='Register'
+        inverted
+        onClick={() => {
+          dispatch(openModal({ modalType: 'RegisterForm' }));
+        }}
+        style={{ marginLeft: '0.5em' }}
+      />
     </Menu.Item>
   );
 };

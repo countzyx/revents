@@ -43,3 +43,7 @@ export type UserCredentials = {
   email: string;
   password: string;
 };
+
+export type UserRegistrationInfo = UserCredentials & {
+  displayName: string;
+};

@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import * as React from 'react';
 import LoginForm from '../../../Features/Auth/LoginForm';
+import RegisterForm from '../../../Features/Auth/RegisterForm';
 import TestModal from '../../../Features/Sandbox/TestModal';
 import { useAppSelector } from '../../Store/hooks';
 
@@ -10,6 +11,7 @@ type ModalDictionary = { [key: string]: React.FC<any> };
 const ModalManager: React.FC = () => {
   const modalLookup: ModalDictionary = {
     LoginForm,
+    RegisterForm,
     TestModal,
   };
   const currentModal = useAppSelector((state) => state.modals);

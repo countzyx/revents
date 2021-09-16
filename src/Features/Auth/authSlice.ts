@@ -1,13 +1,15 @@
 import { Unsubscribe } from 'firebase/firestore';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
+  createUserWithEmailAndPassword,
   getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
+  updateProfile,
   User,
 } from 'firebase/auth';
-import type { UserCredentials } from '../../App/Shared/Types';
+import type { UserCredentials, UserRegistrationInfo } from '../../App/Shared/Types';
 import { AppDispatch, RootState } from '../../App/Store/store';
 
 export type AuthState = {
@@ -21,6 +23,16 @@ const initialState: AuthState = {
   error: undefined,
   isAuth: false,
 };
+
+export const registerUser = createAsyncThunk<User, UserRegistrationInfo>(
+  'auth/registerUser',
+  async (regInfo, thunkApi) => {
+    const auth = getAuth();
+    const regResult = await createUserWithEmailAndPassword(auth, regInfo.email, regInfo.password);
+    await updateProfile(regResult.user, { displayName: regInfo.displayName });
+    return regResult.user;
+  },
+);
 
 export const signInUser = createAsyncThunk<User, UserCredentials>(
   'auth/signInUser',
