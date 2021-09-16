@@ -37,7 +37,12 @@ const LoginForm: React.FC = () => {
       >
         {(formik) => (
           <Form className='ui form'>
-            <FormTextInput autoComplete='username' name='email' placeholder='Email Address' />
+            <FormTextInput
+              autoComplete='username'
+              name='email'
+              placeholder='Email Address'
+              type='email'
+            />
             <FormTextInput
               autoComplete='current-password'
               name='password'
