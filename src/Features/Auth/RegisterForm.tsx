@@ -37,7 +37,7 @@ const RegisterForm: React.FC = () => {
   const dispatch = useAppDispatch();
 
   return (
-    <ModalWrapper size='mini' header='Sign in to Re-vents'>
+    <ModalWrapper size='mini' header='Register with Re-vents'>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -62,9 +62,15 @@ const RegisterForm: React.FC = () => {
               placeholder='Password'
               type='password'
             />
+            <FormTextInput
+              autoComplete='current-password'
+              name='passwordConfirmation'
+              placeholder='Confirm Password'
+              type='password'
+            />
             <Button
               color='teal'
-              content='Login'
+              content='Register'
               disabled={!(formik.isValid && formik.dirty && !formik.isSubmitting)}
               fluid
               loading={formik.isSubmitting}
