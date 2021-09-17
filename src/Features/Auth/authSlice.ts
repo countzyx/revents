@@ -24,6 +24,7 @@ const initialState: AuthState = {
   isAuth: false,
 };
 
+/* TODO: Move Firebase calls to a Firebase service */
 export const registerUser = createAsyncThunk<User, UserRegistrationInfo>(
   'auth/registerUser',
   async (regInfo, thunkApi) => {
@@ -71,15 +72,37 @@ export const authSlice = createSlice({
       currentUser: action.payload,
       isAuth: true,
     }),
+    clearError: (state) => ({
+      ...state,
+      error: undefined,
+    }),
+    setError: (state, action: PayloadAction<Error>) => ({
+      ...state,
+      error: action.payload,
+    }),
     unauthUser: () => initialState,
   },
   extraReducers: (builder) => {
     builder
+      .addCase(registerUser.rejected, (state, action) =>
+        authSlice.caseReducers.setError(initialState, {
+          payload: action.error as Error,
+          type: 'auth/setError',
+        }),
+      )
       .addCase(signInUser.pending, () => authSlice.caseReducers.unauthUser())
-      .addCase(signInUser.rejected, (state, action) => ({
-        ...initialState,
-        error: action.error as Error,
-      }));
+      .addCase(signInUser.rejected, (state, action) =>
+        authSlice.caseReducers.setError(initialState, {
+          payload: action.error as Error,
+          type: 'auth/setError',
+        }),
+      )
+      .addCase(signOutUser.rejected, (state, action) =>
+        authSlice.caseReducers.setError(initialState, {
+          payload: action.error as Error,
+          type: 'auth/setError',
+        }),
+      );
   },
 });
 
