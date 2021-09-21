@@ -106,7 +106,9 @@ export const authSlice = createSlice({
   },
 });
 
+export const { clearError } = authSlice.actions;
 export const selectCurrentUser = (state: RootState): User | undefined => state.auth.currentUser;
+export const selectError = (state: RootState): Error | undefined => state.auth.error;
 export const selectIsAuth = (state: RootState): boolean => state.auth.isAuth;
 
 export default authSlice.reducer;

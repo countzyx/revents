@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
-import { Button } from 'semantic-ui-react';
+import { Button, Label } from 'semantic-ui-react';
 import ModalWrapper from '../../App/Components/Modals/ModalWrapper';
 import FormTextInput from '../../App/Components/Form/FormTextInput';
-import { useAppDispatch } from '../../App/Store/hooks';
-import { registerUser } from './authSlice';
+import { useAppDispatch, useAppSelector } from '../../App/Store/hooks';
+import { clearError, registerUser, selectError, selectIsAuth } from './authSlice';
 import { UserRegistrationInfo } from '../../App/Shared/Types';
 import { closeModal } from '../../App/Components/Modals/modalsSlice';
 
@@ -35,6 +35,16 @@ const validationSchema: Yup.SchemaOf<RegistrationFormValues> = Yup.object({
 
 const RegisterForm: React.FC = () => {
   const dispatch = useAppDispatch();
+  const authError = useAppSelector(selectError);
+  const isAuth = useAppSelector(selectIsAuth);
+
+  React.useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
+
+  React.useEffect(() => {
+    isAuth && dispatch(closeModal());
+  }, [dispatch, isAuth]);
 
   return (
     <ModalWrapper size='mini' header='Register with Re-vents'>
@@ -44,7 +54,6 @@ const RegisterForm: React.FC = () => {
         onSubmit={async (formValues, actions) => {
           await dispatch(registerUser(formValues));
           actions.setSubmitting(false);
-          dispatch(closeModal());
         }}
       >
         {(formik) => (
@@ -68,6 +77,9 @@ const RegisterForm: React.FC = () => {
               placeholder='Confirm Password'
               type='password'
             />
+            {authError && (
+              <Label basic color='red' content={authError?.message} style={{ marginBottom: 10 }} />
+            )}
             <Button
               color='teal'
               content='Register'
