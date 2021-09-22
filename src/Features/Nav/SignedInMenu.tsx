@@ -18,10 +18,14 @@ const SignedInMenu: React.FC = () => {
   return (
     <Menu.Item position='right'>
       <Image avatar spaced='right' src={currentUser?.photoURL || '/assets/user.png'} />
-      <Dropdown pointing='top left' text={currentUser?.email || 'Guest'}>
+      <Dropdown
+        pointing='top left'
+        text={currentUser?.displayName || currentUser?.email || 'Guest'}
+      >
         <Dropdown.Menu>
-          <Dropdown.Item as={Link} to='/createEvent' text='Create Event' icon='plus' />
-          <Dropdown.Item text='My Profile' icon='user' />
+          <Dropdown.Item as={Link} icon='plus' text='Create Event' to='/createEvent' />
+          <Dropdown.Item as={Link} icon='settings' text='My Account' to='/myAccount' />
+          <Dropdown.Item icon='user' text='My Profile' />
           <Dropdown.Item icon='power' onClick={onSignOut} text='Sign out' />
         </Dropdown.Menu>
       </Dropdown>
