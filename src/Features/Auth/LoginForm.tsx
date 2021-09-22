@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
-import { Button, Label } from 'semantic-ui-react';
+import { Button, Divider, Label } from 'semantic-ui-react';
 import ModalWrapper from '../../App/Components/Modals/ModalWrapper';
 import FormTextInput from '../../App/Components/Form/FormTextInput';
 import { useAppDispatch, useAppSelector } from '../../App/Store/hooks';
 import { clearError, selectError, selectIsAuth, signInUser } from './authSlice';
 import { UserCredentials } from '../../App/Shared/Types';
 import { closeModal } from '../../App/Components/Modals/modalsSlice';
+import SocialLogin from './SocialLogin';
 
 type LoginFormValues = UserCredentials;
 
@@ -35,7 +36,7 @@ const LoginForm: React.FC = () => {
   }, [dispatch, isAuth]);
 
   return (
-    <ModalWrapper size='mini' header='Sign in to Re-vents'>
+    <ModalWrapper header='Sign in to Re-vents' size='mini'>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -59,7 +60,12 @@ const LoginForm: React.FC = () => {
               type='password'
             />
             {authError && (
-              <Label basic color='red' content={authError?.message} style={{ marginBottom: 10 }} />
+              <Label
+                basic
+                color='red'
+                content={authError?.message}
+                style={{ marginBottom: '1rem' }}
+              />
             )}
             <Button
               color='teal'
@@ -73,6 +79,8 @@ const LoginForm: React.FC = () => {
           </Form>
         )}
       </Formik>
+      <Divider horizontal>Or</Divider>
+      <SocialLogin />
     </ModalWrapper>
   );
 };
