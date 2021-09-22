@@ -1,4 +1,4 @@
-import type { NextOrObserver } from 'firebase/auth';
+import type { NextOrObserver, User } from 'firebase/auth';
 import type { Unsubscribe } from 'firebase/firestore';
 import {
   createUserWithEmailAndPassword,
@@ -7,7 +7,6 @@ import {
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
-  User,
 } from 'firebase/auth';
 import { UserCredentials, UserRegistrationInfo } from '../Shared/Types';
 import { setUserProfileInFirestore } from './FirestoreUserProfileService';
