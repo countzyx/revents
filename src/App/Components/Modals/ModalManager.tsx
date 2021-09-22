@@ -4,20 +4,23 @@ import LoginForm from '../../../Features/Auth/LoginForm';
 import RegisterForm from '../../../Features/Auth/RegisterForm';
 import TestModal from '../../../Features/Sandbox/TestModal';
 import { useAppSelector } from '../../Store/hooks';
+import { selectModalIsOpen, selectModalProps, selectModalType } from './modalsSlice';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ModalDictionary = { [key: string]: React.FC<any> };
 
-const ModalManager: React.FC = () => {
-  const modalLookup: ModalDictionary = {
-    LoginForm,
-    RegisterForm,
-    TestModal,
-  };
-  const currentModal = useAppSelector((state) => state.modals);
+const modalLookup: ModalDictionary = {
+  LoginForm,
+  RegisterForm,
+  TestModal,
+};
 
-  if (currentModal) {
-    const { modalType, modalProps } = currentModal;
+const ModalManager: React.FC = () => {
+  const isOpen = useAppSelector(selectModalIsOpen);
+  const modalProps = useAppSelector(selectModalProps);
+  const modalType = useAppSelector(selectModalType);
+
+  if (isOpen && modalType) {
     const ModalComponent = modalLookup[modalType];
     return (
       <span>
