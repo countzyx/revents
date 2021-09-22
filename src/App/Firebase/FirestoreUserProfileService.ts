@@ -7,7 +7,7 @@ const userProfileCollection = collection(db, 'users');
 export const setUserProfileInFirestore = async (user: User): Promise<void> => {
   const { displayName, email } = user;
   return setDoc(doc(userProfileCollection, user.uid), {
-    createdAt: serverTimestamp(), // user.metadata.creationTime,
+    createdAt: serverTimestamp(),
     displayName,
     email,
   });
