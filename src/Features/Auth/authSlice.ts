@@ -1,16 +1,14 @@
-import { Unsubscribe } from 'firebase/firestore';
+import type { User } from 'firebase/auth';
+import type { Unsubscribe } from 'firebase/firestore';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {
-  createUserWithEmailAndPassword,
-  getAuth,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut,
-  updateProfile,
-  User,
-} from 'firebase/auth';
 import type { UserCredentials, UserRegistrationInfo } from '../../App/Shared/Types';
 import { AppDispatch, RootState } from '../../App/Store/store';
+import {
+  registerUserInFirebase,
+  signInUserInFirebase,
+  signOutUserInFirebase,
+  verifyAuthWithFirebase,
+} from '../../App/Firebase/FirestoreAuthService';
 
 export type AuthState = {
   currentUser?: User;
@@ -27,41 +25,40 @@ const initialState: AuthState = {
 /* TODO: Move Firebase calls to a Firebase service */
 export const registerUser = createAsyncThunk<User, UserRegistrationInfo>(
   'auth/registerUser',
-  async (regInfo, thunkApi) => {
-    const auth = getAuth();
-    const regResult = await createUserWithEmailAndPassword(auth, regInfo.email, regInfo.password);
-    await updateProfile(regResult.user, { displayName: regInfo.displayName });
-    return regResult.user;
-  },
+  async (regInfo, _0) => registerUserInFirebase(regInfo),
 );
 
 export const signInUser = createAsyncThunk<User, UserCredentials>(
   'auth/signInUser',
   async (creds, thunkApi) => {
-    const auth = getAuth();
-    const authResult = await signInWithEmailAndPassword(auth, creds.email, creds.password);
-    if (!authResult.user) {
+    const user = await signInUserInFirebase(creds);
+    if (!user) {
       return thunkApi.rejectWithValue(new Error('null user'));
     }
-    return authResult.user;
+    return user;
   },
 );
 
-export const signOutUser = createAsyncThunk('auth/signOutUser', async (thunkApi) => {
-  const auth = getAuth();
-  await signOut(auth);
+export const signOutUser = createAsyncThunk('auth/signOutUser', async () => {
+  await signOutUserInFirebase();
 });
 
-export const verifyAuth = (dispatch: AppDispatch): Unsubscribe => {
-  const auth = getAuth();
-  return onAuthStateChanged(auth, (user) => {
-    if (user) {
-      dispatch(authSlice.actions.authUser(user));
-    } else {
-      dispatch(authSlice.actions.unauthUser());
-    }
+export const verifyAuth = (dispatch: AppDispatch): Unsubscribe =>
+  verifyAuthWithFirebase({
+    next: (user) => {
+      if (user) {
+        dispatch(authSlice.actions.authUser(user));
+      } else {
+        dispatch(authSlice.actions.unauthUser());
+      }
+    },
+    error: (err) => {
+      dispatch(authSlice.actions.setError(err));
+    },
+    complete: () => {
+      // never called
+    },
   });
-};
 
 export const authSlice = createSlice({
   name: 'auth',
