@@ -10,11 +10,14 @@ import {
   User,
 } from 'firebase/auth';
 import { UserCredentials, UserRegistrationInfo } from '../Shared/Types';
+import { setUserProfileInFirestore } from './FirestoreUserProfileService';
 
 export const registerUserInFirebase = async (regInfo: UserRegistrationInfo): Promise<User> => {
   const auth = getAuth();
   const regResult = await createUserWithEmailAndPassword(auth, regInfo.email, regInfo.password);
-  await updateProfile(regResult.user, { displayName: regInfo.displayName });
+  const { user } = regResult;
+  await updateProfile(user, { displayName: regInfo.displayName });
+  await setUserProfileInFirestore(user);
   return regResult.user;
 };
 

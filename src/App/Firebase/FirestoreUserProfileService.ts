@@ -1,0 +1,18 @@
+import type { User } from 'firebase/auth';
+import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { db } from './Firebase';
+
+const userProfileCollection = collection(db, 'users');
+
+export const setUserProfileInFirestore = async (user: User): Promise<void> => {
+  const { displayName, email } = user;
+  return setDoc(doc(userProfileCollection, user.uid), {
+    createdAt: serverTimestamp(), // user.metadata.creationTime,
+    displayName,
+    email,
+  });
+};
+
+export const doNothing = (): void => {
+  // stop nagging me, ESLint! I don't want a default export because I'm going to be adding more exports!
+};
