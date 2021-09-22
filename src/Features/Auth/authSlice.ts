@@ -1,5 +1,4 @@
-import * as _ from 'lodash';
-import type { User, UserInfo } from 'firebase/auth';
+import type { UserInfo } from 'firebase/auth';
 import type { Unsubscribe } from 'firebase/firestore';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { UserCredentials, UserRegistrationInfo } from '../../App/Shared/Types';
@@ -25,21 +24,12 @@ const initialState: AuthState = {
   isAuth: false,
 };
 
-const kUserInfoKeys: readonly (keyof UserInfo)[] = [
-  'displayName',
-  'email',
-  'phoneNumber',
-  'photoURL',
-  'providerId',
-  'uid',
-];
-
 /* TODO: Move Firebase calls to a Firebase service */
 export const registerUserWithEmail = createAsyncThunk<UserInfo, UserRegistrationInfo>(
   'auth/registerUserWithEmail',
   async (regInfo, _0) => {
     const user = await registerUserInFirebase(regInfo);
-    const userInfo = _.pick<User, keyof UserInfo>(user, kUserInfoKeys) as UserInfo;
+    const userInfo = user.providerData[0];
     return userInfo;
   },
 );
@@ -51,7 +41,7 @@ export const signInUserWithEmail = createAsyncThunk<UserInfo, UserCredentials>(
     if (!user) {
       return thunkApi.rejectWithValue(new Error('null user'));
     }
-    const userInfo = _.pick<User, keyof UserInfo>(user, kUserInfoKeys) as UserInfo;
+    const userInfo = user.providerData[0];
     return userInfo;
   },
 );
@@ -63,7 +53,7 @@ export const signInUserWithSocialMedia = createAsyncThunk<UserInfo, SocialMediaP
     if (!user) {
       return thunkApi.rejectWithValue(new Error('null user'));
     }
-    const userInfo = _.pick<User, keyof UserInfo>(user, kUserInfoKeys) as UserInfo;
+    const userInfo = user.providerData[0];
     return userInfo;
   },
 );
@@ -76,7 +66,7 @@ export const verifyAuth = (dispatch: AppDispatch): Unsubscribe =>
   verifyAuthWithFirebase({
     next: (user) => {
       if (user) {
-        const userInfo = _.pick<User, keyof UserInfo>(user, kUserInfoKeys) as UserInfo;
+        const userInfo = user.providerData[0];
         dispatch(authSlice.actions.authUser(userInfo));
       } else {
         dispatch(authSlice.actions.unauthUser());
