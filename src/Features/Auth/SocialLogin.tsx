@@ -21,6 +21,7 @@ const SocialLogin: React.FC = () => {
         content='Login with Google'
         fluid
         icon='google'
+        onClick={() => dispatch(signInUserWithSocialMedia('google.com'))}
         style={{ marginBottom: '1rem' }}
       />
     </>
