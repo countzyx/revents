@@ -8,6 +8,8 @@ import {
   registerUserInFirebase,
   signInUserInFirebase,
   signOutUserInFirebase,
+  SocialMediaProvider,
+  socialMediaSignInForFirebase,
   verifyAuthWithFirebase,
 } from '../../App/Firebase/FirestoreAuthService';
 
@@ -33,8 +35,8 @@ const kUserInfoKeys: readonly (keyof UserInfo)[] = [
 ];
 
 /* TODO: Move Firebase calls to a Firebase service */
-export const registerUser = createAsyncThunk<UserInfo, UserRegistrationInfo>(
-  'auth/registerUser',
+export const registerUserWithEmail = createAsyncThunk<UserInfo, UserRegistrationInfo>(
+  'auth/registerUserWithEmail',
   async (regInfo, _0) => {
     const user = await registerUserInFirebase(regInfo);
     const userInfo = _.pick<User, keyof UserInfo>(user, kUserInfoKeys) as UserInfo;
@@ -42,10 +44,22 @@ export const registerUser = createAsyncThunk<UserInfo, UserRegistrationInfo>(
   },
 );
 
-export const signInUser = createAsyncThunk<UserInfo, UserCredentials>(
-  'auth/signInUser',
+export const signInUserWithEmail = createAsyncThunk<UserInfo, UserCredentials>(
+  'auth/signInUserWithEmail',
   async (creds, thunkApi) => {
     const user = await signInUserInFirebase(creds);
+    if (!user) {
+      return thunkApi.rejectWithValue(new Error('null user'));
+    }
+    const userInfo = _.pick<User, keyof UserInfo>(user, kUserInfoKeys) as UserInfo;
+    return userInfo;
+  },
+);
+
+export const signInUserWithSocialMedia = createAsyncThunk<UserInfo, SocialMediaProvider>(
+  'auth/signInUserWithSocialMedia',
+  async (providerName, thunkApi) => {
+    const user = await socialMediaSignInForFirebase(providerName);
     if (!user) {
       return thunkApi.rejectWithValue(new Error('null user'));
     }
@@ -97,20 +111,29 @@ export const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(registerUser.fulfilled, (state, action) =>
+      .addCase(registerUserWithEmail.fulfilled, (state, action) =>
         authSlice.caseReducers.authUser(state, action),
       )
-      .addCase(registerUser.rejected, (state, action) =>
+      .addCase(registerUserWithEmail.rejected, (_0, action) =>
         authSlice.caseReducers.setError(initialState, {
           payload: action.error as Error,
           type: 'auth/setError',
         }),
       )
-      .addCase(signInUser.pending, () => authSlice.caseReducers.unauthUser())
-      .addCase(signInUser.fulfilled, (state, action) =>
+      .addCase(signInUserWithEmail.pending, () => authSlice.caseReducers.unauthUser())
+      .addCase(signInUserWithEmail.fulfilled, (state, action) =>
         authSlice.caseReducers.authUser(state, action),
       )
-      .addCase(signInUser.rejected, (state, action) =>
+      .addCase(signInUserWithEmail.rejected, (_0, action) =>
+        authSlice.caseReducers.setError(initialState, {
+          payload: action.error as Error,
+          type: 'auth/setError',
+        }),
+      )
+      .addCase(signInUserWithSocialMedia.fulfilled, (state, action) =>
+        authSlice.caseReducers.authUser(state, action),
+      )
+      .addCase(signInUserWithSocialMedia.rejected, (_0, action) =>
         authSlice.caseReducers.setError(initialState, {
           payload: action.error as Error,
           type: 'auth/setError',

@@ -5,7 +5,7 @@ import { Button, Divider, Label } from 'semantic-ui-react';
 import ModalWrapper from '../../App/Components/Modals/ModalWrapper';
 import FormTextInput from '../../App/Components/Form/FormTextInput';
 import { useAppDispatch, useAppSelector } from '../../App/Store/hooks';
-import { clearError, selectError, selectIsAuth, signInUser } from './authSlice';
+import { clearError, selectError, selectIsAuth, signInUserWithEmail } from './authSlice';
 import { UserCredentials } from '../../App/Shared/Types';
 import { closeModal } from '../../App/Components/Modals/modalsSlice';
 import SocialLogin from './SocialLogin';
@@ -41,7 +41,7 @@ const LoginForm: React.FC = () => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={async (formValues, actions) => {
-          await dispatch(signInUser(formValues));
+          await dispatch(signInUserWithEmail(formValues));
           actions.setSubmitting(false);
         }}
       >

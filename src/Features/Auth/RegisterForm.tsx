@@ -5,7 +5,7 @@ import { Button, Divider, Label } from 'semantic-ui-react';
 import ModalWrapper from '../../App/Components/Modals/ModalWrapper';
 import FormTextInput from '../../App/Components/Form/FormTextInput';
 import { useAppDispatch, useAppSelector } from '../../App/Store/hooks';
-import { clearError, registerUser, selectError, selectIsAuth } from './authSlice';
+import { clearError, registerUserWithEmail, selectError, selectIsAuth } from './authSlice';
 import { UserRegistrationInfo } from '../../App/Shared/Types';
 import { closeModal } from '../../App/Components/Modals/modalsSlice';
 import SocialLogin from './SocialLogin';
@@ -53,7 +53,7 @@ const RegisterForm: React.FC = () => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={async (formValues, actions) => {
-          await dispatch(registerUser(formValues));
+          await dispatch(registerUserWithEmail(formValues));
           actions.setSubmitting(false);
         }}
       >
