@@ -1,5 +1,5 @@
-import { Unsubscribe } from 'firebase/firestore';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { Unsubscribe } from '../../App/Firebase/FirestoreEventService';
 import {
   getAllEventsFromFirestore,
   getSingleEventFromFirestore,

@@ -1,8 +1,7 @@
-import type { UserInfo } from 'firebase/auth';
-import type { Unsubscribe } from 'firebase/firestore';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { UserCredentials, UserRegistrationInfo } from '../../App/Shared/Types';
 import { AppDispatch, RootState } from '../../App/Store/store';
+import type { Unsubscribe, UserInfo } from '../../App/Firebase/FirebaseAuthService';
 import {
   registerUserInFirebase,
   signInUserInFirebase,
@@ -10,16 +9,16 @@ import {
   SocialMediaProvider,
   socialMediaSignInForFirebase,
   verifyAuthWithFirebase,
-} from '../../App/Firebase/FirestoreAuthService';
+} from '../../App/Firebase/FirebaseAuthService';
 
 export type AuthState = {
-  currentUser?: UserInfo;
+  userInfo?: UserInfo;
   error?: Error;
   isAuth: boolean;
 };
 
 const initialState: AuthState = {
-  currentUser: undefined,
+  userInfo: undefined,
   error: undefined,
   isAuth: false,
 };
@@ -140,8 +139,8 @@ export const authSlice = createSlice({
 });
 
 export const { clearError } = authSlice.actions;
-export const selectCurrentUser = (state: RootState): UserInfo | undefined => state.auth.currentUser;
-export const selectError = (state: RootState): Error | undefined => state.auth.error;
+export const selectAuthUserInfo = (state: RootState): UserInfo | undefined => state.auth.userInfo;
+export const selectAuthError = (state: RootState): Error | undefined => state.auth.error;
 export const selectIsAuth = (state: RootState): boolean => state.auth.isAuth;
 
 export default authSlice.reducer;

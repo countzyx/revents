@@ -16,11 +16,13 @@ import type {
   DocumentSnapshot,
   FirestoreError,
   QuerySnapshot,
-  Unsubscribe,
+  Unsubscribe as FBUnsubscribe,
 } from 'firebase/firestore';
 import { kDateFormat } from '../Shared/Constants';
 import { EventInfo } from '../Shared/Types';
 import { db } from './Firebase';
+
+export type Unsubscribe = FBUnsubscribe;
 
 const eventConverter = {
   fromFirestore: (docSnap: DocumentSnapshot): EventInfo => {

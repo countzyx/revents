@@ -1,5 +1,5 @@
-import type { NextOrObserver, User } from 'firebase/auth';
-import type { Unsubscribe } from 'firebase/firestore';
+import type { NextOrObserver, User, UserInfo as FBUserInfo } from 'firebase/auth';
+import type { Unsubscribe as FBUnsubscribe } from 'firebase/firestore';
 import {
   createUserWithEmailAndPassword,
   FacebookAuthProvider,
@@ -15,6 +15,10 @@ import {
 } from 'firebase/auth';
 import { UserCredentials, UserRegistrationInfo } from '../Shared/Types';
 import { setUserProfileInFirestore } from './FirestoreUserProfileService';
+
+export const AuthProviderId = ProviderId;
+export type Unsubscribe = FBUnsubscribe;
+export type UserInfo = FBUserInfo;
 
 export const registerUserInFirebase = async (regInfo: UserRegistrationInfo): Promise<User> => {
   const auth = getAuth();
