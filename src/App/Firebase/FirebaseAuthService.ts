@@ -21,10 +21,11 @@ export type Unsubscribe = FBUnsubscribe;
 export type UserInfo = FBUserInfo;
 
 export const registerUserInFirebase = async (regInfo: UserRegistrationInfo): Promise<User> => {
+  const { displayName, email, password } = regInfo;
   const auth = getAuth();
-  const regResult = await createUserWithEmailAndPassword(auth, regInfo.email, regInfo.password);
+  const regResult = await createUserWithEmailAndPassword(auth, email, password);
   const { user } = regResult;
-  await updateProfile(user, { displayName: regInfo.displayName });
+  await updateProfile(user, { displayName });
   await setUserProfileInFirestore(user);
   return regResult.user;
 };
