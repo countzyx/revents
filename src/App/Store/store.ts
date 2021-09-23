@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '../../Features/Auth/authSlice';
 import eventsReducer from '../../Features/Events/eventsSlice';
 import modalsReducer from '../Components/Modals/modalsSlice';
+import profilesReducer from '../../Features/Profile/profilesSlice';
 import sandboxReducer from '../../Features/Sandbox/sandboxSlice';
 
 const store = configureStore({
@@ -9,6 +10,7 @@ const store = configureStore({
     auth: authReducer,
     events: eventsReducer,
     modals: modalsReducer,
+    profiles: profilesReducer,
     sandbox: sandboxReducer,
   },
 });
