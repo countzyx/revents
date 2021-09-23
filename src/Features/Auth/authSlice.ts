@@ -12,7 +12,7 @@ import {
   verifyAuthWithFirebase,
 } from '../../App/Firebase/FirebaseAuthService';
 
-export type AuthState = {
+type AuthState = {
   error?: Error;
   isAppLoaded: boolean;
   isAuth: boolean;
