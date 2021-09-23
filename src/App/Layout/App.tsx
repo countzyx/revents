@@ -3,7 +3,8 @@ import { Route, Switch, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { Container } from 'semantic-ui-react';
 import { selectAuthIsAppLoaded, verifyAuth } from '../../Features/Auth/authSlice';
-import MyAccountPage from '../../Features/Auth/MyAccount/MyAccountPage';
+import MyAccountPage from '../../Features/Auth/MyAccountPage/MyAccountPage';
+import ProfilePage from '../../Features/Profile/ProfilePage/ProfilePage';
 import EventDashboard from '../../Features/Events/Dashboard/EventDashboard';
 import EventDetails from '../../Features/Events/Details/EventDetails';
 import EventForm from '../../Features/Events/Form/EventForm';
@@ -53,6 +54,9 @@ const App: React.FC = () => {
             </Route>
             <Route path='/myAccount'>
               <MyAccountPage />
+            </Route>
+            <Route path='/myProfile'>
+              <ProfilePage />
             </Route>
             <Route path='/error'>
               <Error />
