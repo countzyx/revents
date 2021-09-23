@@ -3,6 +3,8 @@ import * as React from 'react';
 import * as Yup from 'yup';
 import { Button, Header, Label } from 'semantic-ui-react';
 import FormTextInput from '../../../App/Components/Form/FormTextInput';
+import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
+import { changePasswordUserPassword, clearError, selectAuthError } from '../authSlice';
 
 type ChangePasswordFormValues = {
   newPassword: string;
@@ -26,7 +28,12 @@ const validationSchema: Yup.SchemaOf<ChangePasswordFormValues> = Yup.object({
 });
 
 const MyAccountPasswordUser: React.FC = () => {
-  const [error] = React.useState<Error | undefined>(undefined);
+  const dispatch = useAppDispatch();
+  const authError = useAppSelector(selectAuthError);
+
+  React.useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
 
   return (
     <div>
@@ -36,6 +43,7 @@ const MyAccountPasswordUser: React.FC = () => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={async (formValues, actions) => {
+          await dispatch(changePasswordUserPassword(formValues.newPassword));
           actions.setSubmitting(false);
         }}
       >
@@ -53,8 +61,13 @@ const MyAccountPasswordUser: React.FC = () => {
               placeholder='Confirm Password'
               type='password'
             />
-            {error && (
-              <Label basic color='red' content={error?.message} style={{ marginBottom: '1rem' }} />
+            {authError && (
+              <Label
+                basic
+                color='red'
+                content={authError?.message}
+                style={{ marginBottom: '1rem' }}
+              />
             )}
             <Button
               content='Update Password'

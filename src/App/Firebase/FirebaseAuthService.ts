@@ -11,6 +11,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  updatePassword,
   updateProfile,
 } from 'firebase/auth';
 import { UserCredentials, UserRegistrationInfo } from '../Shared/Types';
@@ -20,7 +21,18 @@ export const AuthProviderId = ProviderId;
 export type Unsubscribe = FBUnsubscribe;
 export type UserInfo = FBUserInfo;
 
-export const registerUserInFirebase = async (regInfo: UserRegistrationInfo): Promise<User> => {
+export const changePasswordUserPasswordInFirebase = async (newPassword: string): Promise<void> => {
+  const auth = getAuth();
+  const { currentUser } = auth;
+  if (!currentUser) {
+    throw new Error('null user changing password');
+  }
+  return updatePassword(currentUser, newPassword);
+};
+
+export const registerPasswordUserInFirebase = async (
+  regInfo: UserRegistrationInfo,
+): Promise<User> => {
   const { displayName, email, password } = regInfo;
   const auth = getAuth();
   const regResult = await createUserWithEmailAndPassword(auth, email, password);
@@ -30,7 +42,7 @@ export const registerUserInFirebase = async (regInfo: UserRegistrationInfo): Pro
   return regResult.user;
 };
 
-export const signInUserInFirebase = async (creds: UserCredentials): Promise<User> => {
+export const signInPasswordUserInFirebase = async (creds: UserCredentials): Promise<User> => {
   const auth = getAuth();
   const authResult = await signInWithEmailAndPassword(auth, creds.email, creds.password);
   return authResult.user;
@@ -49,7 +61,7 @@ const kSocialMediaMap = {
 const kSocialMediaProviders = [ProviderId.FACEBOOK, ProviderId.GOOGLE] as const;
 export type SocialMediaProvider = typeof kSocialMediaProviders[number];
 
-export const socialMediaSignInForFirebase = async (
+export const signInSocialMediaUserInFirebase = async (
   providerName: SocialMediaProvider,
 ): Promise<User> => {
   const provider = new kSocialMediaMap[providerName]();

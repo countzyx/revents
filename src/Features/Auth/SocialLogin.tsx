@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button } from 'semantic-ui-react';
 import { useAppDispatch } from '../../App/Store/hooks';
-import { signInUserWithSocialMedia } from './authSlice';
+import { signInSocialMediaUser } from './authSlice';
 
 const SocialLogin: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -13,7 +13,7 @@ const SocialLogin: React.FC = () => {
         content='Login with Facebook'
         fluid
         icon='facebook'
-        onClick={() => dispatch(signInUserWithSocialMedia('facebook.com'))}
+        onClick={() => dispatch(signInSocialMediaUser('facebook.com'))}
         style={{ marginBottom: '1rem' }}
       />
       <Button
@@ -21,7 +21,7 @@ const SocialLogin: React.FC = () => {
         content='Login with Google'
         fluid
         icon='google'
-        onClick={() => dispatch(signInUserWithSocialMedia('google.com'))}
+        onClick={() => dispatch(signInSocialMediaUser('google.com'))}
         style={{ marginBottom: '1rem' }}
       />
     </>
