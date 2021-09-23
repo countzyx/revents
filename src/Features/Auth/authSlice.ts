@@ -65,7 +65,7 @@ export const verifyAuth = (dispatch: AppDispatch): Unsubscribe =>
   verifyAuthWithFirebase({
     next: (user) => {
       if (user) {
-        const userInfo = user.providerData[0];
+        const userInfo = { ...user.providerData[0], uid: user.uid };
         dispatch(authSlice.actions.authUser(userInfo));
       } else {
         dispatch(authSlice.actions.unauthUser());
@@ -85,7 +85,7 @@ export const authSlice = createSlice({
   reducers: {
     authUser: (state, action: PayloadAction<UserInfo>) => ({
       ...state,
-      currentUser: action.payload,
+      userInfo: action.payload,
       isAuth: true,
     }),
     clearError: (state) => ({
