@@ -3,7 +3,7 @@ import { Route, Switch, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { Container } from 'semantic-ui-react';
 import { verifyAuth } from '../../Features/Auth/authSlice';
-import MyAccountPage from '../../Features/Auth/MyAccountPage';
+import MyAccountPage from '../../Features/Auth/MyAccount/MyAccountPage';
 import EventDashboard from '../../Features/Events/Dashboard/EventDashboard';
 import EventDetails from '../../Features/Events/Details/EventDetails';
 import EventForm from '../../Features/Events/Form/EventForm';
