@@ -5,7 +5,7 @@ import { Button, Divider, Label } from 'semantic-ui-react';
 import ModalWrapper from '../../App/Components/Modals/ModalWrapper';
 import FormTextInput from '../../App/Components/Form/FormTextInput';
 import { useAppDispatch, useAppSelector } from '../../App/Store/hooks';
-import { clearError, selectAuthError, selectIsAuth, signInPasswordUser } from './authSlice';
+import { clearError, selectAuthError, selectAuthIsAuth, signInPasswordUser } from './authSlice';
 import { UserCredentials } from '../../App/Shared/Types';
 import { closeModal } from '../../App/Components/Modals/modalsSlice';
 import SocialLogin from './SocialLogin';
@@ -25,7 +25,7 @@ const validationSchema: Yup.SchemaOf<LoginFormValues> = Yup.object({
 const LoginForm: React.FC = () => {
   const dispatch = useAppDispatch();
   const authError = useAppSelector(selectAuthError);
-  const isAuth = useAppSelector(selectIsAuth);
+  const isAuth = useAppSelector(selectAuthIsAuth);
 
   React.useEffect(() => {
     dispatch(clearError());

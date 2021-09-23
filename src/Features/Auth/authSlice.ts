@@ -13,15 +13,17 @@ import {
 } from '../../App/Firebase/FirebaseAuthService';
 
 export type AuthState = {
-  userInfo?: UserInfo;
   error?: Error;
+  isAppLoaded: boolean;
   isAuth: boolean;
+  userInfo?: UserInfo;
 };
 
 const initialState: AuthState = {
-  userInfo: undefined,
   error: undefined,
+  isAppLoaded: false,
   isAuth: false,
+  userInfo: undefined,
 };
 
 export const changePasswordUserPassword = createAsyncThunk<void, string>(
@@ -78,6 +80,7 @@ export const verifyAuth = (dispatch: AppDispatch): Unsubscribe =>
       } else {
         dispatch(authSlice.actions.unauthUser());
       }
+      dispatch(authSlice.actions.loadedApp());
     },
     error: (err) => {
       dispatch(authSlice.actions.setError(err));
@@ -100,11 +103,20 @@ export const authSlice = createSlice({
       ...state,
       error: undefined,
     }),
+    loadedApp: (state) => ({
+      ...state,
+      isAppLoaded: true,
+    }),
     setError: (state, action: PayloadAction<Error>) => ({
       ...state,
       error: action.payload,
     }),
-    unauthUser: () => initialState,
+    unauthUser: (state) => ({
+      ...state,
+      error: undefined,
+      isAuth: false,
+      userInfo: undefined,
+    }),
   },
   extraReducers: (builder) => {
     builder
@@ -121,14 +133,14 @@ export const authSlice = createSlice({
       .addCase(registerPasswordUser.rejected, (state, action) =>
         authSlice.caseReducers.setError(state, authSlice.actions.setError(action.error as Error)),
       )
-      .addCase(signInPasswordUser.pending, () => authSlice.caseReducers.unauthUser())
+      .addCase(signInPasswordUser.pending, (state) => authSlice.caseReducers.unauthUser(state))
       .addCase(signInPasswordUser.fulfilled, (state, action) =>
         authSlice.caseReducers.authUser(state, action),
       )
       .addCase(signInPasswordUser.rejected, (state, action) =>
         authSlice.caseReducers.setError(state, authSlice.actions.setError(action.error as Error)),
       )
-      .addCase(signInSocialMediaUser.pending, () => authSlice.caseReducers.unauthUser())
+      .addCase(signInSocialMediaUser.pending, (state) => authSlice.caseReducers.unauthUser(state))
       .addCase(signInSocialMediaUser.fulfilled, (state, action) =>
         authSlice.caseReducers.authUser(state, action),
       )
@@ -136,7 +148,7 @@ export const authSlice = createSlice({
         authSlice.caseReducers.setError(state, authSlice.actions.setError(action.error as Error)),
       )
       .addCase(signOutUser.pending, (state) => authSlice.caseReducers.clearError(state))
-      .addCase(signOutUser.fulfilled, () => authSlice.caseReducers.unauthUser())
+      .addCase(signOutUser.fulfilled, (state) => authSlice.caseReducers.unauthUser(state))
       .addCase(signOutUser.rejected, (state, action) =>
         authSlice.caseReducers.setError(state, authSlice.actions.setError(action.error as Error)),
       );
@@ -144,8 +156,9 @@ export const authSlice = createSlice({
 });
 
 export const { clearError } = authSlice.actions;
-export const selectAuthUserInfo = (state: RootState): UserInfo | undefined => state.auth.userInfo;
 export const selectAuthError = (state: RootState): Error | undefined => state.auth.error;
-export const selectIsAuth = (state: RootState): boolean => state.auth.isAuth;
+export const selectAuthIsAppLoaded = (state: RootState): boolean => state.auth.isAppLoaded;
+export const selectAuthIsAuth = (state: RootState): boolean => state.auth.isAuth;
+export const selectAuthUserInfo = (state: RootState): UserInfo | undefined => state.auth.userInfo;
 
 export default authSlice.reducer;

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Route, Switch, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { Container } from 'semantic-ui-react';
-import { verifyAuth } from '../../Features/Auth/authSlice';
+import { selectAuthIsAppLoaded, verifyAuth } from '../../Features/Auth/authSlice';
 import MyAccountPage from '../../Features/Auth/MyAccount/MyAccountPage';
 import EventDashboard from '../../Features/Events/Dashboard/EventDashboard';
 import EventDetails from '../../Features/Events/Details/EventDetails';
@@ -12,10 +12,12 @@ import NavBar from '../../Features/Nav/NavBar';
 import Sandbox from '../../Features/Sandbox/Sandbox';
 import Error from '../Components/Error/Error';
 import ModalManager from '../Components/Modals/ModalManager';
-import { useAppDispatch } from '../Store/hooks';
+import { useAppDispatch, useAppSelector } from '../Store/hooks';
+import LoadingComponent from './LoadingComponent';
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
+  const isAppLoaded = useAppSelector(selectAuthIsAppLoaded);
 
   React.useEffect(() => {
     const unsubscribed = verifyAuth(dispatch);
@@ -23,6 +25,8 @@ const App: React.FC = () => {
   }, [dispatch]);
 
   const location = useLocation();
+
+  if (!isAppLoaded) return <LoadingComponent content='Loading app...' />;
 
   return (
     <>
