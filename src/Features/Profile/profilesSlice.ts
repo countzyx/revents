@@ -1,11 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { UserProfile } from '../../App/Shared/Types';
 import { RootState } from '../../App/Store/store';
 
 type ProfileState = {
+  currentProfile?: UserProfile;
   error?: Error;
 };
 
 const initialState: ProfileState = {
+  currentProfile: undefined,
   error: undefined,
 };
 

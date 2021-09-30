@@ -34,14 +34,16 @@ export type PlacesInfo = {
   latLng?: google.maps.LatLngLiteral;
 };
 
-export type User = {
-  email: string;
-  photoUrl: string;
-};
-
 export type UserCredentials = {
   email: string;
   password: string;
+};
+
+export type UserProfile = {
+  createdAt: string;
+  displayName?: string;
+  email: string;
+  photoURL?: string;
 };
 
 export type UserRegistrationInfo = UserCredentials & {
