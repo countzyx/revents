@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import {
   addDoc,
   collection,
@@ -8,7 +7,6 @@ import {
   orderBy,
   query,
   setDoc,
-  Timestamp,
   updateDoc,
 } from 'firebase/firestore';
 import type {
@@ -18,37 +16,13 @@ import type {
   QuerySnapshot,
   Unsubscribe as FBUnsubscribe,
 } from 'firebase/firestore';
-import { kDateFormat } from '../Shared/Constants';
+import dateConverter from './FirestoreUtil';
 import { EventInfo } from '../Shared/Types';
 import { db } from './Firebase';
 
 export type Unsubscribe = FBUnsubscribe;
 
-const eventConverter = {
-  fromFirestore: (docSnap: DocumentSnapshot): EventInfo => {
-    const data = docSnap.data();
-
-    for (const prop in data) {
-      if (Object.prototype.hasOwnProperty.call(data, prop)) {
-        if (data[prop] instanceof Timestamp) {
-          data[prop] = format(data[prop].toDate(), kDateFormat);
-        }
-      }
-    }
-
-    if (data && !Object.prototype.hasOwnProperty.call(data, 'isCancelled')) {
-      data.isCancelled = false;
-    }
-
-    return {
-      ...data,
-      id: docSnap.id,
-    } as EventInfo;
-  },
-  toFirestore: (event: EventInfo) => event,
-};
-
-const eventsCollection = collection(db, 'events').withConverter(eventConverter);
+const eventsCollection = collection(db, 'events').withConverter(dateConverter<EventInfo>());
 
 export type CollectionObserver = {
   next?: (snapshot: QuerySnapshot) => void;
