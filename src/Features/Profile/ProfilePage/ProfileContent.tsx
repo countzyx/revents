@@ -1,7 +1,13 @@
 import * as React from 'react';
 import { Tab } from 'semantic-ui-react';
+import { UserProfile } from '../../../App/Shared/Types';
 
-const ProfileContent: React.FC = () => {
+type Props = {
+  profile: UserProfile;
+};
+
+const ProfileContent: React.FC<Props> = (props) => {
+  const { profile } = props;
   const tabPanes = [
     { menuItem: 'About', render: () => <Tab.Pane>About</Tab.Pane> },
     { menuItem: 'Photos', render: () => <Tab.Pane>Photos</Tab.Pane> },
