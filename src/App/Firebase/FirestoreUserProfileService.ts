@@ -1,8 +1,18 @@
 import type { User } from 'firebase/auth';
-import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  onSnapshot,
+  serverTimestamp,
+  setDoc,
+  Unsubscribe as FBUnsubscribe,
+} from 'firebase/firestore';
 // import { UserProfile } from '../Shared/Types';
 import { db } from './Firebase';
+import { DocumentObserver } from './FirestoreEventService';
 // import dateConverter from './FirestoreUtil';
+
+export type Unsubscribe = FBUnsubscribe;
 
 const userProfileCollection = collection(db, 'users');
 
@@ -19,6 +29,7 @@ export const setUserProfileInFirestore = async (user: User): Promise<void> => {
   });
 };
 
-export const doNothing = (): void => {
-  // stop nagging me, ESLint! I don't want a default export because I'm going to be adding more exports!
-};
+export const getUserProfileFromFirestore = (
+  observer: DocumentObserver,
+  userId: string,
+): Unsubscribe => onSnapshot(doc(userProfileCollection, userId), observer);
