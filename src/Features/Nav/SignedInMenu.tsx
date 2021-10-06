@@ -21,7 +21,12 @@ const SignedInMenu: React.FC = () => {
         <Dropdown.Menu>
           <Dropdown.Item as={Link} icon='plus' text='Create Event' to='/createEvent' />
           <Dropdown.Item as={Link} icon='settings' text='My Account' to='/myAccount' />
-          <Dropdown.Item as={Link} icon='user' text='My Profile' to='/myProfile' />
+          <Dropdown.Item
+            as={Link}
+            icon='user'
+            text='My Profile'
+            to={userInfo ? `/profile/${userInfo?.uid}` : '/error'}
+          />
           <Dropdown.Item icon='power' onClick={onSignOut} text='Sign out' />
         </Dropdown.Menu>
       </Dropdown>

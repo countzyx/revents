@@ -55,7 +55,7 @@ const App: React.FC = () => {
             <Route path='/myAccount'>
               <MyAccountPage />
             </Route>
-            <Route path='/myProfile'>
+            <Route path='/profile/:id?'>
               <ProfilePage />
             </Route>
             <Route path='/error'>
