@@ -41,6 +41,7 @@ export type UserCredentials = {
 
 export type UserProfile = {
   createdAt: string;
+  description?: string;
   displayName?: string;
   email: string;
   photoURL?: string;
