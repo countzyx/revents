@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Button, Grid, Header, Tab } from 'semantic-ui-react';
 import { useAppSelector } from '../../../App/Store/hooks';
 import { selectProfileCurrentProfile } from '../profilesSlice';
+import ProfileForm from './ProfileForm';
 
 const AboutTab: React.FC = () => {
   const [isEditable, setIsEditable] = React.useState(false);
@@ -25,7 +26,7 @@ const AboutTab: React.FC = () => {
         </Grid.Column>
         <Grid.Column width={16}>
           {isEditable ? (
-            <p>profile form</p>
+            <ProfileForm />
           ) : (
             <>
               <div style={{ marginBottom: 10 }}>Member since: {createdAt}</div>
