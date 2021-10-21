@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { Button, Divider, Grid, Header, Item, Reveal, Segment, Statistic } from 'semantic-ui-react';
-import { UserProfile } from '../../../App/Shared/Types';
+import { useAppSelector } from '../../../App/Store/hooks';
+import { selectProfileCurrentProfile } from '../profilesSlice';
 
-type Props = {
-  profile: UserProfile;
-};
+const ProfileHeader: React.FC = () => {
+  const currentProfile = useAppSelector(selectProfileCurrentProfile);
 
-const ProfileHeader: React.FC<Props> = (props) => {
-  const { profile } = props;
+  if (!currentProfile) return <div />;
+
+  const { displayName, photoURL } = currentProfile;
 
   return (
     <Segment>
@@ -15,11 +16,11 @@ const ProfileHeader: React.FC<Props> = (props) => {
         <Grid.Column width={12}>
           <Item.Group>
             <Item>
-              <Item.Image avatar size='small' src={profile.photoURL || '/assets/user.png'} />
+              <Item.Image avatar size='small' src={photoURL || '/assets/user.png'} />
               <Item.Content verticalAlign='middle'>
                 <Header
                   as='h1'
-                  content={profile.displayName}
+                  content={displayName}
                   style={{ display: 'block', marginBottom: 10 }}
                 />
               </Item.Content>

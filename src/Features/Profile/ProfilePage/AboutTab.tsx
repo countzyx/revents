@@ -1,15 +1,15 @@
 import * as React from 'react';
 import { Button, Grid, Header, Tab } from 'semantic-ui-react';
-import { UserProfile } from '../../../App/Shared/Types';
+import { useAppSelector } from '../../../App/Store/hooks';
+import { selectProfileCurrentProfile } from '../profilesSlice';
 
-type Props = {
-  profile: UserProfile;
-};
-
-const AboutTab: React.FC<Props> = (props) => {
-  const { profile } = props;
-  const { createdAt, description, displayName } = profile;
+const AboutTab: React.FC = () => {
   const [isEditable, setIsEditable] = React.useState(false);
+  const currentProfile = useAppSelector(selectProfileCurrentProfile);
+
+  if (!currentProfile) return <div />;
+
+  const { createdAt, description, displayName } = currentProfile;
 
   return (
     <Tab.Pane>

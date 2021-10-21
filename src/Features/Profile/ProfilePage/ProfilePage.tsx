@@ -45,8 +45,8 @@ const ProfilePage: React.FC = () => {
   return (
     <Grid>
       <Grid.Column width={16}>
-        <ProfileHeader profile={currentProfile} />
-        <ProfileContent profile={currentProfile} />
+        <ProfileHeader />
+        <ProfileContent />
       </Grid.Column>
     </Grid>
   );
