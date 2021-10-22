@@ -42,6 +42,12 @@ export const createPasswordUserInFirebase = async (
   return regResult.user;
 };
 
+export const readCurrentUserId = (): string | undefined => {
+  const auth = getAuth();
+  const { currentUser } = auth;
+  return currentUser?.uid;
+};
+
 export const signInPasswordUserInFirebase = async (creds: UserCredentials): Promise<User> => {
   const auth = getAuth();
   const authResult = await signInWithEmailAndPassword(auth, creds.email, creds.password);
@@ -70,6 +76,17 @@ export const signInSocialMediaUserInFirebase = async (
   const additionalUserInfo = getAdditionalUserInfo(authResult);
   additionalUserInfo?.isNewUser && (await createUserProfileInFirestore(authResult.user));
   return authResult.user;
+};
+
+export const updateAuthUserDisplayNameInFirebase = async (
+  displayName: string | undefined,
+): Promise<void> => {
+  const auth = getAuth();
+  const { currentUser } = auth;
+  if (!currentUser) throw new Error('null user');
+  if (displayName !== currentUser.displayName) {
+    await updateProfile(currentUser, { displayName });
+  }
 };
 
 export const verifyAuthWithFirebase = (authVerifyObserver: NextOrObserver<User>): Unsubscribe => {

@@ -6,13 +6,13 @@ import {
   serverTimestamp,
   setDoc,
   Unsubscribe as FBUnsubscribe,
+  updateDoc,
 } from 'firebase/firestore';
 import { UserProfile } from '../Shared/Types';
-// import { UserProfile } from '../Shared/Types';
 import { db } from './Firebase';
+import { readCurrentUserId, updateAuthUserDisplayNameInFirebase } from './FirebaseAuthService';
 import { DocumentObserver } from './FirestoreEventService';
 import dateConverter from './FirestoreUtil';
-// import dateConverter from './FirestoreUtil';
 
 export type Unsubscribe = FBUnsubscribe;
 
@@ -35,3 +35,10 @@ export const readUserProfileFromFirestore = (
   observer: DocumentObserver,
   userId: string,
 ): Unsubscribe => onSnapshot(doc(userProfileCollection, userId), observer);
+
+export const updateUserProfileInFirestore = async (profile: UserProfile): Promise<void> => {
+  const { displayName } = profile;
+  await updateAuthUserDisplayNameInFirebase(displayName);
+  const uid = readCurrentUserId();
+  return updateDoc(doc(userProfileCollection, uid), profile);
+};
