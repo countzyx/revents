@@ -20,7 +20,7 @@ import { kDateFormat } from '../../../App/Shared/Constants';
 import { getDateFromString } from '../../../App/Shared/Utils';
 import LoadingComponent from '../../../App/Layout/LoadingComponent';
 import {
-  addEventToFirestore,
+  createEventInFirestore,
   toggleCancelEventInFirestore,
   updateEventInFirestore,
 } from '../../../App/Firebase/FirestoreEventService';
@@ -138,7 +138,7 @@ const EventForm: React.FC = () => {
           ...formValues,
           date: format(getDateFromString(formValues.date)!, kDateFormat), // FormDate is inconsistent with date string, need to fix
         };
-        await addEventToFirestore(newEvent);
+        await createEventInFirestore(newEvent);
         setSubmitting(false);
         history.push(`/events/${newEvent.id}`);
       }

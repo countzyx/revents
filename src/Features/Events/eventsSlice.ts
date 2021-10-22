@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { Unsubscribe } from '../../App/Firebase/FirestoreEventService';
 import {
-  getAllEventsFromFirestore,
-  getSingleEventFromFirestore,
+  readAllEventsFromFirestore,
+  readSingleEventFromFirestore,
 } from '../../App/Firebase/FirestoreEventService';
 
 import type { AsyncState, EventInfo } from '../../App/Shared/Types';
@@ -20,7 +20,7 @@ const initialState: EventState = {
 
 export const fetchSingleEvent = (dispatch: AppDispatch, eventId: string): Unsubscribe => {
   const { fetchEventsPending, fetchEventsFulfilled, fetchEventsRejected } = eventsSlice.actions;
-  const unsubscribe = getSingleEventFromFirestore(
+  const unsubscribe = readSingleEventFromFirestore(
     {
       next: async (snapshot) => {
         dispatch(fetchEventsPending());
@@ -37,7 +37,7 @@ export const fetchSingleEvent = (dispatch: AppDispatch, eventId: string): Unsubs
 
 export const fetchAllEvents = (dispatch: AppDispatch): Unsubscribe => {
   const { fetchEventsPending, fetchEventsFulfilled, fetchEventsRejected } = eventsSlice.actions;
-  const unsubscribe = getAllEventsFromFirestore({
+  const unsubscribe = readAllEventsFromFirestore({
     next: async (snapshot) => {
       dispatch(fetchEventsPending());
       const fetchedEvents = snapshot.docs.map((docResult) => docResult.data());

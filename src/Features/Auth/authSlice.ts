@@ -3,8 +3,8 @@ import type { UserCredentials, UserRegistrationInfo } from '../../App/Shared/Typ
 import { AppDispatch, RootState } from '../../App/Store/store';
 import type { Unsubscribe, UserInfo } from '../../App/Firebase/FirebaseAuthService';
 import {
-  changePasswordUserPasswordInFirebase,
-  registerPasswordUserInFirebase,
+  updatePwUserPasswordInFirebase,
+  createPasswordUserInFirebase,
   signInPasswordUserInFirebase,
   signOutUserInFirebase,
   SocialMediaProvider,
@@ -29,7 +29,7 @@ const initialState: AuthState = {
 export const changePasswordUserPassword = createAsyncThunk<void, string>(
   'auth/changePasswordUserPassword',
   async (newPassword) => {
-    await changePasswordUserPasswordInFirebase(newPassword);
+    await updatePwUserPasswordInFirebase(newPassword);
   },
 );
 
@@ -37,7 +37,7 @@ export const changePasswordUserPassword = createAsyncThunk<void, string>(
 export const registerPasswordUser = createAsyncThunk<UserInfo, UserRegistrationInfo>(
   'auth/registerPasswordUser',
   async (regInfo, _0) => {
-    const user = await registerPasswordUserInFirebase(regInfo);
+    const user = await createPasswordUserInFirebase(regInfo);
     const userInfo = user.providerData[0];
     return userInfo;
   },

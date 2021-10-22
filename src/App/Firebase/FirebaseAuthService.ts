@@ -15,13 +15,13 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { UserCredentials, UserRegistrationInfo } from '../Shared/Types';
-import { setUserProfileInFirestore } from './FirestoreUserProfileService';
+import { createUserProfileInFirestore } from './FirestoreUserProfileService';
 
 export const AuthProviderId = ProviderId;
 export type Unsubscribe = FBUnsubscribe;
 export type UserInfo = FBUserInfo;
 
-export const changePasswordUserPasswordInFirebase = async (newPassword: string): Promise<void> => {
+export const updatePwUserPasswordInFirebase = async (newPassword: string): Promise<void> => {
   const auth = getAuth();
   const { currentUser } = auth;
   if (!currentUser) {
@@ -30,7 +30,7 @@ export const changePasswordUserPasswordInFirebase = async (newPassword: string):
   return updatePassword(currentUser, newPassword);
 };
 
-export const registerPasswordUserInFirebase = async (
+export const createPasswordUserInFirebase = async (
   regInfo: UserRegistrationInfo,
 ): Promise<User> => {
   const { displayName, email, password } = regInfo;
@@ -38,7 +38,7 @@ export const registerPasswordUserInFirebase = async (
   const regResult = await createUserWithEmailAndPassword(auth, email, password);
   const { user } = regResult;
   await updateProfile(user, { displayName });
-  await setUserProfileInFirestore(user);
+  await createUserProfileInFirestore(user);
   return regResult.user;
 };
 
@@ -68,7 +68,7 @@ export const signInSocialMediaUserInFirebase = async (
   const auth = getAuth();
   const authResult = await signInWithPopup(auth, provider);
   const additionalUserInfo = getAdditionalUserInfo(authResult);
-  additionalUserInfo?.isNewUser && (await setUserProfileInFirestore(authResult.user));
+  additionalUserInfo?.isNewUser && (await createUserProfileInFirestore(authResult.user));
   return authResult.user;
 };
 

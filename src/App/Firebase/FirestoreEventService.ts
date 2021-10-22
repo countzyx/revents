@@ -36,7 +36,7 @@ export type DocumentObserver = {
   complete?: () => void; // Never gets executed by Firestore.
 };
 
-export const addEventToFirestore = async (
+export const createEventInFirestore = async (
   event: EventInfo,
 ): Promise<DocumentReference<EventInfo>> =>
   addDoc(eventsCollection, {
@@ -61,10 +61,10 @@ export const addEventToFirestore = async (
 export const deleteEventInFirestore = async (eventId: string): Promise<void> =>
   deleteDoc(doc(eventsCollection, eventId));
 
-export const getAllEventsFromFirestore = (observer: CollectionObserver): Unsubscribe =>
+export const readAllEventsFromFirestore = (observer: CollectionObserver): Unsubscribe =>
   onSnapshot(query(eventsCollection, orderBy('date')), observer);
 
-export const getSingleEventFromFirestore = (
+export const readSingleEventFromFirestore = (
   observer: DocumentObserver,
   eventId: string,
 ): Unsubscribe => onSnapshot(doc(eventsCollection, eventId), observer);

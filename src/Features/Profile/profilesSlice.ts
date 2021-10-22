@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
-  getUserProfileFromFirestore,
+  readUserProfileFromFirestore,
   Unsubscribe,
 } from '../../App/Firebase/FirestoreUserProfileService';
 import { UserProfile } from '../../App/Shared/Types';
@@ -21,7 +21,7 @@ const initialState: ProfileState = {
 export const fetchUserProfile = (dispatch: AppDispatch, eventId: string): Unsubscribe => {
   const { fetchUserProfilePending, fetchUserProfileFulfilled, fetchUserProfileRejected } =
     profilesSlice.actions;
-  const unsubscribe = getUserProfileFromFirestore(
+  const unsubscribe = readUserProfileFromFirestore(
     {
       next: async (snapshot) => {
         dispatch(fetchUserProfilePending());

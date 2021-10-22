@@ -18,7 +18,7 @@ export type Unsubscribe = FBUnsubscribe;
 
 const userProfileCollection = collection(db, 'users').withConverter(dateConverter<UserProfile>());
 
-export const setUserProfileInFirestore = async (user: User): Promise<void> => {
+export const createUserProfileInFirestore = async (user: User): Promise<void> => {
   const { displayName, email, photoURL } = user;
   if (!email) {
     throw new Error('email is null');
@@ -31,7 +31,7 @@ export const setUserProfileInFirestore = async (user: User): Promise<void> => {
   });
 };
 
-export const getUserProfileFromFirestore = (
+export const readUserProfileFromFirestore = (
   observer: DocumentObserver,
   userId: string,
 ): Unsubscribe => onSnapshot(doc(userProfileCollection, userId), observer);

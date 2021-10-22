@@ -8,7 +8,7 @@ import type {
 } from 'firebase/firestore';
 import { kDateFormat } from '../Shared/Constants';
 
-const dateConverter = <T>(): FirestoreDataConverter<T> => ({
+export const dateConverter = <T>(): FirestoreDataConverter<T> => ({
   fromFirestore: (docSnap: DocumentSnapshot): T => {
     const data = docSnap.data();
 
