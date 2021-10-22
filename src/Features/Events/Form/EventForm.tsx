@@ -184,10 +184,8 @@ const EventForm: React.FC = () => {
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={(values, { setSubmitting }) => {
-          setTimeout(() => {
-            onFormSubmitHandler(values, setSubmitting);
-          }, 400);
+        onSubmit={async (values, { setSubmitting }) => {
+          await onFormSubmitHandler(values, setSubmitting);
         }}
       >
         {(formik) => (
