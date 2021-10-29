@@ -22,7 +22,7 @@ export const eventConverter: FirestoreDataConverter<EventInfo> = {
     return {
       ...returnData,
       id: docSnap.id,
-    } as unknown as EventInfo;
+    } as EventInfo;
   },
   toFirestore: (data: WithFieldValue<EventInfo>) => {
     const { id, ...cleanData } = data;
@@ -39,7 +39,7 @@ export const userProfileConverter: FirestoreDataConverter<UserProfile> = {
     return {
       ...returnData,
       id: docSnap.id,
-    } as unknown as UserProfile;
+    } as UserProfile;
   },
   toFirestore: (data: WithFieldValue<UserProfile>) => {
     const { id, ...returnData } = data;
