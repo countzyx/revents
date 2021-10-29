@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import { format } from 'date-fns';
 import { Timestamp } from 'firebase/firestore';
 import type {
@@ -48,15 +49,13 @@ export const userProfileConverter: FirestoreDataConverter<UserProfile> = {
 };
 
 const convertTimestampsToDateStrings = (data: DocumentData): DocumentData => {
-  const returnData: DocumentData = {};
+  const returnData: DocumentData = _.cloneDeep(data); // didn't know how to make an empty version
 
   for (const prop in data) {
     if (Object.prototype.hasOwnProperty.call(data, prop)) {
       if (data[prop] instanceof Timestamp) {
         returnData[prop] = format(data[prop].toDate(), kDateFormat);
       }
-    } else {
-      returnData[prop] = data[prop];
     }
   }
 
