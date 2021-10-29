@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { format } from 'date-fns';
 import { Timestamp } from 'firebase/firestore';
 import type {
