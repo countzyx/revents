@@ -12,21 +12,22 @@ import { UserProfile } from '../Shared/Types';
 import { db } from './Firebase';
 import { readCurrentUserId, updateAuthUserDisplayNameInFirebase } from './FirebaseAuthService';
 import { DocumentObserver } from './FirestoreEventService';
-import dateConverter from './FirestoreUtil';
+import { userProfileConverter } from './FirestoreUtil';
 
 export type Unsubscribe = FBUnsubscribe;
 
-const userProfileCollection = collection(db, 'users').withConverter(dateConverter<UserProfile>());
+const userProfileCollection = collection(db, 'users').withConverter(userProfileConverter);
 
 export const createUserProfileInFirestore = async (user: User): Promise<void> => {
-  const { displayName, email, photoURL } = user;
+  const { displayName, email, photoURL, uid } = user;
   if (!email) {
     throw new Error('email is null');
   }
-  return setDoc(doc(userProfileCollection, user.uid), {
+  return setDoc(doc(userProfileCollection, uid), {
     createdAt: serverTimestamp(),
     displayName: displayName || undefined,
     email,
+    id: uid,
     photoURL: photoURL || undefined,
   });
 };

@@ -44,6 +44,7 @@ export type UserProfile = {
   description?: string;
   displayName?: string;
   email: string;
+  id: string;
   photoURL?: string;
 };
 

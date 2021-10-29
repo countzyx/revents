@@ -16,13 +16,13 @@ import type {
   QuerySnapshot,
   Unsubscribe as FBUnsubscribe,
 } from 'firebase/firestore';
-import dateConverter from './FirestoreUtil';
+import { eventConverter } from './FirestoreUtil';
 import { EventInfo } from '../Shared/Types';
 import { db } from './Firebase';
 
 export type Unsubscribe = FBUnsubscribe;
 
-const eventsCollection = collection(db, 'events').withConverter(dateConverter<EventInfo>());
+const eventsCollection = collection(db, 'events').withConverter(eventConverter);
 
 export type CollectionObserver = {
   next?: (snapshot: QuerySnapshot) => void;
