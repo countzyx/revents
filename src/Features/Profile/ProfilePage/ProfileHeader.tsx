@@ -1,14 +1,17 @@
 import * as React from 'react';
 import { Button, Divider, Grid, Header, Item, Reveal, Segment, Statistic } from 'semantic-ui-react';
 import { useAppSelector } from '../../../App/Store/hooks';
-import { selectProfileCurrentProfile } from '../profilesSlice';
+import { selectAuthUserInfo } from '../../Auth/authSlice';
+import { selectProfileSelectedProfile } from '../profilesSlice';
 
 const ProfileHeader: React.FC = () => {
-  const currentProfile = useAppSelector(selectProfileCurrentProfile);
+  const currentUser = useAppSelector(selectAuthUserInfo);
+  const selectedProfile = useAppSelector(selectProfileSelectedProfile);
+  const isCurrentUser = currentUser && currentUser.uid === selectedProfile?.id;
 
-  if (!currentProfile) return <div />;
+  if (!selectedProfile) return <div />;
 
-  const { displayName, photoURL } = currentProfile;
+  const { displayName, photoURL } = selectedProfile;
 
   return (
     <Segment>
@@ -32,15 +35,19 @@ const ProfileHeader: React.FC = () => {
             <Statistic label='Followers' value={10} />
             <Statistic label='Following' value={5} />
           </Statistic.Group>
-          <Divider />
-          <Reveal animated='move'>
-            <Reveal.Content style={{ width: '100%' }} visible>
-              <Button color='teal' content='Following' fluid />
-            </Reveal.Content>
-            <Reveal.Content hidden style={{ width: '100%' }}>
-              <Button basic color='red' content='Unfollow' fluid />
-            </Reveal.Content>
-          </Reveal>
+          {!isCurrentUser && (
+            <>
+              <Divider />
+              <Reveal animated='move'>
+                <Reveal.Content style={{ width: '100%' }} visible>
+                  <Button color='teal' content='Following' fluid />
+                </Reveal.Content>
+                <Reveal.Content hidden style={{ width: '100%' }}>
+                  <Button basic color='red' content='Unfollow' fluid />
+                </Reveal.Content>
+              </Reveal>
+            </>
+          )}
         </Grid.Column>
       </Grid>
     </Segment>

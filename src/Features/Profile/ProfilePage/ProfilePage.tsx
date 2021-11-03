@@ -32,6 +32,8 @@ const ProfilePage: React.FC = () => {
     return unsubscribed;
   }, [dispatch, userId]);
 
+  if (!userId && !currentUser) return <Redirect to={{ pathname: '/' }} />;
+
   if (!userId && currentUser) return <Redirect to={{ pathname: `/profile/${currentUser.uid}` }} />;
 
   if (isLoading) return <LoadingComponent />;
