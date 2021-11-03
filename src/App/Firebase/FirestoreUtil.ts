@@ -1,12 +1,7 @@
 import * as _ from 'lodash';
 import { format } from 'date-fns';
 import { Timestamp } from 'firebase/firestore';
-import type {
-  DocumentData,
-  DocumentSnapshot,
-  FirestoreDataConverter,
-  WithFieldValue,
-} from 'firebase/firestore';
+import type { DocumentData, DocumentSnapshot, FirestoreDataConverter } from 'firebase/firestore';
 import { kDateFormat } from '../Shared/Constants';
 import { EventInfo, UserProfile } from '../Shared/Types';
 
@@ -25,7 +20,8 @@ export const eventConverter: FirestoreDataConverter<EventInfo> = {
       id: docSnap.id,
     } as EventInfo;
   },
-  toFirestore: (data: WithFieldValue<EventInfo>) => {
+  toFirestore: (data: EventInfo) => {
+    // Not called by updateDoc
     const { id, ...cleanData } = data;
     return cleanData as DocumentData;
   },
@@ -42,7 +38,8 @@ export const userProfileConverter: FirestoreDataConverter<UserProfile> = {
       id: docSnap.id,
     } as UserProfile;
   },
-  toFirestore: (data: WithFieldValue<UserProfile>) => {
+  toFirestore: (data: UserProfile) => {
+    // Not called by updateDoc
     const { id, ...returnData } = data;
     return returnData as DocumentData;
   },
