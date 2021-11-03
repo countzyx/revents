@@ -10,27 +10,53 @@ type ProfileState = {
   currentProfile?: UserProfile;
   error?: Error;
   isLoading: boolean;
+  selectedProfile?: UserProfile;
 };
 
 const initialState: ProfileState = {
   currentProfile: undefined,
   error: undefined,
   isLoading: false,
+  selectedProfile: undefined,
 };
 
-export const fetchUserProfile = (dispatch: AppDispatch, eventId: string): Unsubscribe => {
-  const { fetchUserProfilePending, fetchUserProfileFulfilled, fetchUserProfileRejected } =
-    profilesSlice.actions;
+export const fetchCurrentUserProfile = (dispatch: AppDispatch, userId: string): Unsubscribe => {
+  const {
+    fetchCurrentUserProfilePending,
+    fetchCurrentUserProfileFulfilled,
+    fetchCurrentUserProfileRejected,
+  } = profilesSlice.actions;
   const unsubscribe = readUserProfileFromFirestore(
     {
       next: async (snapshot) => {
-        dispatch(fetchUserProfilePending());
+        dispatch(fetchCurrentUserProfilePending());
         const fetchedUserProfile = snapshot.data() as UserProfile;
-        dispatch(fetchUserProfileFulfilled(fetchedUserProfile));
+        dispatch(fetchCurrentUserProfileFulfilled(fetchedUserProfile));
       },
-      error: async (err) => dispatch(fetchUserProfileRejected(err)),
+      error: async (err) => dispatch(fetchCurrentUserProfileRejected(err)),
     },
-    eventId,
+    userId,
+  );
+
+  return unsubscribe;
+};
+
+export const fetchSelectedUserProfile = (dispatch: AppDispatch, userId: string): Unsubscribe => {
+  const {
+    fetchSelectedUserProfilePending,
+    fetchSelectedUserProfileFulfilled,
+    fetchSelectedUserProfileRejected,
+  } = profilesSlice.actions;
+  const unsubscribe = readUserProfileFromFirestore(
+    {
+      next: async (snapshot) => {
+        dispatch(fetchSelectedUserProfilePending());
+        const fetchedUserProfile = snapshot.data() as UserProfile;
+        dispatch(fetchSelectedUserProfileFulfilled(fetchedUserProfile));
+      },
+      error: async (err) => dispatch(fetchSelectedUserProfileRejected(err)),
+    },
+    userId,
   );
 
   return unsubscribe;
@@ -44,21 +70,39 @@ export const profilesSlice = createSlice({
       ...state,
       error: undefined,
     }),
-    fetchUserProfilePending: (state) => ({
+    fetchCurrentUserProfilePending: (state) => ({
       ...state,
       currentProfile: undefined,
       error: undefined,
       isLoading: true,
     }),
-    fetchUserProfileFulfilled: (state, action: PayloadAction<UserProfile>) => ({
+    fetchCurrentUserProfileFulfilled: (state, action: PayloadAction<UserProfile>) => ({
       ...state,
       currentProfile: action.payload,
       error: undefined,
       isLoading: false,
     }),
-    fetchUserProfileRejected: (state, action: PayloadAction<Error>) => ({
+    fetchCurrentUserProfileRejected: (state, action: PayloadAction<Error>) => ({
       ...state,
       currentProfile: undefined,
+      error: action.payload,
+      isLoading: false,
+    }),
+    fetchSelectedUserProfilePending: (state) => ({
+      ...state,
+      selectedProfile: undefined,
+      error: undefined,
+      isLoading: true,
+    }),
+    fetchSelectedUserProfileFulfilled: (state, action: PayloadAction<UserProfile>) => ({
+      ...state,
+      selectedProfile: action.payload,
+      error: undefined,
+      isLoading: false,
+    }),
+    fetchSelectedUserProfileRejected: (state, action: PayloadAction<Error>) => ({
+      ...state,
+      selectedProfile: undefined,
       error: action.payload,
       isLoading: false,
     }),
@@ -74,5 +118,7 @@ export const selectProfileCurrentProfile = (state: RootState): UserProfile | und
   state.profiles.currentProfile;
 export const selectProfileError = (state: RootState): Error | undefined => state.profiles.error;
 export const selectProfileIsLoading = (state: RootState): boolean => state.profiles.isLoading;
+export const selectProfileSelectedProfile = (state: RootState): UserProfile | undefined =>
+  state.profiles.selectedProfile;
 
 export default profilesSlice.reducer;

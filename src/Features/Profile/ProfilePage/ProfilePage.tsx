@@ -5,10 +5,10 @@ import LoadingComponent from '../../../App/Layout/LoadingComponent';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { selectAuthUserInfo } from '../../Auth/authSlice';
 import {
-  fetchUserProfile,
-  selectProfileCurrentProfile,
+  fetchSelectedUserProfile,
   selectProfileError,
   selectProfileIsLoading,
+  selectProfileSelectedProfile,
 } from '../profilesSlice';
 import ProfileContent from './ProfileContent';
 import ProfileHeader from './ProfileHeader';
@@ -21,14 +21,14 @@ const ProfilePage: React.FC = () => {
   const userId = useParams<ProfilePageParams>().id;
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector(selectAuthUserInfo);
-  const currentProfile = useAppSelector(selectProfileCurrentProfile);
+  const selectedProfile = useAppSelector(selectProfileSelectedProfile);
   const error = useAppSelector(selectProfileError);
   const isLoading = useAppSelector(selectProfileIsLoading);
 
   React.useEffect(() => {
     if (!userId) return undefined;
 
-    const unsubscribed = fetchUserProfile(dispatch, userId);
+    const unsubscribed = fetchSelectedUserProfile(dispatch, userId);
     return unsubscribed;
   }, [dispatch, userId]);
 
@@ -38,7 +38,7 @@ const ProfilePage: React.FC = () => {
 
   if (error) return <Redirect to={{ pathname: '/error', state: { error } }} />;
 
-  if (!currentProfile) {
+  if (!selectedProfile) {
     return <h1>No profile found</h1>;
   }
 

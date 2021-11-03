@@ -62,7 +62,7 @@ export const signInSocialMediaUser = createAsyncThunk<UserInfo, SocialMediaProvi
     if (!user) {
       return thunkApi.rejectWithValue(new Error('null user'));
     }
-    const userInfo = user.providerData[0];
+    const userInfo = { ...user.providerData[0], uid: user.uid }; // Social media provider data has wrong uid
     return userInfo;
   },
 );
@@ -75,7 +75,7 @@ export const verifyAuth = (dispatch: AppDispatch): Unsubscribe =>
   verifyAuthWithFirebase({
     next: (user) => {
       if (user) {
-        const userInfo = { ...user.providerData[0], uid: user.uid };
+        const userInfo = { ...user.providerData[0], uid: user.uid }; // Assume it's social media provider and has wrong uid
         dispatch(authSlice.actions.authUser(userInfo));
       } else {
         dispatch(authSlice.actions.unauthUser());
