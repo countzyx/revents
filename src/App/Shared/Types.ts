@@ -29,6 +29,11 @@ export type EventInfo = {
   isCancelled: boolean;
 };
 
+export type PhotoPreview = {
+  file: File;
+  previewUrl: string;
+};
+
 export type PlacesInfo = {
   address: string;
   latLng?: google.maps.LatLngLiteral;

@@ -1,0 +1,10 @@
+.dropzone {
+  border: dashed 0.5rem #eee;
+  border-radius: 5%;
+  padding-top: 2rem;
+  text-align: center;
+}
+
+.dropzone:active {
+  border: dashed 0.5rem green;
+}
