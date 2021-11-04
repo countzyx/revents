@@ -1,0 +1,9 @@
+.image-preview {
+  min-height: 12rem;
+  min-width: 12rem;
+  overflow: hidden;
+}
+
+.button {
+  width: 6rem;
+}
