@@ -3,6 +3,7 @@ import { Button, Card, Grid, Header, Image, Tab } from 'semantic-ui-react';
 import { useAppSelector } from '../../../App/Store/hooks';
 import { selectAuthUserInfo } from '../../Auth/authSlice';
 import { selectProfileSelectedProfile } from '../profilesSlice';
+import PhotoUpload from '../../../App/Components/Photos/PhotoUpload';
 
 const PhotosTab: React.FC = () => {
   const [isEditable, setIsEditable] = React.useState(false);
@@ -30,7 +31,7 @@ const PhotosTab: React.FC = () => {
         </Grid.Column>
         <Grid.Column width={16}>
           {isEditable ? (
-            <p>Photo widgets</p>
+            <PhotoUpload />
           ) : (
             <Card.Group itemsPerRow={5}>
               <Card>
