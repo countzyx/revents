@@ -1,13 +1,13 @@
 import * as React from 'react';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Container, Header, Icon, Image, Segment } from 'semantic-ui-react';
 import styles from './HomePage.module.css';
 
-const HomePage: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
-  const { history } = props;
+const HomePage: React.FC = () => {
+  const navigate = useNavigate();
 
   const onGetStartedClick = () => {
-    history.push('/events');
+    navigate('/events');
   };
 
   return (
@@ -26,4 +26,4 @@ const HomePage: React.FC<RouteComponentProps> = (props: RouteComponentProps) => 
   );
 };
 
-export default withRouter(HomePage);
+export default HomePage;

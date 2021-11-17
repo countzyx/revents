@@ -2,7 +2,7 @@
 import * as React from 'react';
 import _ from 'lodash';
 import { Button, Confirm, Header, Segment } from 'semantic-ui-react';
-import { Redirect, useHistory, useParams, withRouter } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { format } from 'date-fns';
@@ -91,13 +91,9 @@ const blankEvent: EventInfo = {
   isCancelled: false,
 };
 
-type EditEventParams = {
-  id: string;
-};
-
 const EventForm: React.FC = () => {
-  const history = useHistory();
-  const eventId = useParams<EditEventParams>().id;
+  const navigate = useNavigate();
+  const { eventId } = useParams();
   const selectedEvent = useAppSelector((state) =>
     state.events.events.find((e) => e.id === eventId),
   );
@@ -128,7 +124,7 @@ const EventForm: React.FC = () => {
         };
         await updateEventInFirestore(updatedEvent);
         setSubmitting(false);
-        history.push(`/events/${updatedEvent.id}`);
+        navigate(`/events/${updatedEvent.id}`);
       } else {
         const newEvent: EventInfo = {
           ...blankEvent,
@@ -140,7 +136,7 @@ const EventForm: React.FC = () => {
         };
         await createEventInFirestore(newEvent);
         setSubmitting(false);
-        history.push(`/events/${newEvent.id}`);
+        navigate(`/events/${newEvent.id}`);
       }
     } catch (anyErr) {
       const err = anyErr as Error;
@@ -169,15 +165,15 @@ const EventForm: React.FC = () => {
 
   const onExit = () => {
     if (selectedEvent) {
-      history.push(`/events/${selectedEvent.id}`);
+      navigate(`/events/${selectedEvent.id}`);
     } else {
-      history.push('/events');
+      navigate('/events');
     }
   };
 
   if (isLoading) return <LoadingComponent />;
 
-  if (error) return <Redirect to={{ pathname: '/error', state: { error } }} />;
+  if (error) return <Navigate to='/error' state={error} />;
 
   return (
     <Segment clearing>
@@ -253,4 +249,4 @@ const EventForm: React.FC = () => {
   );
 };
 
-export default withRouter(EventForm);
+export default EventForm;

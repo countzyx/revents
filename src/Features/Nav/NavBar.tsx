@@ -12,7 +12,7 @@ const NavBar: React.FC = () => {
   return (
     <Menu inverted fixed='top'>
       <Container>
-        <Menu.Item as={NavLink} to='/' exact header>
+        <Menu.Item as={NavLink} to='/' end header>
           <img src='/assets/logo.png' alt='logo' style={{ marginRight: '15px' }} />
           Re-vents
         </Menu.Item>

@@ -54,7 +54,7 @@ const EventListItem: React.FC<Props> = (props: Props) => {
           content='Delete'
           onClick={() => deleteEventInFirestore(event.id)}
         />
-        <Button color='teal' floated='right' content='View' as={Link} to={`/events/${event.id}`} />
+        <Button color='teal' floated='right' content='View' as={Link} to={`${event.id}`} />
       </Segment>
     </Segment.Group>
   );

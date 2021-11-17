@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Dropdown, Image, Menu } from 'semantic-ui-react';
 import { useAppDispatch, useAppSelector } from '../../App/Store/hooks';
 import { selectAuthUserInfo, signOutUser } from '../Auth/authSlice';
@@ -9,7 +9,7 @@ const SignedInMenu: React.FC = () => {
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector(selectAuthUserInfo);
   const currentProfile = useAppSelector(selectProfileCurrentProfile);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     if (!userInfo) return undefined;
@@ -21,7 +21,7 @@ const SignedInMenu: React.FC = () => {
 
   const onSignOut = async () => {
     await dispatch(signOutUser());
-    history.push('/');
+    navigate('/');
   };
 
   return (

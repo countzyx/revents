@@ -8,7 +8,7 @@ type Props = {
 
 const Error: React.FC<Props> = (props: Props) => {
   const { error } = props;
-  const location = useLocation<Props>();
+  const location = useLocation();
 
   let locationError: Error | undefined;
   if (!error) {
