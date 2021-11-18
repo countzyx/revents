@@ -21,15 +21,6 @@ export const AuthProviderId = ProviderId;
 export type Unsubscribe = FBUnsubscribe;
 export type UserInfo = FBUserInfo;
 
-export const updatePwUserPasswordInFirebase = async (newPassword: string): Promise<void> => {
-  const auth = getAuth();
-  const { currentUser } = auth;
-  if (!currentUser) {
-    throw new Error('null user changing password');
-  }
-  return updatePassword(currentUser, newPassword);
-};
-
 export const createPasswordUserInFirebase = async (
   regInfo: UserRegistrationInfo,
 ): Promise<User> => {
@@ -42,10 +33,11 @@ export const createPasswordUserInFirebase = async (
   return regResult.user;
 };
 
-export const readCurrentUserId = (): string | undefined => {
+export const readCurrentUser = (): User => {
   const auth = getAuth();
   const { currentUser } = auth;
-  return currentUser?.uid;
+  if (!currentUser) throw new Error('No current user');
+  return currentUser;
 };
 
 export const signInPasswordUserInFirebase = async (creds: UserCredentials): Promise<User> => {
@@ -81,12 +73,22 @@ export const signInSocialMediaUserInFirebase = async (
 export const updateAuthUserDisplayNameInFirebase = async (
   displayName: string | undefined,
 ): Promise<void> => {
-  const auth = getAuth();
-  const { currentUser } = auth;
-  if (!currentUser) throw new Error('null user');
+  const currentUser = readCurrentUser();
   if (displayName !== currentUser.displayName) {
     await updateProfile(currentUser, { displayName });
   }
+};
+
+export const updateAuthUserPhotoInFirebase = async (newPhotoUrl: string): Promise<void> => {
+  const currentUser = readCurrentUser();
+  if (newPhotoUrl !== currentUser.photoURL) {
+    await updateProfile(currentUser, { photoURL: newPhotoUrl });
+  }
+};
+
+export const updatePwUserPasswordInFirebase = async (newPassword: string): Promise<void> => {
+  const currentUser = readCurrentUser();
+  return updatePassword(currentUser, newPassword);
 };
 
 export const verifyAuthWithFirebase = (authVerifyObserver: NextOrObserver<User>): Unsubscribe => {

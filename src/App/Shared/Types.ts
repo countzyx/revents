@@ -29,6 +29,11 @@ export type EventInfo = {
   isCancelled: boolean;
 };
 
+export type PhotoData = {
+  name: string;
+  photoUrl: string;
+};
+
 export type PhotoPreview = {
   file: File;
   previewUrl: string;

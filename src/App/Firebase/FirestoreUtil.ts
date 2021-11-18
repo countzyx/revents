@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { Timestamp } from 'firebase/firestore';
 import type { DocumentData, DocumentSnapshot, FirestoreDataConverter } from 'firebase/firestore';
 import { kDateFormat } from '../Shared/Constants';
-import { EventInfo, UserProfile } from '../Shared/Types';
+import { EventInfo, PhotoData, UserProfile } from '../Shared/Types';
 
 export const eventConverter: FirestoreDataConverter<EventInfo> = {
   fromFirestore: (docSnap: DocumentSnapshot): EventInfo => {
@@ -25,6 +25,14 @@ export const eventConverter: FirestoreDataConverter<EventInfo> = {
     const { id, ...cleanData } = data;
     return cleanData as DocumentData;
   },
+};
+
+export const photoDataConverter: FirestoreDataConverter<PhotoData> = {
+  fromFirestore: (docSnap: DocumentSnapshot): PhotoData => {
+    const docData = docSnap.data();
+    return docData as PhotoData;
+  },
+  toFirestore: (data: PhotoData) => data as DocumentData,
 };
 
 export const userProfileConverter: FirestoreDataConverter<UserProfile> = {
