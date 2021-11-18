@@ -21,9 +21,8 @@ const SubPages: React.FC = () => (
         <Route path='events/:eventId' element={<EventDetails />} />
         <Route path='sandbox' element={<Sandbox />} />
         <Route path='myAccount' element={<MyAccountPage />} />
-        <Route path='profile' element={<ProfilePage />}>
-          <Route path=':userId' element={<ProfilePage />} />
-        </Route>
+        <Route path='profile' element={<ProfilePage />} />
+        <Route path='profile/:userId' element={<ProfilePage />} />
         <Route path='error' element={<Error />} />
       </Routes>
     </Container>
