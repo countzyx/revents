@@ -15,6 +15,10 @@ const PhotosTab: React.FC = () => {
 
   const { displayName } = selectedProfile;
 
+  const onPhotoUploadFinishHandler = () => {
+    setIsEditable(false);
+  };
+
   return (
     <Tab.Pane>
       <Grid>
@@ -31,7 +35,7 @@ const PhotosTab: React.FC = () => {
         </Grid.Column>
         <Grid.Column width={16}>
           {isEditable ? (
-            <PhotoUpload />
+            <PhotoUpload onFinish={onPhotoUploadFinishHandler} />
           ) : (
             <Card.Group itemsPerRow={5}>
               <Card>

@@ -5,16 +5,16 @@ import { Header, Icon } from 'semantic-ui-react';
 import styles from './PhotoDropzone.module.css';
 
 type Props = {
-  onPhotoUpload: (newFiles: File[]) => void;
+  onPhotoDrop: (newFiles: File[]) => void;
 };
 
 const PhotoDropzone: React.FC<Props> = (props) => {
-  const { onPhotoUpload } = props;
+  const { onPhotoDrop } = props;
   const onDrop = React.useCallback(
     (acceptedFiles: File[]) => {
-      onPhotoUpload(acceptedFiles);
+      onPhotoDrop(acceptedFiles);
     },
-    [onPhotoUpload],
+    [onPhotoDrop],
   );
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 

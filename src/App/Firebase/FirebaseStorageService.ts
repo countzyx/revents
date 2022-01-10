@@ -1,14 +1,16 @@
-import { getStorage, ref, uploadBytes, UploadResult } from 'firebase/storage';
+import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
+import type { StorageReference, UploadTask } from 'firebase/storage';
 import { readCurrentUser } from './FirebaseAuthService';
 
-export const createFileInFirebase = async (file: File, fileName: string): Promise<UploadResult> => {
+export const createFileInFirebase = (fileName: string, image: Blob): UploadTask => {
   const trimmedFileName = fileName.trim();
-  if (!trimmedFileName) throw new Error('File name is empty');
-  if (file.size === 0) throw new Error('File is empty');
+  if (!trimmedFileName) throw new Error('file name is empty');
+  if (!image || image.size === 0) throw new Error('image is empty');
   const currentUser = readCurrentUser();
   const storage = getStorage();
   const fileRef = ref(storage, `${currentUser.uid}/images/${trimmedFileName}`);
-  return uploadBytes(fileRef, file);
+  return uploadBytesResumable(fileRef, image);
 };
 
-export default createFileInFirebase;
+export const readDownloadUrl = async (uploadedRef: StorageReference): Promise<string> =>
+  getDownloadURL(uploadedRef);

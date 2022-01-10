@@ -19,3 +19,15 @@ export const getDateFromString = (dateString: string): Date | undefined => {
 
   return date;
 };
+
+export const getErrorStringForCatch = (anyError: unknown): string => {
+  const err = anyError as Error;
+  if (err) {
+    return err.message;
+  }
+  return String(anyError);
+};
+
+export const getFileExtension = (fileName: string): string =>
+  // eslint-disable-next-line no-bitwise
+  fileName.slice(((fileName.lastIndexOf('.') - 1) >>> 0) + 2);

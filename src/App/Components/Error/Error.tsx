@@ -12,7 +12,7 @@ const Error: React.FC<Props> = (props: Props) => {
 
   let locationError: Error | undefined;
   if (!error) {
-    locationError = location.state.error;
+    locationError = (location.state as Props)?.error;
   }
 
   return (
