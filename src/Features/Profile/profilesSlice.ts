@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   readUserProfilePhotosFromFirestore,
   readUserProfileFromFirestore,
@@ -65,27 +65,14 @@ export const fetchSelectedUserProfile = (dispatch: AppDispatch, userId: string):
   return unsubscribe;
 };
 
-export const fetchUserProfilePhotos = (dispatch: AppDispatch, userId: string): Unsubscribe => {
-  const {
-    fetchUserProfilePhotosFulfilled,
-    fetchUserProfilePhotosPending,
-    fetchUserProfilePhotosRejected,
-  } = profilesSlice.actions;
-  const unsubscribe = readUserProfilePhotosFromFirestore(
-    {
-      next: async (snapshot) => {
-        dispatch(fetchUserProfilePhotosPending());
-        console.log(snapshot.docChanges());
-        const fetchedPhotos = snapshot.docs.map((docResult) => docResult.data());
-        const photos = fetchedPhotos.filter((p) => p !== undefined) as PhotoData[];
-        dispatch(fetchUserProfilePhotosFulfilled(photos));
-      },
-      error: async (err) => dispatch(fetchUserProfilePhotosRejected(err)),
-    },
-    userId,
-  );
-  return unsubscribe;
-};
+export const readUserProfilePhotos = createAsyncThunk<PhotoData[], string>(
+  'profile/readUserProfilePhotos',
+  async (userId, _0) => {
+    const snapshot = await readUserProfilePhotosFromFirestore(userId);
+    const photos = snapshot.docs.map((d) => d.data());
+    return photos;
+  },
+);
 
 export const profilesSlice = createSlice({
   name: 'profiles',
@@ -131,28 +118,26 @@ export const profilesSlice = createSlice({
       error: action.payload,
       isLoading: false,
     }),
-    fetchUserProfilePhotosPending: (state) => ({
-      ...state,
-      // photos: [],
-      error: undefined,
-      isLoading: true,
-    }),
-    fetchUserProfilePhotosFulfilled: (state, action: PayloadAction<PhotoData[]>) => ({
-      ...state,
-      photos: action.payload,
-      error: undefined,
-      isLoading: false,
-    }),
-    fetchUserProfilePhotosRejected: (state, action: PayloadAction<Error>) => ({
-      ...state,
-      photos: [],
-      error: action.payload,
-      isLoading: false,
-    }),
     setError: (state, action: PayloadAction<Error>) => ({
       ...state,
       error: action.payload,
     }),
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(readUserProfilePhotos.pending, (state) => ({
+        ...state,
+        photos: [],
+      }))
+      .addCase(readUserProfilePhotos.fulfilled, (state, action) => ({
+        ...state,
+        photos: action.payload,
+      }))
+      .addCase(readUserProfilePhotos.rejected, (state, action) => ({
+        ...state,
+        photos: [],
+        error: action.error as Error,
+      }));
   },
 });
 
