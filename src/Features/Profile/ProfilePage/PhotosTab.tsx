@@ -1,15 +1,32 @@
 import * as React from 'react';
 import { Button, Card, Grid, Header, Image, Tab } from 'semantic-ui-react';
-import { useAppSelector } from '../../../App/Store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { selectAuthUserInfo } from '../../Auth/authSlice';
-import { selectProfileSelectedProfile } from '../profilesSlice';
+import {
+  fetchUserProfilePhotos,
+  selectProfilePhotos,
+  selectProfileSelectedProfile,
+} from '../profilesSlice';
 import PhotoUpload from '../../../App/Components/Photos/PhotoUpload';
 
 const PhotosTab: React.FC = () => {
+  const dispatch = useAppDispatch();
   const [isEditable, setIsEditable] = React.useState(false);
   const currentUser = useAppSelector(selectAuthUserInfo);
   const selectedProfile = useAppSelector(selectProfileSelectedProfile);
+  const photos = useAppSelector(selectProfilePhotos);
   const isCurrentUser = currentUser && currentUser.uid === selectedProfile?.id;
+  const userId = selectedProfile?.id || currentUser?.uid;
+
+  React.useEffect(() => {
+    //    console.log(`photos uid - ${userId} : ${dispatch}`);
+    if (!userId) return undefined;
+
+    const unsubscribed = fetchUserProfilePhotos(dispatch, userId);
+    return unsubscribed;
+  }, [dispatch, userId]);
+
+  //  console.log(`photos - ${JSON.stringify(photos)}`);
 
   if (!selectedProfile) return <div />;
 
@@ -38,13 +55,15 @@ const PhotosTab: React.FC = () => {
             <PhotoUpload onFinish={onPhotoUploadFinishHandler} />
           ) : (
             <Card.Group itemsPerRow={5}>
-              <Card>
-                <Image src='/assets/user.png' />
-                <Button.Group fluid widths={2}>
-                  <Button basic color='green' content='Main' />
-                  <Button basic color='red' icon='trash' />
-                </Button.Group>
-              </Card>
+              {photos.map((p) => (
+                <Card key={p.name}>
+                  <Image src={p.photoUrl} />
+                  <Button.Group fluid widths={2}>
+                    <Button basic color='green' content='Main' />
+                    <Button basic color='red' icon='trash' />
+                  </Button.Group>
+                </Card>
+              ))}
             </Card.Group>
           )}
         </Grid.Column>

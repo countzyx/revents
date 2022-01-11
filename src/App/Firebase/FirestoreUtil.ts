@@ -29,10 +29,17 @@ export const eventConverter: FirestoreDataConverter<EventInfo> = {
 
 export const photoDataConverter: FirestoreDataConverter<PhotoData> = {
   fromFirestore: (docSnap: DocumentSnapshot): PhotoData => {
-    const docData = docSnap.data();
-    return docData as PhotoData;
+    const photoData = docSnap.data();
+    return {
+      ...photoData,
+      id: docSnap.id,
+    } as PhotoData;
   },
-  toFirestore: (data: PhotoData) => data as DocumentData,
+  toFirestore: (data: PhotoData) => {
+    // Not called by updateDoc
+    const { id, ...returnData } = data;
+    return returnData as DocumentData;
+  },
 };
 
 export const userProfileConverter: FirestoreDataConverter<UserProfile> = {

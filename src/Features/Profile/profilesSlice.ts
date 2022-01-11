@@ -1,15 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
+  readUserProfilePhotosFromFirestore,
   readUserProfileFromFirestore,
   Unsubscribe,
 } from '../../App/Firebase/FirestoreUserProfileService';
-import { UserProfile } from '../../App/Shared/Types';
+import { PhotoData, UserProfile } from '../../App/Shared/Types';
 import { AppDispatch, RootState } from '../../App/Store/store';
 
 type ProfileState = {
   currentProfile?: UserProfile;
   error?: Error;
   isLoading: boolean;
+  photos: PhotoData[];
   selectedProfile?: UserProfile;
 };
 
@@ -17,6 +19,7 @@ const initialState: ProfileState = {
   currentProfile: undefined,
   error: undefined,
   isLoading: false,
+  photos: [],
   selectedProfile: undefined,
 };
 
@@ -59,6 +62,28 @@ export const fetchSelectedUserProfile = (dispatch: AppDispatch, userId: string):
     userId,
   );
 
+  return unsubscribe;
+};
+
+export const fetchUserProfilePhotos = (dispatch: AppDispatch, userId: string): Unsubscribe => {
+  const {
+    fetchUserProfilePhotosFulfilled,
+    fetchUserProfilePhotosPending,
+    fetchUserProfilePhotosRejected,
+  } = profilesSlice.actions;
+  const unsubscribe = readUserProfilePhotosFromFirestore(
+    {
+      next: async (snapshot) => {
+        dispatch(fetchUserProfilePhotosPending());
+        console.log(snapshot.docChanges());
+        const fetchedPhotos = snapshot.docs.map((docResult) => docResult.data());
+        const photos = fetchedPhotos.filter((p) => p !== undefined) as PhotoData[];
+        dispatch(fetchUserProfilePhotosFulfilled(photos));
+      },
+      error: async (err) => dispatch(fetchUserProfilePhotosRejected(err)),
+    },
+    userId,
+  );
   return unsubscribe;
 };
 
@@ -106,6 +131,24 @@ export const profilesSlice = createSlice({
       error: action.payload,
       isLoading: false,
     }),
+    fetchUserProfilePhotosPending: (state) => ({
+      ...state,
+      // photos: [],
+      error: undefined,
+      isLoading: true,
+    }),
+    fetchUserProfilePhotosFulfilled: (state, action: PayloadAction<PhotoData[]>) => ({
+      ...state,
+      photos: action.payload,
+      error: undefined,
+      isLoading: false,
+    }),
+    fetchUserProfilePhotosRejected: (state, action: PayloadAction<Error>) => ({
+      ...state,
+      photos: [],
+      error: action.payload,
+      isLoading: false,
+    }),
     setError: (state, action: PayloadAction<Error>) => ({
       ...state,
       error: action.payload,
@@ -118,6 +161,7 @@ export const selectProfileCurrentProfile = (state: RootState): UserProfile | und
   state.profiles.currentProfile;
 export const selectProfileError = (state: RootState): Error | undefined => state.profiles.error;
 export const selectProfileIsLoading = (state: RootState): boolean => state.profiles.isLoading;
+export const selectProfilePhotos = (state: RootState): PhotoData[] => state.profiles.photos;
 export const selectProfileSelectedProfile = (state: RootState): UserProfile | undefined =>
   state.profiles.selectedProfile;
 

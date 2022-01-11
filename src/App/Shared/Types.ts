@@ -30,6 +30,7 @@ export type EventInfo = {
 };
 
 export type PhotoData = {
+  id?: string;
   name: string;
   photoUrl: string;
 };

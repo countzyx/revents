@@ -17,7 +17,7 @@ import {
   updateAuthUserDisplayNameInFirebase,
   updateAuthUserPhotoInFirebase,
 } from './FirebaseAuthService';
-import { DocumentObserver } from './FirestoreEventService';
+import { CollectionObserver, DocumentObserver } from './FirestoreEventService';
 import { photoDataConverter, userProfileConverter } from './FirestoreUtil';
 
 export type Unsubscribe = FBUnsubscribe;
@@ -42,6 +42,17 @@ export const readUserProfileFromFirestore = (
   observer: DocumentObserver,
   userId: string,
 ): Unsubscribe => onSnapshot(doc(userProfileCollection, userId), observer);
+
+export const readUserProfilePhotosFromFirestore = (
+  observer: CollectionObserver,
+  userId: string,
+): Unsubscribe => {
+  const profileDoc = doc(userProfileCollection, userId);
+  const photosCollection = collection(db, profileDoc.path, 'photos').withConverter(
+    photoDataConverter,
+  );
+  return onSnapshot(photosCollection, observer);
+};
 
 export const updateUserProfileInFirestore = async (profile: UserProfile): Promise<void> => {
   const { displayName } = profile;
