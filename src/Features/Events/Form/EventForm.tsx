@@ -17,7 +17,7 @@ import FormTextInput from '../../../App/Components/Form/FormTextInput';
 import CategoryData from '../../../App/Api/CategoryData';
 import FormDate from '../../../App/Components/Form/FormDate';
 import { kDateFormat } from '../../../App/Shared/Constants';
-import { getDateFromString } from '../../../App/Shared/Utils';
+import { getDateFromString, getErrorStringForCatch } from '../../../App/Shared/Utils';
 import LoadingComponent from '../../../App/Layout/LoadingComponent';
 import {
   createEventInFirestore,
@@ -97,8 +97,8 @@ const EventForm: React.FC = () => {
   const selectedEvent = useAppSelector((state) =>
     state.events.events.find((e) => e.id === eventId),
   );
-  const error = useAppSelector(selectEventsError);
-  const isLoading = useAppSelector(selectEventsIsLoading);
+  const eventsError = useAppSelector(selectEventsError);
+  const isLoadingEvents = useAppSelector(selectEventsIsLoading);
   const dispatch = useAppDispatch();
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [loadingCancelChange, setLoadingCancelChange] = React.useState(false);
@@ -138,13 +138,9 @@ const EventForm: React.FC = () => {
         setSubmitting(false);
         navigate(`/events/${newEvent.id}`);
       }
-    } catch (anyErr) {
-      const err = anyErr as Error;
-      if (err) {
-        toast.error(err.message);
-      } else {
-        toast.error(String(anyErr));
-      }
+    } catch (err) {
+      const errorMessage = getErrorStringForCatch(err);
+      toast.error(errorMessage);
       setSubmitting(false);
     }
   };
@@ -157,7 +153,8 @@ const EventForm: React.FC = () => {
     try {
       await toggleCancelEventInFirestore(selectedEvent);
     } catch (err) {
-      toast.error(String(err));
+      const errorMessage = getErrorStringForCatch(err);
+      toast.error(errorMessage);
     } finally {
       setLoadingCancelChange(false);
     }
@@ -171,9 +168,9 @@ const EventForm: React.FC = () => {
     }
   };
 
-  if (isLoading) return <LoadingComponent />;
+  if (isLoadingEvents) return <LoadingComponent />;
 
-  if (error) return <Navigate to='/error' state={error} />;
+  if (eventsError) return <Navigate to='/error' state={eventsError} />;
 
   return (
     <Segment clearing>

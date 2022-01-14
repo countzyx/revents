@@ -7,7 +7,7 @@ import EventListItemPlaceholder from './EventListItemPlaceholder';
 import EventList from './EventsList';
 
 const EventDashboard: React.FC = () => {
-  const isLoading = useAppSelector(selectEventsIsLoading);
+  const isLoadingEvents = useAppSelector(selectEventsIsLoading);
   const dispatch = useAppDispatch();
 
   React.useEffect(() => {
@@ -18,7 +18,7 @@ const EventDashboard: React.FC = () => {
   return (
     <Grid>
       <Grid.Column width={10}>
-        {isLoading && (
+        {isLoadingEvents && (
           <>
             <EventListItemPlaceholder />
             <EventListItemPlaceholder />

@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   readUserProfilePhotosFromFirestore,
   readUserProfileFromFirestore,
@@ -9,17 +9,21 @@ import { AppDispatch, RootState } from '../../App/Store/store';
 
 type ProfileState = {
   currentProfile?: UserProfile;
-  error?: Error;
-  isLoading: boolean;
+  isLoadingPhotos: boolean;
+  isLoadingProfile: boolean;
   photos: PhotoData[];
+  photosError?: Error;
+  profileError?: Error;
   selectedProfile?: UserProfile;
 };
 
 const initialState: ProfileState = {
   currentProfile: undefined,
-  error: undefined,
-  isLoading: false,
+  isLoadingPhotos: false,
+  isLoadingProfile: false,
   photos: [],
+  photosError: undefined,
+  profileError: undefined,
   selectedProfile: undefined,
 };
 
@@ -65,88 +69,113 @@ export const fetchSelectedUserProfile = (dispatch: AppDispatch, userId: string):
   return unsubscribe;
 };
 
-export const readUserProfilePhotos = createAsyncThunk<PhotoData[], string>(
-  'profile/readUserProfilePhotos',
-  async (userId, _0) => {
-    const snapshot = await readUserProfilePhotosFromFirestore(userId);
-    const photos = snapshot.docs.map((d) => d.data());
-    return photos;
-  },
-);
+export const fetchUserProfilePhotos = (dispatch: AppDispatch, userId: string): Unsubscribe => {
+  const {
+    fetchUserProfilePhotosFulfilled,
+    fetchUserProfilePhotosPending,
+    fetchUserProfilePhotosRejected,
+  } = profilesSlice.actions;
+  const unsubscribe = readUserProfilePhotosFromFirestore(
+    {
+      next: async (snapshot) => {
+        dispatch(fetchUserProfilePhotosPending());
+        const fetchedPhotos = snapshot.docs.map((docResult) => docResult.data());
+        const photos = fetchedPhotos.filter((p) => p !== undefined) as PhotoData[];
+        dispatch(fetchUserProfilePhotosFulfilled(photos));
+      },
+      error: async (err) => dispatch(fetchUserProfilePhotosRejected(err)),
+    },
+    userId,
+  );
+  return unsubscribe;
+};
 
 export const profilesSlice = createSlice({
   name: 'profiles',
   initialState,
   reducers: {
-    clearError: (state) => ({
+    clearErrors: (state) => ({
       ...state,
-      error: undefined,
+      photosError: undefined,
+      profileError: undefined,
     }),
     fetchCurrentUserProfilePending: (state) => ({
       ...state,
       currentProfile: undefined,
-      error: undefined,
-      isLoading: true,
+      profileError: undefined,
+      isLoadingProfile: true,
     }),
     fetchCurrentUserProfileFulfilled: (state, action: PayloadAction<UserProfile>) => ({
       ...state,
       currentProfile: action.payload,
-      error: undefined,
-      isLoading: false,
+      profileError: undefined,
+      isLoadingProfile: false,
     }),
     fetchCurrentUserProfileRejected: (state, action: PayloadAction<Error>) => ({
       ...state,
       currentProfile: undefined,
-      error: action.payload,
-      isLoading: false,
+      profileError: action.payload,
+      isLoadingProfile: false,
     }),
     fetchSelectedUserProfilePending: (state) => ({
       ...state,
       selectedProfile: undefined,
-      error: undefined,
-      isLoading: true,
+      profileError: undefined,
+      isLoadingProfile: true,
     }),
     fetchSelectedUserProfileFulfilled: (state, action: PayloadAction<UserProfile>) => ({
       ...state,
       selectedProfile: action.payload,
-      error: undefined,
-      isLoading: false,
+      profileError: undefined,
+      isLoadingProfile: false,
     }),
     fetchSelectedUserProfileRejected: (state, action: PayloadAction<Error>) => ({
       ...state,
       selectedProfile: undefined,
+      profileError: action.payload,
+      isLoadingProfile: false,
+    }),
+    fetchUserProfilePhotosPending: (state) => ({
+      ...state,
+      photos: [],
+      error: undefined,
+      isLoading: true,
+    }),
+    fetchUserProfilePhotosFulfilled: (state, action: PayloadAction<PhotoData[]>) => ({
+      ...state,
+      photos: action.payload,
+      error: undefined,
+      isLoading: false,
+    }),
+    fetchUserProfilePhotosRejected: (state, action: PayloadAction<Error>) => ({
+      ...state,
+      photos: [],
       error: action.payload,
       isLoading: false,
     }),
-    setError: (state, action: PayloadAction<Error>) => ({
+    setPhotoError: (state, action: PayloadAction<Error>) => ({
       ...state,
-      error: action.payload,
+      photosError: action.payload,
     }),
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(readUserProfilePhotos.pending, (state) => ({
-        ...state,
-        photos: [],
-      }))
-      .addCase(readUserProfilePhotos.fulfilled, (state, action) => ({
-        ...state,
-        photos: action.payload,
-      }))
-      .addCase(readUserProfilePhotos.rejected, (state, action) => ({
-        ...state,
-        photos: [],
-        error: action.error as Error,
-      }));
+    setProfileError: (state, action: PayloadAction<Error>) => ({
+      ...state,
+      profileError: action.payload,
+    }),
   },
 });
 
-export const { clearError } = profilesSlice.actions;
+export const { clearErrors } = profilesSlice.actions;
 export const selectProfileCurrentProfile = (state: RootState): UserProfile | undefined =>
   state.profiles.currentProfile;
-export const selectProfileError = (state: RootState): Error | undefined => state.profiles.error;
-export const selectProfileIsLoading = (state: RootState): boolean => state.profiles.isLoading;
+export const selectProfileError = (state: RootState): Error | undefined =>
+  state.profiles.profileError;
+export const selectProfileIsLoading = (state: RootState): boolean =>
+  state.profiles.isLoadingProfile;
+export const selectProfileIsLoadingPhotos = (state: RootState): boolean =>
+  state.profiles.isLoadingPhotos;
 export const selectProfilePhotos = (state: RootState): PhotoData[] => state.profiles.photos;
+export const selectProfilePhotosError = (state: RootState): Error | undefined =>
+  state.profiles.photosError;
 export const selectProfileSelectedProfile = (state: RootState): UserProfile | undefined =>
   state.profiles.selectedProfile;
 

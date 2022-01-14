@@ -4,9 +4,7 @@ import {
   collection,
   doc,
   getDoc,
-  getDocs,
   onSnapshot,
-  QuerySnapshot,
   serverTimestamp,
   setDoc,
   Unsubscribe as FBUnsubscribe,
@@ -19,7 +17,7 @@ import {
   updateAuthUserDisplayNameInFirebase,
   updateAuthUserPhotoInFirebase,
 } from './FirebaseAuthService';
-import { DocumentObserver } from './FirestoreEventService';
+import { CollectionObserver, DocumentObserver } from './FirestoreEventService';
 import { photoDataConverter, userProfileConverter } from './FirestoreUtil';
 
 export type Unsubscribe = FBUnsubscribe;
@@ -45,14 +43,15 @@ export const readUserProfileFromFirestore = (
   userId: string,
 ): Unsubscribe => onSnapshot(doc(userProfileCollection, userId), observer);
 
-export const readUserProfilePhotosFromFirestore = async (
+export const readUserProfilePhotosFromFirestore = (
+  observer: CollectionObserver,
   userId: string,
-): Promise<QuerySnapshot<PhotoData>> => {
+): Unsubscribe => {
   const profileDoc = doc(userProfileCollection, userId);
   const photosCollection = collection(db, profileDoc.path, 'photos').withConverter(
     photoDataConverter,
   );
-  return getDocs(photosCollection);
+  return onSnapshot(photosCollection, observer);
 };
 
 export const updateUserProfileInFirestore = async (profile: UserProfile): Promise<void> => {

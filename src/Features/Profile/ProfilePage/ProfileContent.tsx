@@ -11,14 +11,7 @@ const ProfileContent: React.FC = () => {
     { menuItem: 'Followers', render: () => <Tab.Pane>Followers</Tab.Pane> },
     { menuItem: 'Following', render: () => <Tab.Pane>Following</Tab.Pane> },
   ];
-  return (
-    <Tab
-      activeIndex={1}
-      menu={{ fluid: true, vertical: true }}
-      menuPosition='right'
-      panes={tabPanes}
-    />
-  );
+  return <Tab menu={{ fluid: true, vertical: true }} menuPosition='right' panes={tabPanes} />;
 };
 
 export default ProfileContent;

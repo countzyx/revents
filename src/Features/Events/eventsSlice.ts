@@ -5,17 +5,19 @@ import {
   readSingleEventFromFirestore,
 } from '../../App/Firebase/FirestoreEventService';
 
-import type { AsyncState, EventInfo } from '../../App/Shared/Types';
+import type { EventInfo } from '../../App/Shared/Types';
 import { AppDispatch, RootState } from '../../App/Store/store';
 
 type EventState = {
   events: EventInfo[];
-} & AsyncState;
+  eventsError?: Error;
+  isLoadingEvents: boolean;
+};
 
 const initialState: EventState = {
-  error: undefined,
   events: [],
-  isLoading: true,
+  eventsError: undefined,
+  isLoadingEvents: true,
 };
 
 export const fetchSingleEvent = (dispatch: AppDispatch, eventId: string): Unsubscribe => {
@@ -56,26 +58,26 @@ export const eventsSlice = createSlice({
   reducers: {
     fetchEventsFulfilled: (state, action: PayloadAction<EventInfo[]>) => ({
       ...state,
-      error: undefined,
+      eventsError: undefined,
       events: action.payload,
-      isLoading: false,
+      isLoadingEvents: false,
     }),
     fetchEventsPending: (state) => ({
       ...state,
-      error: undefined,
-      isLoading: true,
+      eventsError: undefined,
+      isLoadingEvents: true,
     }),
     fetchEventsRejected: (state, action: PayloadAction<Error>) => ({
       ...state,
-      error: action.payload,
-      isLoading: false,
+      eventsError: action.payload,
+      isLoadingEvents: false,
     }),
   },
 });
 
 // export const {} = eventsSlice.actions;
 export const selectEvents = (state: RootState): EventInfo[] => state.events.events;
-export const selectEventsError = (state: RootState): Error | undefined => state.events.error;
-export const selectEventsIsLoading = (state: RootState): boolean => state.events.isLoading;
+export const selectEventsError = (state: RootState): Error | undefined => state.events.eventsError;
+export const selectEventsIsLoading = (state: RootState): boolean => state.events.isLoadingEvents;
 
 export default eventsSlice.reducer;

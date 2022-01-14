@@ -18,23 +18,23 @@ const ProfilePage: React.FC = () => {
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector(selectAuthUserInfo);
   const selectedProfile = useAppSelector(selectProfileSelectedProfile);
-  const error = useAppSelector(selectProfileError);
-  const isLoading = useAppSelector(selectProfileIsLoading);
+  const profileError = useAppSelector(selectProfileError);
+  const isLoadingProfile = useAppSelector(selectProfileIsLoading);
 
   React.useEffect(() => {
     if (!userId) return undefined;
 
-    const unsubscribed = fetchSelectedUserProfile(dispatch, userId);
-    return unsubscribed;
+    const unsubscribe = fetchSelectedUserProfile(dispatch, userId);
+    return unsubscribe;
   }, [dispatch, userId]);
 
   if (!userId && !currentUser) return <Navigate to='/' />;
 
   if (!userId && currentUser) return <Navigate to={`/profile/${currentUser.uid}`} />;
 
-  if (isLoading) return <LoadingComponent />;
+  if (isLoadingProfile) return <LoadingComponent />;
 
-  if (error) return <Navigate to='/error' state={error} />;
+  if (profileError) return <Navigate to='/error' state={profileError} />;
 
   if (!selectedProfile) {
     return <h1>No profile found</h1>;

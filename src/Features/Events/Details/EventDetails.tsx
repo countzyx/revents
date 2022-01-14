@@ -12,8 +12,8 @@ import EventDetailsSidebar from './EventDetailsSidebar';
 const EventDetails: React.FC = () => {
   const { eventId } = useParams();
   const event = useAppSelector((state) => state.events.events.find((e) => e.id === eventId));
-  const error = useAppSelector(selectEventsError);
-  const isLoading = useAppSelector(selectEventsIsLoading);
+  const eventsError = useAppSelector(selectEventsError);
+  const isLoadingEvents = useAppSelector(selectEventsIsLoading);
   const dispatch = useAppDispatch();
   React.useEffect(() => {
     if (event) return undefined;
@@ -23,9 +23,9 @@ const EventDetails: React.FC = () => {
     return unsubscribed;
   }, [dispatch, event, eventId]);
 
-  if (isLoading) return <LoadingComponent />;
+  if (isLoadingEvents) return <LoadingComponent />;
 
-  if (error) return <Navigate to='/error' state={error} />;
+  if (eventsError) return <Navigate to='/error' state={eventsError} />;
 
   if (!event) {
     return <h1>No event found</h1>;
