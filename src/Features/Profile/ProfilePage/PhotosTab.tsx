@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { selectAuthUserInfo } from '../../Auth/authSlice';
 import {
   fetchUserProfilePhotos,
+  selectProfileIsLoadingPhotos,
   selectProfilePhotos,
   selectProfileSelectedProfile,
 } from '../profilesSlice';
@@ -14,6 +15,7 @@ const PhotosTab: React.FC = () => {
   const [isEditable, setIsEditable] = React.useState(false);
   const currentUser = useAppSelector(selectAuthUserInfo);
   const selectedProfile = useAppSelector(selectProfileSelectedProfile);
+  const isLoadingPhotos = useAppSelector(selectProfileIsLoadingPhotos);
   const photos = useAppSelector(selectProfilePhotos);
   const isCurrentUser = currentUser && currentUser.uid === selectedProfile?.id;
   const userId = selectedProfile?.id || currentUser?.uid;
@@ -34,7 +36,7 @@ const PhotosTab: React.FC = () => {
   const { displayName } = selectedProfile;
 
   return (
-    <Tab.Pane>
+    <Tab.Pane loading={isLoadingPhotos}>
       <Grid>
         <Grid.Column width={16}>
           <Header content={`${displayName} Photos`} floated='left' icon='images' />
