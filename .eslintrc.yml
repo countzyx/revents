@@ -33,6 +33,7 @@ rules:
   import/no-extraneous-dependencies:
     - 2
     - devDependencies: true
+  import/no-import-module-exports: 'off'
   indent: 'off'
   jsx-a11y/label-has-associated-control:
     - 2
@@ -41,6 +42,10 @@ rules:
       depth: 3
   no-use-before-define: 'off'
   no-unused-vars: 'off'
+  react/function-component-definition:
+    - 2
+    - namedComponents: arrow-function
+      unnamedComponents: arrow-function
   react/jsx-filename-extension:
     - 2
     - extensions:
