@@ -1,8 +1,12 @@
 import { isValid, parse } from 'date-fns';
 import { kDateFormat } from './Constants';
 
-export const delay = (ms: number): Promise<unknown> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+export const delay = (ms: number): Promise<NodeJS.Timeout> =>
+  Promise.resolve(
+    setTimeout(() => {
+      /* do nothing */
+    }, ms),
+  );
 
 export const getDateFromString = (dateString: string): Date | undefined => {
   let date: Date | undefined;
