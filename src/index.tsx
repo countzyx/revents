@@ -12,7 +12,7 @@ import reportWebVitals from './reportWebVitals';
 import store from './App/Store/store';
 import ScrollToTop from './App/Layout/ScrollToTop';
 
-function render(reduxStore: Store, element: HTMLElement) {
+const render = (reduxStore: Store, element: HTMLElement) => {
   ReactDOM.render(
     <Provider store={reduxStore}>
       <BrowserRouter>
@@ -22,7 +22,7 @@ function render(reduxStore: Store, element: HTMLElement) {
     </Provider>,
     element,
   );
-}
+};
 
 const rootElement = document.getElementById('root');
 if (rootElement) {
