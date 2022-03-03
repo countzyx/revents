@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { createFileInFirebase, readDownloadUrl } from '../../App/Firebase/FirebaseStorageService';
+import { createImageInFirebase, readDownloadUrl } from '../../App/Firebase/FirebaseStorageService';
 import {
   readUserProfilePhotosFromFirestore,
   watchUserProfileFromFirestore,
@@ -115,7 +115,7 @@ export const uploadPhoto = (
   const { uploadPhotosPending, uploadPhotosFulfilled, uploadPhotosRejected, uploadPhotosProgress } =
     profilesSlice.actions;
   dispatch(uploadPhotosPending());
-  const uploadTask = createFileInFirebase(photoName, photo);
+  const uploadTask = createImageInFirebase(photoName, photo);
   uploadTask.on('state_changed', {
     next: (snapshot) => {
       const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
