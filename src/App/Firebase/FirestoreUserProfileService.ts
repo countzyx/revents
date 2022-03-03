@@ -2,6 +2,7 @@ import type { User } from 'firebase/auth';
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   onSnapshot,
@@ -52,6 +53,24 @@ export const createUserProfileInFirestore = async (user: User): Promise<void> =>
     id: uid,
     photoURL: photoURL || undefined,
   });
+};
+
+export const deletePhotoInProfileCollection = async (
+  photoName: string,
+  profilePath?: string,
+): Promise<void> => {
+  let photoParentPath = profilePath;
+  if (!photoParentPath) {
+    const userProfile = await readUserProfileFromFirestore();
+    if (!userProfile) throw new Error('No user profile');
+    photoParentPath = userProfile.ref.path;
+  }
+  const photosCollection = collection(db, photoParentPath, 'photos').withConverter(
+    photoDataConverter,
+  );
+
+  const photoToDeleteRef = doc(photosCollection, photoName);
+  await deleteDoc(photoToDeleteRef);
 };
 
 const readUserProfileFromFirestore = async () => {
