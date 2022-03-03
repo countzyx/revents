@@ -3,13 +3,18 @@ import * as React from 'react';
 import { Button, Grid, Header } from 'semantic-ui-react';
 import cuid from 'cuid';
 import { toast } from 'react-toastify';
-import { PhotoData, PhotoPreview } from '../../Shared/Types';
+import type { PhotoPreview } from '../../Shared/Types';
 import PhotoCropper from './PhotoCropper';
 import PhotoDropzone from './PhotoDropzone';
 import styles from './PhotoUpload.module.css';
-import { getErrorStringForCatch, getFileExtension } from '../../Shared/Utils';
-import { createFileInFirebase, readDownloadUrl } from '../../Firebase/FirebaseStorageService';
-import { updateUserProfilePhotoInFirestore } from '../../Firebase/FirestoreUserProfileService';
+import { getFileExtension } from '../../Shared/Utils';
+import { useAppDispatch, useAppSelector } from '../../Store/hooks';
+import {
+  selectProfileIsUploadingPhoto,
+  selectProfilePhotosError,
+  uploadPhoto,
+} from '../../../Features/Profile/profilesSlice';
+import { selectAuthUserInfo } from '../../../Features/Auth/authSlice';
 
 type Props = {
   onFinish: () => void;
@@ -17,9 +22,17 @@ type Props = {
 
 const PhotoUpload: React.FC<Props> = (props) => {
   const { onFinish } = props;
+  const dispatch = useAppDispatch();
+  const currentUser = useAppSelector(selectAuthUserInfo);
+  const photosError = useAppSelector(selectProfilePhotosError);
+  const isUploadingPhoto = useAppSelector(selectProfileIsUploadingPhoto);
   const [photoFile, setPhotoFile] = React.useState<PhotoPreview>();
   const [image, setImage] = React.useState<Blob>();
-  const [isUploading, setIsUploading] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (!photosError) return;
+    toast.error(photosError?.message);
+  }, [photosError]);
 
   const onPhotoDropHandler = (newPhotos: File[]) => {
     const photoPreviews = newPhotos.map<PhotoPreview>((file) => ({
@@ -34,54 +47,23 @@ const PhotoUpload: React.FC<Props> = (props) => {
     console.log(image);
   };
 
-  const clearState = () => {
+  const clearLocalState = () => {
     setImage(undefined);
-    setIsUploading(false);
     setPhotoFile(undefined);
   };
 
   const onCloseHandler = () => {
-    clearState();
+    clearLocalState();
     onFinish();
   };
 
   const onPhotoUploadHandler = () => {
-    // I don't like this logic here; should refactor into a Redux slice or something.
-    setIsUploading(true);
     if (!photoFile) return;
     const uploadFileName = `${cuid()}.${getFileExtension(photoFile.file.name || 'jpg')}`;
     if (!image) return;
-    const uploadTask = createFileInFirebase(uploadFileName, image);
-    uploadTask.on('state_changed', {
-      next: (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log(`upload "${uploadFileName}" - ${progress} done`);
-      },
-      error: (error) => {
-        toast.error(error.message);
-        console.warn(error.message);
-      },
-      complete: async () => {
-        try {
-          const photoUrl = await readDownloadUrl(uploadTask.snapshot.ref);
-          console.log(`uploaded to ${photoUrl}`);
-          try {
-            const photoData: PhotoData = {
-              name: uploadFileName,
-              photoUrl,
-            };
-            await updateUserProfilePhotoInFirestore(photoData);
-          } catch (err) {
-            toast.error(getErrorStringForCatch(err));
-          }
-        } catch (err) {
-          toast.error(getErrorStringForCatch(err));
-        } finally {
-          clearState();
-          onFinish();
-        }
-      },
-    });
+    const updateProfilePhoto = !!currentUser?.photoURL;
+    uploadPhoto(dispatch, uploadFileName, image, updateProfilePhoto);
+    onCloseHandler();
   };
 
   return (
@@ -107,13 +89,13 @@ const PhotoUpload: React.FC<Props> = (props) => {
               <Button
                 className={styles.button}
                 icon='check'
-                loading={isUploading}
+                loading={isUploadingPhoto}
                 onClick={onPhotoUploadHandler}
                 positive
               />
               <Button
                 className={styles.button}
-                disabled={isUploading}
+                disabled={isUploadingPhoto}
                 icon='close'
                 onClick={onCloseHandler}
               />

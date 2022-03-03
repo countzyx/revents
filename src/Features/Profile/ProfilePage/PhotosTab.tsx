@@ -5,10 +5,13 @@ import { selectAuthUserInfo } from '../../Auth/authSlice';
 import {
   fetchUserProfilePhotos,
   selectProfileIsLoadingPhotos,
+  selectProfileIsUpdating,
   selectProfilePhotos,
   selectProfileSelectedProfile,
+  updateUserProfilePhoto,
 } from '../profilesSlice';
 import PhotoUpload from '../../../App/Components/Photos/PhotoUpload';
+import { PhotoData } from '../../../App/Shared/Types';
 
 const PhotosTab: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -16,6 +19,7 @@ const PhotosTab: React.FC = () => {
   const currentUser = useAppSelector(selectAuthUserInfo);
   const selectedProfile = useAppSelector(selectProfileSelectedProfile);
   const isLoadingPhotos = useAppSelector(selectProfileIsLoadingPhotos);
+  const isUpdatingProfile = useAppSelector(selectProfileIsUpdating);
   const photos = useAppSelector(selectProfilePhotos);
   const isCurrentUser = currentUser && currentUser.uid === selectedProfile?.id;
   const userId = selectedProfile?.id || currentUser?.uid;
@@ -26,6 +30,10 @@ const PhotosTab: React.FC = () => {
     const unsubscribe = fetchUserProfilePhotos(dispatch, userId);
     return unsubscribe;
   }, [dispatch, userId]);
+
+  const onUpdateProfilePhoto = (photoData: PhotoData) => {
+    dispatch(updateUserProfilePhoto(photoData));
+  };
 
   const onPhotoUploadFinishHandler = React.useCallback(() => {
     setIsEditable(false);
@@ -58,7 +66,13 @@ const PhotosTab: React.FC = () => {
                 <Card key={p.name}>
                   <Image src={p.photoUrl} />
                   <Button.Group fluid widths={2}>
-                    <Button basic color='green' content='Main' />
+                    <Button
+                      basic
+                      color='green'
+                      content='Main'
+                      loading={isUpdatingProfile}
+                      onClick={() => onUpdateProfilePhoto(p)}
+                    />
                     <Button basic color='red' icon='trash' />
                   </Button.Group>
                 </Card>

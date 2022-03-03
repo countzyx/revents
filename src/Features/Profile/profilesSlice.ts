@@ -1,8 +1,11 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createFileInFirebase, readDownloadUrl } from '../../App/Firebase/FirebaseStorageService';
 import {
   readUserProfilePhotosFromFirestore,
-  readUserProfileFromFirestore,
+  watchUserProfileFromFirestore,
   Unsubscribe,
+  updateUserProfilePhotoInFirestore,
+  createPhotoInProfileCollection,
 } from '../../App/Firebase/FirestoreUserProfileService';
 import { PhotoData, UserProfile } from '../../App/Shared/Types';
 import { AppDispatch, RootState } from '../../App/Store/store';
@@ -11,20 +14,26 @@ type ProfileState = {
   currentProfile?: UserProfile;
   isLoadingPhotos: boolean;
   isLoadingProfile: boolean;
+  isUpdatingProfile: boolean;
+  isUploadingPhoto: boolean;
   photos: PhotoData[];
   photosError?: Error;
   profileError?: Error;
   selectedProfile?: UserProfile;
+  uploadProgress: number;
 };
 
 const initialState: ProfileState = {
   currentProfile: undefined,
   isLoadingPhotos: false,
   isLoadingProfile: false,
+  isUpdatingProfile: false,
+  isUploadingPhoto: false,
   photos: [],
   photosError: undefined,
   profileError: undefined,
   selectedProfile: undefined,
+  uploadProgress: 0,
 };
 
 export const fetchCurrentUserProfile = (dispatch: AppDispatch, userId: string): Unsubscribe => {
@@ -33,7 +42,7 @@ export const fetchCurrentUserProfile = (dispatch: AppDispatch, userId: string): 
     fetchCurrentUserProfileFulfilled,
     fetchCurrentUserProfileRejected,
   } = profilesSlice.actions;
-  const unsubscribe = readUserProfileFromFirestore(
+  const unsubscribe = watchUserProfileFromFirestore(
     {
       next: async (snapshot) => {
         dispatch(fetchCurrentUserProfilePending());
@@ -54,7 +63,7 @@ export const fetchSelectedUserProfile = (dispatch: AppDispatch, userId: string):
     fetchSelectedUserProfileFulfilled,
     fetchSelectedUserProfileRejected,
   } = profilesSlice.actions;
-  const unsubscribe = readUserProfileFromFirestore(
+  const unsubscribe = watchUserProfileFromFirestore(
     {
       next: async (snapshot) => {
         dispatch(fetchSelectedUserProfilePending());
@@ -88,6 +97,58 @@ export const fetchUserProfilePhotos = (dispatch: AppDispatch, userId: string): U
     userId,
   );
   return unsubscribe;
+};
+
+export const updateUserProfilePhoto = createAsyncThunk(
+  'profile/updateUserProfilePhoto',
+  async (photoData: PhotoData, thunkApi) => {
+    await updateUserProfilePhotoInFirestore(photoData);
+  },
+);
+
+export const uploadPhoto = (
+  dispatch: AppDispatch,
+  photoName: string,
+  photo: Blob,
+  updateCurrentProfile = false,
+) => {
+  const { uploadPhotosPending, uploadPhotosFulfilled, uploadPhotosRejected, uploadPhotosProgress } =
+    profilesSlice.actions;
+  dispatch(uploadPhotosPending());
+  const uploadTask = createFileInFirebase(photoName, photo);
+  uploadTask.on('state_changed', {
+    next: (snapshot) => {
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      dispatch(uploadPhotosProgress(progress));
+    },
+    error: (error) => {
+      dispatch(uploadPhotosRejected(error));
+    },
+    complete: async () => {
+      try {
+        const photoUrl = await readDownloadUrl(uploadTask.snapshot.ref);
+
+        const photoData: PhotoData = {
+          name: photoName,
+          photoUrl,
+        };
+        await createPhotoInProfileCollection(photoData);
+        dispatch(uploadPhotosFulfilled());
+
+        if (updateCurrentProfile) {
+          try {
+            await updateUserProfilePhotoInFirestore(photoData);
+          } catch (e) {
+            const err = e as Error;
+            dispatch(uploadPhotosRejected(err || new Error(String(e))));
+          }
+        }
+      } catch (e) {
+        const err = e as Error;
+        dispatch(uploadPhotosRejected(err || new Error(String(e))));
+      }
+    },
+  });
 };
 
 export const profilesSlice = createSlice({
@@ -138,19 +199,19 @@ export const profilesSlice = createSlice({
     fetchUserProfilePhotosPending: (state) => ({
       ...state,
       photos: [],
-      error: undefined,
+      photosError: undefined,
       isLoading: true,
     }),
     fetchUserProfilePhotosFulfilled: (state, action: PayloadAction<PhotoData[]>) => ({
       ...state,
       photos: action.payload,
-      error: undefined,
+      photosError: undefined,
       isLoading: false,
     }),
     fetchUserProfilePhotosRejected: (state, action: PayloadAction<Error>) => ({
       ...state,
       photos: [],
-      error: action.payload,
+      photosError: action.payload,
       isLoading: false,
     }),
     setPhotoError: (state, action: PayloadAction<Error>) => ({
@@ -161,6 +222,44 @@ export const profilesSlice = createSlice({
       ...state,
       profileError: action.payload,
     }),
+    uploadPhotosPending: (state) => ({
+      ...state,
+      isUploadingPhoto: true,
+      photosError: undefined,
+      uploadProgress: 0,
+    }),
+    uploadPhotosFulfilled: (state) => ({
+      ...state,
+      isUploadingPhoto: false,
+      photosError: undefined,
+      uploadProgress: 0,
+    }),
+    uploadPhotosRejected: (state, action: PayloadAction<Error>) => ({
+      ...state,
+      isUploadingPhoto: false,
+      photosError: action.payload,
+      uploadProgress: 0,
+    }),
+    uploadPhotosProgress: (state, action: PayloadAction<number>) => ({
+      ...state,
+      uploadProgress: action.payload,
+    }),
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(updateUserProfilePhoto.fulfilled, (state) => ({
+        ...state,
+        isUpdatingProfile: false,
+      }))
+      .addCase(updateUserProfilePhoto.pending, (state) => ({
+        ...state,
+        isUpdatingProfile: true,
+      }))
+      .addCase(updateUserProfilePhoto.rejected, (state, action) => ({
+        ...state,
+        isUpdatingProfile: false,
+        photosError: action.error as Error,
+      }));
   },
 });
 
@@ -173,6 +272,10 @@ export const selectProfileIsLoading = (state: RootState): boolean =>
   state.profiles.isLoadingProfile;
 export const selectProfileIsLoadingPhotos = (state: RootState): boolean =>
   state.profiles.isLoadingPhotos;
+export const selectProfileIsUpdating = (state: RootState): boolean =>
+  state.profiles.isUpdatingProfile;
+export const selectProfileIsUploadingPhoto = (state: RootState): boolean =>
+  state.profiles.isUploadingPhoto;
 export const selectProfilePhotos = (state: RootState): PhotoData[] => state.profiles.photos;
 export const selectProfilePhotosError = (state: RootState): Error | undefined =>
   state.profiles.photosError;

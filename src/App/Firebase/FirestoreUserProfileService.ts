@@ -24,6 +24,22 @@ export type Unsubscribe = FBUnsubscribe;
 
 const userProfileCollection = collection(db, 'users').withConverter(userProfileConverter);
 
+export const createPhotoInProfileCollection = async (
+  photoData: PhotoData,
+  profilePath?: string,
+): Promise<void> => {
+  let photoParentPath = profilePath;
+  if (!photoParentPath) {
+    const userProfile = await readUserProfileFromFirestore();
+    if (!userProfile) throw new Error('No user profile');
+    photoParentPath = userProfile.ref.path;
+  }
+  const photosCollection = collection(db, photoParentPath, 'photos').withConverter(
+    photoDataConverter,
+  );
+  await addDoc(photosCollection, photoData);
+};
+
 export const createUserProfileInFirestore = async (user: User): Promise<void> => {
   const { displayName, email, photoURL, uid } = user;
   if (!email) {
@@ -38,10 +54,12 @@ export const createUserProfileInFirestore = async (user: User): Promise<void> =>
   });
 };
 
-export const readUserProfileFromFirestore = (
-  observer: DocumentObserver,
-  userId: string,
-): Unsubscribe => onSnapshot(doc(userProfileCollection, userId), observer);
+const readUserProfileFromFirestore = async () => {
+  const currentUser = readCurrentUser();
+  const profileDoc = doc(userProfileCollection, currentUser.uid);
+  const userProfile = await getDoc(profileDoc);
+  return userProfile;
+};
 
 export const readUserProfilePhotosFromFirestore = (
   observer: CollectionObserver,
@@ -62,17 +80,13 @@ export const updateUserProfileInFirestore = async (profile: UserProfile): Promis
 };
 
 export const updateUserProfilePhotoInFirestore = async (photoData: PhotoData): Promise<void> => {
-  const currentUser = readCurrentUser();
-  const profileDoc = doc(userProfileCollection, currentUser.uid);
-  const userProfile = (await getDoc(profileDoc)).data();
+  const userProfile = await readUserProfileFromFirestore();
   if (!userProfile) throw new Error('No user profile');
-  // not sure why we are only updating the photo url if it's empty; users should be able to change it all they want
-  if (!userProfile.photoURL) {
-    await updateDoc(profileDoc, { photoURL: photoData.photoUrl });
-    await updateAuthUserPhotoInFirebase(photoData.photoUrl);
-  }
-  const photosCollection = collection(db, profileDoc.path, 'photos').withConverter(
-    photoDataConverter,
-  );
-  await addDoc(photosCollection, photoData);
+  await updateDoc(userProfile.ref, { photoURL: photoData.photoUrl });
+  await updateAuthUserPhotoInFirebase(photoData.photoUrl);
 };
+
+export const watchUserProfileFromFirestore = (
+  observer: DocumentObserver,
+  userId: string,
+): Unsubscribe => onSnapshot(doc(userProfileCollection, userId), observer);
