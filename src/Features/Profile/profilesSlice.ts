@@ -1,11 +1,16 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { createImageInFirebase, readDownloadUrl } from '../../App/Firebase/FirebaseStorageService';
+import {
+  createImageInFirebase,
+  deleteImageInFirebase,
+  readDownloadUrl,
+} from '../../App/Firebase/FirebaseStorageService';
 import {
   readUserProfilePhotosFromFirestore,
   watchUserProfileFromFirestore,
   Unsubscribe,
   updateUserProfilePhotoInFirestore,
   createPhotoInProfileCollection,
+  deletePhotoInProfileCollection,
 } from '../../App/Firebase/FirestoreUserProfileService';
 import { PhotoData, UserProfile } from '../../App/Shared/Types';
 import { AppDispatch, RootState } from '../../App/Store/store';
@@ -35,6 +40,31 @@ const initialState: ProfileState = {
   selectedProfile: undefined,
   uploadProgress: 0,
 };
+
+export const deletePhotoFromCurrentProfile = createAsyncThunk<
+  void,
+  PhotoData,
+  { dispatch: AppDispatch; state: RootState }
+>('profile/deletePhotoFromCurrentProfile', async (photoData, thunkApi) => {
+  const { id, name, photoUrl } = photoData;
+  if (!id) {
+    thunkApi.rejectWithValue(new Error('photo has no ID'));
+    return;
+  }
+  const { profiles } = thunkApi.getState();
+  const { currentProfile } = profiles;
+  if (!currentProfile) {
+    thunkApi.rejectWithValue(new Error('no current profile'));
+    return;
+  }
+  if (currentProfile?.photoURL === photoUrl) {
+    thunkApi.rejectWithValue(new Error('cannot delete active profile photo'));
+    return;
+  }
+
+  await deletePhotoInProfileCollection(id);
+  await deleteImageInFirebase(name);
+});
 
 export const fetchCurrentUserProfile = (dispatch: AppDispatch, userId: string): Unsubscribe => {
   const {
@@ -99,18 +129,19 @@ export const fetchUserProfilePhotos = (dispatch: AppDispatch, userId: string): U
   return unsubscribe;
 };
 
-export const updateUserProfilePhoto = createAsyncThunk(
-  'profile/updateUserProfilePhoto',
-  async (photoData: PhotoData, thunkApi) => {
-    await updateUserProfilePhotoInFirestore(photoData);
-  },
-);
+export const updateUserProfilePhoto = createAsyncThunk<
+  void,
+  PhotoData,
+  { dispatch: AppDispatch; state: RootState }
+>('profile/updateUserProfilePhoto', async (photoData, thunkApi) => {
+  await updateUserProfilePhotoInFirestore(photoData);
+});
 
-export const uploadPhoto = (
+export const uploadPhotoToCurrentProfile = (
   dispatch: AppDispatch,
   photoName: string,
   photo: Blob,
-  updateCurrentProfile = false,
+  updateProfilePhoto = false,
 ) => {
   const { uploadPhotosPending, uploadPhotosFulfilled, uploadPhotosRejected, uploadPhotosProgress } =
     profilesSlice.actions;
@@ -135,7 +166,7 @@ export const uploadPhoto = (
         await createPhotoInProfileCollection(photoData);
         dispatch(uploadPhotosFulfilled());
 
-        if (updateCurrentProfile) {
+        if (updateProfilePhoto) {
           try {
             await updateUserProfilePhotoInFirestore(photoData);
           } catch (e) {
@@ -247,6 +278,14 @@ export const profilesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(deletePhotoFromCurrentProfile.pending, (state) => ({
+        ...state,
+        photosError: undefined,
+      }))
+      .addCase(deletePhotoFromCurrentProfile.rejected, (state, action) => ({
+        ...state,
+        photosError: action.error as Error,
+      }))
       .addCase(updateUserProfilePhoto.fulfilled, (state) => ({
         ...state,
         isUpdatingProfile: false,
@@ -254,6 +293,7 @@ export const profilesSlice = createSlice({
       .addCase(updateUserProfilePhoto.pending, (state) => ({
         ...state,
         isUpdatingProfile: true,
+        photosError: undefined,
       }))
       .addCase(updateUserProfilePhoto.rejected, (state, action) => ({
         ...state,

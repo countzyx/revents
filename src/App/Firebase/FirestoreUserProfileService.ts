@@ -56,7 +56,7 @@ export const createUserProfileInFirestore = async (user: User): Promise<void> =>
 };
 
 export const deletePhotoInProfileCollection = async (
-  photoName: string,
+  photoId: string,
   profilePath?: string,
 ): Promise<void> => {
   let photoParentPath = profilePath;
@@ -69,7 +69,7 @@ export const deletePhotoInProfileCollection = async (
     photoDataConverter,
   );
 
-  const photoToDeleteRef = doc(photosCollection, photoName);
+  const photoToDeleteRef = doc(photosCollection, photoId);
   await deleteDoc(photoToDeleteRef);
 };
 

@@ -3,6 +3,7 @@ import { Button, Card, Grid, Header, Image, Tab } from 'semantic-ui-react';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { selectAuthUserInfo } from '../../Auth/authSlice';
 import {
+  deletePhotoFromCurrentProfile,
   fetchUserProfilePhotos,
   selectProfileIsLoadingPhotos,
   selectProfileIsUpdating,
@@ -30,6 +31,12 @@ const PhotosTab: React.FC = () => {
     const unsubscribe = fetchUserProfilePhotos(dispatch, userId);
     return unsubscribe;
   }, [dispatch, userId]);
+
+  const onDeleteProfilePhoto = (photoData: PhotoData) => {
+    const { photoUrl } = photoData;
+    if (isCurrentUser && selectedProfile?.photoURL === photoUrl) return;
+    dispatch(deletePhotoFromCurrentProfile(photoData));
+  };
 
   const onUpdateProfilePhoto = (photoData: PhotoData) => {
     dispatch(updateUserProfilePhoto(photoData));
@@ -69,11 +76,18 @@ const PhotosTab: React.FC = () => {
                     <Button
                       basic
                       color='green'
-                      content='Main'
+                      disabled={selectedProfile.photoURL === p.photoUrl}
+                      icon='user'
                       loading={isUpdatingProfile}
                       onClick={() => onUpdateProfilePhoto(p)}
                     />
-                    <Button basic color='red' icon='trash' />
+                    <Button
+                      basic
+                      color='red'
+                      disabled={selectedProfile.photoURL === p.photoUrl}
+                      icon='trash'
+                      onClick={() => onDeleteProfilePhoto(p)}
+                    />
                   </Button.Group>
                 </Card>
               ))}

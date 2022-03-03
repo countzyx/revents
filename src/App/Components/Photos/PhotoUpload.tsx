@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from '../../Store/hooks';
 import {
   selectProfileIsUploadingPhoto,
   selectProfilePhotosError,
-  uploadPhoto,
+  uploadPhotoToCurrentProfile,
 } from '../../../Features/Profile/profilesSlice';
 import { selectAuthUserInfo } from '../../../Features/Auth/authSlice';
 
@@ -62,7 +62,7 @@ const PhotoUpload: React.FC<Props> = (props) => {
     const uploadFileName = `${cuid()}.${getFileExtension(photoFile.file.name || 'jpg')}`;
     if (!image) return;
     const updateProfilePhoto = !!currentUser?.photoURL;
-    uploadPhoto(dispatch, uploadFileName, image, updateProfilePhoto);
+    uploadPhotoToCurrentProfile(dispatch, uploadFileName, image, updateProfilePhoto);
     onCloseHandler();
   };
 
