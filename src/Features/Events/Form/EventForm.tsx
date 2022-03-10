@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as React from 'react';
-import _ from 'lodash';
 import { Button, Confirm, Header, Segment } from 'semantic-ui-react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { Form, Formik } from 'formik';
