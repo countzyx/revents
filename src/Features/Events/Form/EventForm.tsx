@@ -81,6 +81,7 @@ const blankEvent: EventInfo = {
   date: '',
   description: '',
   hostPhotoUrl: '',
+  hostUid: '',
   hostedBy: '',
   title: '',
   venue: {
@@ -88,6 +89,7 @@ const blankEvent: EventInfo = {
     latLng: undefined,
   },
   attendees: [],
+  attendeeIds: [],
   isCancelled: false,
 };
 
@@ -128,9 +130,6 @@ const EventForm: React.FC = () => {
       } else {
         const newEvent: EventInfo = {
           ...blankEvent,
-          id: _.uniqueId(),
-          hostedBy: 'Bobbie',
-          hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
           ...formValues,
           date: format(getDateFromString(formValues.date)!, kDateFormat), // FormDate is inconsistent with date string, need to fix
         };

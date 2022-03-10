@@ -1,5 +1,6 @@
 import {
   addDoc,
+  arrayUnion,
   collection,
   deleteDoc,
   doc,
@@ -19,6 +20,7 @@ import type {
 import { eventConverter } from './FirestoreUtil';
 import { EventInfo } from '../Shared/Types';
 import { db } from './Firebase';
+import { readCurrentUser } from './FirebaseAuthService';
 
 export type Unsubscribe = FBUnsubscribe;
 
@@ -38,25 +40,23 @@ export type DocumentObserver = {
 
 export const createEventInFirestore = async (
   event: EventInfo,
-): Promise<DocumentReference<EventInfo>> =>
-  addDoc(eventsCollection, {
+): Promise<DocumentReference<EventInfo>> => {
+  const user = readCurrentUser();
+  const { displayName, photoURL, uid } = user;
+  return addDoc(eventsCollection, {
     ...event,
-    hostedBy: 'Bobbie',
-    hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
-    attendees: [
-      {
-        id: 'a',
-        name: 'Bobbie',
-        photoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
-      },
-      {
-        id: 'b',
-        name: 'Tony',
-        photoUrl: 'https://randomuser.me/api/portraits/men/40.jpg',
-      },
-    ],
+    hostUid: uid,
+    hostedBy: displayName || 'anonymous',
+    hostPhotoUrl: photoURL || '/assets/user.png',
+    attendees: arrayUnion({
+      id: uid,
+      name: displayName || 'anonymous',
+      photoUrl: photoURL || '/assets/user.png',
+    }),
+    attendeeIds: arrayUnion(uid),
     isCancelled: false,
   });
+};
 
 export const deleteEventInFirestore = async (eventId: string): Promise<void> =>
   deleteDoc(doc(eventsCollection, eventId));

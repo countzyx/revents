@@ -18,9 +18,11 @@ export type EventInfo = {
   description: string;
   city: PlacesInfo;
   venue: PlacesInfo;
+  hostUid: string;
   hostedBy: string;
   hostPhotoUrl: string;
   attendees?: EventAttendee[];
+  attendeeIds: string[];
   isCancelled: boolean;
 };
 

@@ -23,6 +23,7 @@ export const SampleData: EventInfo[] = [
         lng: -73.98568585932333,
       },
     },
+    hostUid: 'bobbie',
     hostedBy: 'Bobbie',
     hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
     attendees: [
@@ -37,6 +38,7 @@ export const SampleData: EventInfo[] = [
         photoUrl: 'https://randomuser.me/api/portraits/men/40.jpg',
       },
     ],
+    attendeeIds: ['a', 'b'],
     isCancelled: false,
   },
   {
@@ -60,6 +62,7 @@ export const SampleData: EventInfo[] = [
         lng: -0.12295318602565862,
       },
     },
+    hostUid: 'tony',
     hostedBy: 'Tony',
     hostPhotoUrl: 'https://randomuser.me/api/portraits/men/40.jpg',
     attendees: [
@@ -74,6 +77,7 @@ export const SampleData: EventInfo[] = [
         photoUrl: 'https://randomuser.me/api/portraits/men/40.jpg',
       },
     ],
+    attendeeIds: ['a', 'b'],
     isCancelled: false,
   },
 ];
