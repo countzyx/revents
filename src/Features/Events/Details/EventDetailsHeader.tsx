@@ -6,10 +6,12 @@ import styles from './EventDetailsHeader.module.css';
 
 type Props = {
   event: EventInfo;
+  userIsHost: boolean;
+  userIsAttending: boolean;
 };
 
 const EventDetailsHeader: React.FC<Props> = (props: Props) => {
-  const { event } = props;
+  const { event, userIsAttending, userIsHost } = props;
 
   return (
     <Segment.Group>
@@ -42,13 +44,19 @@ const EventDetailsHeader: React.FC<Props> = (props: Props) => {
         </Segment>
       </Segment>
 
-      <Segment attached='bottom'>
-        <Button>Cancel My Place</Button>
-        <Button color='teal'>JOIN THIS EVENT</Button>
+      <Segment attached='bottom' clearing>
+        {!userIsHost &&
+          (userIsAttending ? (
+            <Button>Cancel My Place</Button>
+          ) : (
+            <Button color='teal'>JOIN THIS EVENT</Button>
+          ))}
 
-        <Button as={Link} to={`/editEvent/${event.id}`} color='orange' floated='right'>
-          Manage Event
-        </Button>
+        {userIsHost && (
+          <Button as={Link} to={`/editEvent/${event.id}`} color='orange' floated='right'>
+            Manage Event
+          </Button>
+        )}
       </Segment>
     </Segment.Group>
   );
