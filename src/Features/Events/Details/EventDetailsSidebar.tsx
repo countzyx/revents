@@ -1,13 +1,15 @@
 import * as React from 'react';
-import { Item, Segment } from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
+import { Item, Label, Segment } from 'semantic-ui-react';
 import { EventAttendee } from '../../../App/Shared/Types';
 
 type Props = {
   attendees: EventAttendee[] | undefined;
+  hostUid: string;
 };
 
 const EventDetailsSidebar: React.FC<Props> = (props: Props) => {
-  const { attendees } = props;
+  const { attendees, hostUid } = props;
 
   const getPeopleCountMessage = () => {
     if (attendees) {
@@ -25,13 +27,28 @@ const EventDetailsSidebar: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <Segment textAlign='center' style={{ border: 'none' }} attached='top' secondary inverted color='teal'>
+      <Segment
+        textAlign='center'
+        style={{ border: 'none' }}
+        attached='top'
+        secondary
+        inverted
+        color='teal'
+      >
         {getPeopleCountMessage()} Going
       </Segment>
       <Segment attached>
         <Item.Group relaxed divided>
           {attendees?.map((a) => (
-            <Item key={a.id} style={{ position: 'relative' }}>
+            <Item as={Link} key={a.id} style={{ position: 'relative' }} to={`/profile/${a.id}`}>
+              {hostUid === a.id && (
+                <Label
+                  color='orange'
+                  content='Host'
+                  ribbon='right'
+                  style={{ position: 'absolute' }}
+                />
+              )}
               <Item.Image size='tiny' src={a.photoUrl || '/assets/user.png'} />
               <Item.Content verticalAlign='middle'>
                 <Item.Header as='h3'>

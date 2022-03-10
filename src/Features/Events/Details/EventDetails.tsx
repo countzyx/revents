@@ -38,7 +38,7 @@ const EventDetails: React.FC = () => {
         <EventDetailsChat />
       </Grid.Column>
       <Grid.Column width={6}>
-        <EventDetailsSidebar attendees={event.attendees} />
+        <EventDetailsSidebar attendees={event.attendees} hostUid={event.hostUid} />
       </Grid.Column>
     </Grid>
   );

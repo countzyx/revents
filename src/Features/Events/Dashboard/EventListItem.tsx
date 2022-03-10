@@ -20,7 +20,9 @@ const EventListItem: React.FC<Props> = (props: Props) => {
             <Item.Image size='tiny' src={event.hostPhotoUrl} />
             <Item.Content>
               <Item.Header content={event.title} />
-              <Item.Description>Hosted by {event.hostedBy}</Item.Description>
+              <Item.Description>
+                Hosted by <Link to={`/profile/${event.hostUid}`}>{event.hostedBy}</Link>
+              </Item.Description>
               {event.isCancelled && (
                 <Label
                   color='red'

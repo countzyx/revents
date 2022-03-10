@@ -59,11 +59,14 @@ const EventDetailsHeader: React.FC<Props> = (props: Props) => {
         <Segment basic className={styles.eventImageText}>
           <Item.Group>
             <Item>
-              <Item.Content>
+              <Item.Content style={{ color: 'white' }}>
                 <Header size='huge' content={event.title} style={{ color: 'white' }} />
                 <p>{event.date}</p>
                 <p>
-                  Hosted by <strong>{event.hostedBy}</strong>
+                  Hosted by{' '}
+                  <strong>
+                    <Link to={`/profile/${event.hostUid}`}>{event.hostedBy}</Link>
+                  </strong>
                 </p>
               </Item.Content>
             </Item>

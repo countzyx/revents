@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import { Image, List } from 'semantic-ui-react';
 import type { EventAttendee } from '../../../App/Shared/Types';
 
@@ -11,7 +12,9 @@ const EventListAttendee: React.FC<Props> = (props: Props) => {
 
   return (
     <List.Item>
-      <Image size='mini' circular src={attendee.photoUrl} />
+      <Link to={`/profile/${attendee.id}`}>
+        <Image size='mini' circular src={attendee.photoUrl} />
+      </Link>
     </List.Item>
   );
 };
