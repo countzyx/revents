@@ -38,6 +38,18 @@ export type DocumentObserver = {
   complete?: () => void; // Never gets executed by Firestore.
 };
 
+export const addCurrentUserAsEventAttendeeInFirestore = async (event: EventInfo): Promise<void> => {
+  const user = readCurrentUser();
+  return updateDoc(doc(eventsCollection, event.id), {
+    attendees: arrayUnion({
+      id: user.uid,
+      name: user.displayName,
+      photoUrl: user.photoURL,
+    }),
+    attendeeIds: arrayUnion(user.uid),
+  });
+};
+
 export const createEventInFirestore = async (
   event: EventInfo,
 ): Promise<DocumentReference<EventInfo>> => {

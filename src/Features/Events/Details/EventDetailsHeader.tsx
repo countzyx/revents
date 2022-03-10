@@ -1,17 +1,39 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { Button, Header, Image, Item, Label, Segment } from 'semantic-ui-react';
 import { EventInfo } from '../../../App/Shared/Types';
+import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
+import { selectAuthUserInfo } from '../../Auth/authSlice';
+import {
+  addCurrentUserAsAttendeeToEvent,
+  selectEventsIsUpdatingAttendees,
+  seletcEventsUpdateAttendeesError,
+} from '../eventsSlice';
 import styles from './EventDetailsHeader.module.css';
 
 type Props = {
   event: EventInfo;
-  userIsHost: boolean;
-  userIsAttending: boolean;
 };
 
 const EventDetailsHeader: React.FC<Props> = (props: Props) => {
-  const { event, userIsAttending, userIsHost } = props;
+  const { event } = props;
+  const user = useAppSelector(selectAuthUserInfo);
+  const isUpdatingAttendees = useAppSelector(selectEventsIsUpdatingAttendees);
+  const updateAttendeesError = useAppSelector(seletcEventsUpdateAttendeesError);
+  const dispatch = useAppDispatch();
+
+  React.useEffect(() => {
+    if (!updateAttendeesError) return;
+    toast.error(updateAttendeesError.message);
+  }, [updateAttendeesError]);
+
+  const userIsHost = event.hostUid === user?.uid;
+  const userIsAttending = event.attendeeIds.some((id) => id === user?.uid);
+
+  const onAddCurrentUserAsAttendee = () => {
+    dispatch(addCurrentUserAsAttendeeToEvent(event));
+  };
 
   return (
     <Segment.Group>
@@ -49,7 +71,9 @@ const EventDetailsHeader: React.FC<Props> = (props: Props) => {
           (userIsAttending ? (
             <Button>Cancel My Place</Button>
           ) : (
-            <Button color='teal'>JOIN THIS EVENT</Button>
+            <Button color='teal' loading={isUpdatingAttendees} onClick={onAddCurrentUserAsAttendee}>
+              JOIN THIS EVENT
+            </Button>
           ))}
 
         {userIsHost && (
