@@ -26,6 +26,11 @@ export type EventInfo = {
   isCancelled: boolean;
 };
 
+export type CriteriaKeys = 'filter' | 'startDate';
+export type FilterValues = 'all' | 'isGoing' | 'isHost';
+export type FilterEntry = { filter: FilterValues };
+export type EventSearchCriteria = FilterEntry & { startDate: string };
+
 export type PhotoData = {
   id?: string;
   name: string;

@@ -1,19 +1,20 @@
 import * as React from 'react';
 import { Grid } from 'semantic-ui-react';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
-import { fetchAllEvents, selectEventsIsLoading } from '../eventsSlice';
+import { fetchAllEvents, selectEventsIsLoading, selectEventsSearchCriteria } from '../eventsSlice';
 import EventFilters from './EventFilters';
 import EventListItemPlaceholder from './EventListItemPlaceholder';
 import EventList from './EventsList';
 
 const EventDashboard: React.FC = () => {
   const isLoadingEvents = useAppSelector(selectEventsIsLoading);
+  const searchCriteria = useAppSelector(selectEventsSearchCriteria);
   const dispatch = useAppDispatch();
 
   React.useEffect(() => {
-    const unsubscribed = fetchAllEvents(dispatch);
+    const unsubscribed = fetchAllEvents(dispatch, searchCriteria);
     return unsubscribed;
-  }, [dispatch]);
+  }, [dispatch, searchCriteria]);
 
   return (
     <Grid>

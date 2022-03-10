@@ -11,6 +11,7 @@ import {
   query,
   setDoc,
   updateDoc,
+  where,
 } from 'firebase/firestore';
 import type {
   DocumentReference,
@@ -20,7 +21,7 @@ import type {
   Unsubscribe as FBUnsubscribe,
 } from 'firebase/firestore';
 import { eventConverter } from './FirestoreUtil';
-import { EventInfo } from '../Shared/Types';
+import { EventInfo, EventSearchCriteria } from '../Shared/Types';
 import { db } from './Firebase';
 import { readCurrentUser } from './FirebaseAuthService';
 
@@ -75,8 +76,26 @@ export const createEventInFirestore = async (
 export const deleteEventInFirestore = async (eventId: string): Promise<void> =>
   deleteDoc(doc(eventsCollection, eventId));
 
-export const readAllEventsFromFirestore = (observer: CollectionObserver): Unsubscribe =>
-  onSnapshot(query(eventsCollection, orderBy('date')), observer);
+export const readAllEventsFromFirestore = (
+  observer: CollectionObserver,
+  searchCriteria: EventSearchCriteria,
+): Unsubscribe => {
+  const { uid } = readCurrentUser();
+  const criteria = [where('date', '>=', searchCriteria.startDate)];
+  switch (searchCriteria.filter) {
+    case 'isGoing': {
+      criteria.push(where('attendeeIds', 'array-contains', uid));
+      break;
+    }
+    case 'isHost': {
+      criteria.push(where('hostUid', '==', uid));
+      break;
+    }
+  }
+
+  const allEventsQuery = query(eventsCollection, orderBy('date'), ...criteria);
+  return onSnapshot(allEventsQuery, observer);
+};
 
 export const readSingleEventFromFirestore = (
   observer: DocumentObserver,

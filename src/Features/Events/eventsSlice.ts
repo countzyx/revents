@@ -6,15 +6,22 @@ import {
   removeCurrentUserAsEventAttendeeInFirestore,
 } from '../../App/Firebase/FirestoreEventService';
 import type { Unsubscribe } from '../../App/Firebase/FirestoreEventService';
-import type { EventInfo } from '../../App/Shared/Types';
+import { EventInfo, EventSearchCriteria } from '../../App/Shared/Types';
 import { AppDispatch, RootState } from '../../App/Store/store';
+import { getStringFromDate } from '../../App/Shared/Utils';
 
 type EventState = {
   events: EventInfo[];
   eventsError?: Error;
   isLoadingEvents: boolean;
   isUpdatingAttendees: boolean;
+  searchCriteria: EventSearchCriteria;
   updateAttendeesError?: Error;
+};
+
+const defaultSearchCriteria: EventSearchCriteria = {
+  filter: 'all',
+  startDate: getStringFromDate(new Date()),
 };
 
 const initialState: EventState = {
@@ -22,6 +29,7 @@ const initialState: EventState = {
   eventsError: undefined,
   isLoadingEvents: true,
   isUpdatingAttendees: false,
+  searchCriteria: { ...defaultSearchCriteria },
   updateAttendeesError: undefined,
 };
 
@@ -50,17 +58,23 @@ export const fetchSingleEvent = (dispatch: AppDispatch, eventId: string): Unsubs
   return unsubscribe;
 };
 
-export const fetchAllEvents = (dispatch: AppDispatch): Unsubscribe => {
+export const fetchAllEvents = (
+  dispatch: AppDispatch,
+  searchCriteria: EventSearchCriteria,
+): Unsubscribe => {
   const { fetchEventsPending, fetchEventsFulfilled, fetchEventsRejected } = eventsSlice.actions;
-  const unsubscribe = readAllEventsFromFirestore({
-    next: async (snapshot) => {
-      dispatch(fetchEventsPending());
-      const fetchedEvents = snapshot.docs.map((docResult) => docResult.data());
-      const events = fetchedEvents.filter((e) => e !== undefined) as EventInfo[];
-      dispatch(fetchEventsFulfilled(events));
+  const unsubscribe = readAllEventsFromFirestore(
+    {
+      next: async (snapshot) => {
+        dispatch(fetchEventsPending());
+        const fetchedEvents = snapshot.docs.map((docResult) => docResult.data());
+        const events = fetchedEvents.filter((e) => e !== undefined) as EventInfo[];
+        dispatch(fetchEventsFulfilled(events));
+      },
+      error: async (err) => dispatch(fetchEventsRejected(err)),
     },
-    error: async (err) => dispatch(fetchEventsRejected(err)),
-  });
+    searchCriteria,
+  );
 
   return unsubscribe;
 };
@@ -92,6 +106,10 @@ export const eventsSlice = createSlice({
       ...state,
       eventsError: action.payload,
       isLoadingEvents: false,
+    }),
+    setSearchCriteria: (state, action: PayloadAction<EventSearchCriteria>) => ({
+      ...state,
+      searchCriteria: action.payload,
     }),
   },
   extraReducers: (builder) => {
@@ -128,11 +146,14 @@ export const eventsSlice = createSlice({
 });
 
 // export const {} = eventsSlice.actions;
+export const { setSearchCriteria } = eventsSlice.actions;
 export const selectEvents = (state: RootState): EventInfo[] => state.events.events;
 export const selectEventsError = (state: RootState): Error | undefined => state.events.eventsError;
 export const selectEventsIsLoading = (state: RootState): boolean => state.events.isLoadingEvents;
 export const selectEventsIsUpdatingAttendees = (state: RootState): boolean =>
   state.events.isUpdatingAttendees;
+export const selectEventsSearchCriteria = (state: RootState): EventSearchCriteria =>
+  state.events.searchCriteria;
 export const seletcEventsUpdateAttendeesError = (state: RootState): Error | undefined =>
   state.events.updateAttendeesError;
 
