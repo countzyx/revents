@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { selectAuthUserInfo } from '../../Auth/authSlice';
 import {
   addCurrentUserAsAttendeeToEvent,
+  removeCurrentUserAsAttendeeFromEvent,
   selectEventsIsUpdatingAttendees,
   seletcEventsUpdateAttendeesError,
 } from '../eventsSlice';
@@ -33,6 +34,10 @@ const EventDetailsHeader: React.FC<Props> = (props: Props) => {
 
   const onAddCurrentUserAsAttendee = () => {
     dispatch(addCurrentUserAsAttendeeToEvent(event));
+  };
+
+  const onRemoveCurrentUserAsAttendee = () => {
+    dispatch(removeCurrentUserAsAttendeeFromEvent(event));
   };
 
   return (
@@ -69,7 +74,9 @@ const EventDetailsHeader: React.FC<Props> = (props: Props) => {
       <Segment attached='bottom' clearing>
         {!userIsHost &&
           (userIsAttending ? (
-            <Button>Cancel My Place</Button>
+            <Button loading={isUpdatingAttendees} onClick={onRemoveCurrentUserAsAttendee}>
+              Cancel My Place
+            </Button>
           ) : (
             <Button color='teal' loading={isUpdatingAttendees} onClick={onAddCurrentUserAsAttendee}>
               JOIN THIS EVENT

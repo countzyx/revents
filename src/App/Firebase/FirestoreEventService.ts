@@ -1,9 +1,11 @@
 import {
   addDoc,
+  arrayRemove,
   arrayUnion,
   collection,
   deleteDoc,
   doc,
+  getDoc,
   onSnapshot,
   orderBy,
   query,
@@ -80,6 +82,20 @@ export const readSingleEventFromFirestore = (
   observer: DocumentObserver,
   eventId: string,
 ): Unsubscribe => onSnapshot(doc(eventsCollection, eventId), observer);
+
+export const removeCurrentUserAsEventAttendeeInFirestore = async (
+  event: EventInfo,
+): Promise<void> => {
+  const user = readCurrentUser();
+  const eventRef = doc(eventsCollection, event.id);
+  const eventDoc = await getDoc(eventRef);
+  const oldEvent = eventDoc.data();
+  if (!oldEvent) throw Error(`event ${event.id}: ${event.title} data not found`);
+  return updateDoc(eventRef, {
+    attendees: oldEvent.attendees?.filter((a) => a.id !== user.uid),
+    attendeeIds: arrayRemove(user.uid),
+  });
+};
 
 export const toggleCancelEventInFirestore = async (event: EventInfo): Promise<void> =>
   updateDoc(doc(eventsCollection, event.id), {

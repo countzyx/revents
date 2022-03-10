@@ -3,6 +3,7 @@ import {
   addCurrentUserAsEventAttendeeInFirestore,
   readAllEventsFromFirestore,
   readSingleEventFromFirestore,
+  removeCurrentUserAsEventAttendeeInFirestore,
 } from '../../App/Firebase/FirestoreEventService';
 import type { Unsubscribe } from '../../App/Firebase/FirestoreEventService';
 import type { EventInfo } from '../../App/Shared/Types';
@@ -64,6 +65,14 @@ export const fetchAllEvents = (dispatch: AppDispatch): Unsubscribe => {
   return unsubscribe;
 };
 
+export const removeCurrentUserAsAttendeeFromEvent = createAsyncThunk<
+  void,
+  EventInfo,
+  { dispatch: AppDispatch; state: RootState }
+>('events/removeCurrentUserAsAttendeeToEvent', async (event, thunkApi) => {
+  await removeCurrentUserAsEventAttendeeInFirestore(event);
+});
+
 export const eventsSlice = createSlice({
   name: 'events',
   initialState,
@@ -98,6 +107,20 @@ export const eventsSlice = createSlice({
         updateAttendeesError: action.error as Error,
       }))
       .addCase(addCurrentUserAsAttendeeToEvent.fulfilled, (state) => ({
+        ...state,
+        isUpdatingAttendees: false,
+      }))
+      .addCase(removeCurrentUserAsAttendeeFromEvent.pending, (state) => ({
+        ...state,
+        isUpdatingAttendees: true,
+        updateAttendeesError: undefined,
+      }))
+      .addCase(removeCurrentUserAsAttendeeFromEvent.rejected, (state, action) => ({
+        ...state,
+        isUpdatingAttendees: false,
+        updateAttendeesError: action.error as Error,
+      }))
+      .addCase(removeCurrentUserAsAttendeeFromEvent.fulfilled, (state) => ({
         ...state,
         isUpdatingAttendees: false,
       }));
