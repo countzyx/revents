@@ -1,4 +1,4 @@
-import { isValid, parse } from 'date-fns';
+import { format, isValid, parse } from 'date-fns';
 import { kDateFormat } from './Constants';
 
 export const delay = (ms: number): Promise<NodeJS.Timeout> =>
@@ -23,6 +23,8 @@ export const getDateFromString = (dateString: string): Date | undefined => {
 
   return date;
 };
+
+export const getStringFromDate = (date: Date): string => format(date, kDateFormat);
 
 export const getErrorStringForCatch = (anyError: unknown): string => {
   const err = anyError as Error;

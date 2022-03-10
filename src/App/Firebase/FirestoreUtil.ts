@@ -1,9 +1,8 @@
 import * as _ from 'lodash';
-import { format } from 'date-fns';
 import { Timestamp } from 'firebase/firestore';
 import type { DocumentData, DocumentSnapshot, FirestoreDataConverter } from 'firebase/firestore';
-import { kDateFormat } from '../Shared/Constants';
 import { EventInfo, PhotoData, UserProfile } from '../Shared/Types';
+import { getStringFromDate } from '../Shared/Utils';
 
 export const eventConverter: FirestoreDataConverter<EventInfo> = {
   fromFirestore: (docSnap: DocumentSnapshot): EventInfo => {
@@ -66,7 +65,7 @@ const convertTimestampsToDateStrings = (data: DocumentData): DocumentData => {
   for (const prop in data) {
     if (Object.prototype.hasOwnProperty.call(data, prop)) {
       if (data[prop] instanceof Timestamp) {
-        returnData[prop] = format(data[prop].toDate(), kDateFormat);
+        returnData[prop] = getStringFromDate(data[prop].toDate());
       }
     }
   }
