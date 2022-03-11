@@ -35,7 +35,7 @@ const EventDetails: React.FC = () => {
       <Grid.Column width={10}>
         <EventDetailsHeader event={event} />
         <EventDetailsInfo event={event} />
-        <EventDetailsChat />
+        <EventDetailsChat eventId={event.id} />
       </Grid.Column>
       <Grid.Column width={6}>
         <EventDetailsSidebar attendees={event.attendees} hostUid={event.hostUid} />
