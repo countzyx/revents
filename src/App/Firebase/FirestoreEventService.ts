@@ -9,6 +9,7 @@ import {
   onSnapshot,
   orderBy,
   query,
+  QueryConstraint,
   setDoc,
   updateDoc,
   where,
@@ -21,7 +22,7 @@ import type {
   Unsubscribe as FBUnsubscribe,
 } from 'firebase/firestore';
 import { eventConverter } from './FirestoreUtil';
-import { EventInfo, EventSearchCriteria } from '../Shared/Types';
+import { EventInfo, EventSearchCriteria, UserEventType } from '../Shared/Types';
 import { db } from './Firebase';
 import { readCurrentUser } from './FirebaseAuthService';
 
@@ -95,6 +96,36 @@ export const readAllEventsFromFirestore = (
 
   const allEventsQuery = query(eventsCollection, orderBy('date'), ...criteria);
   return onSnapshot(allEventsQuery, observer);
+};
+
+export const readEventsForUserFromFirestore = (
+  observer: CollectionObserver,
+  eventType: UserEventType,
+  uid: string,
+): Unsubscribe => {
+  const criteria: QueryConstraint[] = [];
+  switch (eventType) {
+    case 'hosting': {
+      criteria.push(where('hostUid', '==', uid));
+      criteria.push(orderBy('date'));
+      break;
+    }
+    case 'past': {
+      criteria.push(where('attendeeIds', 'array-contains', uid));
+      criteria.push(where('date', '<=', new Date()));
+      criteria.push(orderBy('date', 'desc'));
+      break;
+    }
+    default: {
+      // attending
+      criteria.push(where('attendeeIds', 'array-contains', uid));
+      criteria.push(orderBy('date'));
+      break;
+    }
+  }
+
+  const userEventsQuery = query(eventsCollection, ...criteria);
+  return onSnapshot(userEventsQuery, observer);
 };
 
 export const readSingleEventFromFirestore = (

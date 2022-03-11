@@ -1,5 +1,6 @@
 import { format, isValid, parse } from 'date-fns';
-import { kDateFormat } from './Constants';
+import { kDateFormat, kShortDateFormat, kTimeFormat } from './Constants';
+import { ShortDateAndTime } from './Types';
 
 export const delay = (ms: number): Promise<NodeJS.Timeout> =>
   Promise.resolve(
@@ -22,6 +23,12 @@ export const getDateFromString = (dateString: string): Date | undefined => {
   }
 
   return date;
+};
+
+export const getShortDateAndTimeFromString = (dateString: string): ShortDateAndTime | undefined => {
+  const date = getDateFromString(dateString);
+  if (!date) return undefined;
+  return { shortDate: format(date, kShortDateFormat), time: format(date, kTimeFormat) };
 };
 
 export const getStringFromDate = (date: Date): string => format(date, kDateFormat);

@@ -4,6 +4,7 @@ import {
   deleteImageInFirebase,
   readDownloadUrl,
 } from '../../App/Firebase/FirebaseStorageService';
+import { readEventsForUserFromFirestore } from '../../App/Firebase/FirestoreEventService';
 import {
   readUserProfilePhotosFromFirestore,
   watchUserProfileFromFirestore,
@@ -12,11 +13,13 @@ import {
   createPhotoInProfileCollection,
   deletePhotoInProfileCollection,
 } from '../../App/Firebase/FirestoreUserProfileService';
-import { PhotoData, UserProfile } from '../../App/Shared/Types';
+import { EventInfo, PhotoData, UserEventType, UserProfile } from '../../App/Shared/Types';
 import { AppDispatch, RootState } from '../../App/Store/store';
 
 type ProfileState = {
   currentProfile?: UserProfile;
+  eventsError?: Error;
+  isLoadingEvents: boolean;
   isLoadingPhotos: boolean;
   isLoadingProfile: boolean;
   isUpdatingProfile: boolean;
@@ -24,12 +27,15 @@ type ProfileState = {
   photos: PhotoData[];
   photosError?: Error;
   profileError?: Error;
+  profileEvents?: EventInfo[];
   selectedProfile?: UserProfile;
   uploadProgress: number;
 };
 
 const initialState: ProfileState = {
   currentProfile: undefined,
+  eventsError: undefined,
+  isLoadingEvents: false,
   isLoadingPhotos: false,
   isLoadingProfile: false,
   isUpdatingProfile: false,
@@ -37,6 +43,7 @@ const initialState: ProfileState = {
   photos: [],
   photosError: undefined,
   profileError: undefined,
+  profileEvents: [],
   selectedProfile: undefined,
   uploadProgress: 0,
 };
@@ -105,6 +112,33 @@ export const fetchSelectedUserProfile = (dispatch: AppDispatch, userId: string):
     userId,
   );
 
+  return unsubscribe;
+};
+
+export const fetchUserEvents = (
+  dispatch: AppDispatch,
+  eventType: UserEventType,
+  uid: string,
+): Unsubscribe => {
+  const {
+    fetchUserProfileEventsFulfilled,
+    fetchUserProfileEventsPending,
+    fetchUserProfileEventsRejected,
+  } = profilesSlice.actions;
+
+  const unsubscribe = readEventsForUserFromFirestore(
+    {
+      next: async (snapshot) => {
+        dispatch(fetchUserProfileEventsPending());
+        const fetchedEvents = snapshot.docs.map((docResult) => docResult.data());
+        const events = fetchedEvents.filter((e) => e !== undefined) as EventInfo[];
+        dispatch(fetchUserProfileEventsFulfilled(events));
+      },
+      error: async (err) => dispatch(fetchUserProfileEventsRejected(err)),
+    },
+    eventType,
+    uid,
+  );
   return unsubscribe;
 };
 
@@ -227,23 +261,41 @@ export const profilesSlice = createSlice({
       profileError: action.payload,
       isLoadingProfile: false,
     }),
+    fetchUserProfileEventsPending: (state) => ({
+      ...state,
+      profileEvents: [],
+      eventsError: undefined,
+      isLoadingEvents: true,
+    }),
+    fetchUserProfileEventsFulfilled: (state, action: PayloadAction<EventInfo[]>) => ({
+      ...state,
+      profileEvents: action.payload,
+      eventsError: undefined,
+      isLoadingEvents: false,
+    }),
+    fetchUserProfileEventsRejected: (state, action: PayloadAction<Error>) => ({
+      ...state,
+      profileEvents: [],
+      eventsError: action.payload,
+      isLoadingEvents: false,
+    }),
     fetchUserProfilePhotosPending: (state) => ({
       ...state,
       photos: [],
       photosError: undefined,
-      isLoading: true,
+      isLoadingPhotos: true,
     }),
     fetchUserProfilePhotosFulfilled: (state, action: PayloadAction<PhotoData[]>) => ({
       ...state,
       photos: action.payload,
       photosError: undefined,
-      isLoading: false,
+      isLoadingPhotos: false,
     }),
     fetchUserProfilePhotosRejected: (state, action: PayloadAction<Error>) => ({
       ...state,
       photos: [],
       photosError: action.payload,
-      isLoading: false,
+      isLoadingPhotos: false,
     }),
     setPhotoError: (state, action: PayloadAction<Error>) => ({
       ...state,
@@ -308,8 +360,14 @@ export const selectProfileCurrentProfile = (state: RootState): UserProfile | und
   state.profiles.currentProfile;
 export const selectProfileError = (state: RootState): Error | undefined =>
   state.profiles.profileError;
+export const selectProfileEvents = (state: RootState): EventInfo[] | undefined =>
+  state.profiles.profileEvents;
+export const selectProfileEventsError = (state: RootState): Error | undefined =>
+  state.profiles.eventsError;
 export const selectProfileIsLoading = (state: RootState): boolean =>
   state.profiles.isLoadingProfile;
+export const selectProfileIsLoadingEvents = (state: RootState): boolean =>
+  state.profiles.isLoadingEvents;
 export const selectProfileIsLoadingPhotos = (state: RootState): boolean =>
   state.profiles.isLoadingPhotos;
 export const selectProfileIsUpdating = (state: RootState): boolean =>

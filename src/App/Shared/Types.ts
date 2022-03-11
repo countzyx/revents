@@ -47,10 +47,17 @@ export type PlacesInfo = {
   latLng?: google.maps.LatLngLiteral;
 };
 
+export type ShortDateAndTime = {
+  shortDate: string | '';
+  time: string | '';
+};
+
 export type UserCredentials = {
   email: string;
   password: string;
 };
+
+export type UserEventType = 'attending' | 'past' | 'hosting';
 
 export type UserProfile = {
   createdAt: string;
