@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Item, Label, Segment } from 'semantic-ui-react';
+import { kUnknownUserImageUrl } from '../../../App/Shared/Constants';
 import { EventAttendee } from '../../../App/Shared/Types';
 
 type Props = {
@@ -49,7 +50,7 @@ const EventDetailsSidebar: React.FC<Props> = (props: Props) => {
                   style={{ position: 'absolute' }}
                 />
               )}
-              <Item.Image size='tiny' src={a.photoUrl || '/assets/user.png'} />
+              <Item.Image size='tiny' src={a.photoUrl || kUnknownUserImageUrl} />
               <Item.Content verticalAlign='middle'>
                 <Item.Header as='h3'>
                   <span>{a.name}</span>

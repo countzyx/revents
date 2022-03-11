@@ -27,7 +27,7 @@ import { ChatComment, EventInfo, EventSearchCriteria, UserEventType } from '../S
 import { db, rtdb } from './Firebase';
 import { readCurrentUser } from './FirebaseAuthService';
 import { getStringFromDate } from '../Shared/Utils';
-import { kUnknownUserUrl } from '../Shared/Constants';
+import { kUnknownUserImageUrl } from '../Shared/Constants';
 
 export type Unsubscribe = FBUnsubscribe;
 
@@ -57,7 +57,7 @@ export const addCurrentUserAsEventAttendeeInFirestore = async (event: EventInfo)
   });
 };
 
-export const addEventChatCommentAsCurrentUser = (
+export const addEventChatCommentAsCurrentUserInFirebase = (
   eventId: number,
   comment: string,
 ): ThenableReference => {
@@ -66,7 +66,7 @@ export const addEventChatCommentAsCurrentUser = (
     date: getStringFromDate(new Date()),
     uid,
     name: displayName || '',
-    photoUrl: photoURL || kUnknownUserUrl,
+    photoUrl: photoURL || kUnknownUserImageUrl,
     text: comment,
   };
   const chatRef = ref(rtdb, `/chat/${eventId}`);
@@ -82,11 +82,11 @@ export const createEventInFirestore = async (
     ...event,
     hostUid: uid,
     hostedBy: displayName || 'anonymous',
-    hostPhotoUrl: photoURL || '/assets/user.png',
+    hostPhotoUrl: photoURL || kUnknownUserImageUrl,
     attendees: arrayUnion({
       id: uid,
       name: displayName || 'anonymous',
-      photoUrl: photoURL || '/assets/user.png',
+      photoUrl: photoURL || kUnknownUserImageUrl,
     }),
     attendeeIds: arrayUnion(uid),
     isCancelled: false,

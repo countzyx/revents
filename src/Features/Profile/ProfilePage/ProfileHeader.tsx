@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Button, Divider, Grid, Header, Item, Reveal, Segment, Statistic } from 'semantic-ui-react';
+import { kUnknownUserImageUrl } from '../../../App/Shared/Constants';
 import { useAppSelector } from '../../../App/Store/hooks';
 import { selectAuthUserInfo } from '../../Auth/authSlice';
 import { selectProfileSelectedProfile } from '../profilesSlice';
@@ -19,7 +20,7 @@ const ProfileHeader: React.FC = () => {
         <Grid.Column width={12}>
           <Item.Group>
             <Item>
-              <Item.Image avatar size='small' src={photoURL || '/assets/user.png'} />
+              <Item.Image avatar size='small' src={photoURL || kUnknownUserImageUrl} />
               <Item.Content verticalAlign='middle'>
                 <Header
                   as='h1'

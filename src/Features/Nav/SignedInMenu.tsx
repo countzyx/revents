@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Dropdown, Image, Menu } from 'semantic-ui-react';
+import { kUnknownUserImageUrl } from '../../App/Shared/Constants';
 import { useAppDispatch, useAppSelector } from '../../App/Store/hooks';
 import { selectAuthUserInfo, signOutUser } from '../Auth/authSlice';
 import { fetchCurrentUserProfile, selectProfileCurrentProfile } from '../Profile/profilesSlice';
@@ -26,7 +27,7 @@ const SignedInMenu: React.FC = () => {
 
   return (
     <Menu.Item position='right'>
-      <Image avatar spaced='right' src={currentProfile?.photoURL || '/assets/user.png'} />
+      <Image avatar spaced='right' src={currentProfile?.photoURL || kUnknownUserImageUrl} />
       <Dropdown
         pointing='top left'
         text={currentProfile?.displayName || currentProfile?.email || 'Guest'}

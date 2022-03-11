@@ -2,4 +2,4 @@ export const GoogleMapsApiKey: string | undefined = process.env.REACT_APP_GOOGLE
 export const kDateFormat = 'yyyy-MM-dd h:mm a';
 export const kShortDateFormat = 'MMM dd, yyyy';
 export const kTimeFormat = 'h:mm a';
-export const kUnknownUserUrl = '/assets/user.png';
+export const kUnknownUserImageUrl = '/assets/user.png';
