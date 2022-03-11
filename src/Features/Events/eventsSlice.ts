@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   addCurrentUserAsEventAttendeeInFirestore,
+  addEventChatCommentAsCurrentUserInFirebase,
   readAllEventsFromFirestore,
   readSingleEventFromFirestore,
   removeCurrentUserAsEventAttendeeInFirestore,
@@ -11,10 +12,12 @@ import { AppDispatch, RootState } from '../../App/Store/store';
 import { getStringFromDate } from '../../App/Shared/Utils';
 
 type EventState = {
+  chatError?: Error;
   events: EventInfo[];
   eventsError?: Error;
   isLoadingEvents: boolean;
   isUpdatingAttendees: boolean;
+  isUpdatingChat: boolean;
   searchCriteria: EventSearchCriteria;
   updateAttendeesError?: Error;
 };
@@ -25,10 +28,12 @@ const defaultSearchCriteria: EventSearchCriteria = {
 };
 
 const initialState: EventState = {
+  chatError: undefined,
   events: [],
   eventsError: undefined,
   isLoadingEvents: true,
   isUpdatingAttendees: false,
+  isUpdatingChat: false,
   searchCriteria: { ...defaultSearchCriteria },
   updateAttendeesError: undefined,
 };
@@ -39,6 +44,15 @@ export const addCurrentUserAsAttendeeToEvent = createAsyncThunk<
   { dispatch: AppDispatch; state: RootState }
 >('events/addCurrentUserAsAttendeeToEvent', async (event, thunkApi) => {
   await addCurrentUserAsEventAttendeeInFirestore(event);
+});
+
+export const addEventChatCommentAsCurrentUser = createAsyncThunk<
+  void,
+  { eventId: number; comment: string },
+  { dispatch: AppDispatch; state: RootState }
+>('events/addEventChatCommentAsCurrentUser', async (eventChatMessage, thunkApi) => {
+  const { eventId, comment } = eventChatMessage;
+  await addEventChatCommentAsCurrentUserInFirebase(eventId, comment);
 });
 
 export const fetchSingleEvent = (dispatch: AppDispatch, eventId: string): Unsubscribe => {
@@ -128,6 +142,20 @@ export const eventsSlice = createSlice({
         ...state,
         isUpdatingAttendees: false,
       }))
+      .addCase(addEventChatCommentAsCurrentUser.pending, (state) => ({
+        ...state,
+        isUpdatingChat: true,
+        chatError: undefined,
+      }))
+      .addCase(addEventChatCommentAsCurrentUser.rejected, (state, action) => ({
+        ...state,
+        isUpdatingChat: false,
+        chatError: action.error as Error,
+      }))
+      .addCase(addEventChatCommentAsCurrentUser.fulfilled, (state) => ({
+        ...state,
+        isUpdatingChat: false,
+      }))
       .addCase(removeCurrentUserAsAttendeeFromEvent.pending, (state) => ({
         ...state,
         isUpdatingAttendees: true,
@@ -148,10 +176,14 @@ export const eventsSlice = createSlice({
 // export const {} = eventsSlice.actions;
 export const { setSearchCriteria } = eventsSlice.actions;
 export const selectEvents = (state: RootState): EventInfo[] => state.events.events;
+export const selectEventsChatError = (state: RootState): Error | undefined =>
+  state.events.chatError;
 export const selectEventsError = (state: RootState): Error | undefined => state.events.eventsError;
 export const selectEventsIsLoading = (state: RootState): boolean => state.events.isLoadingEvents;
 export const selectEventsIsUpdatingAttendees = (state: RootState): boolean =>
   state.events.isUpdatingAttendees;
+export const selectEventsIsUpdatingChat = (state: RootState): boolean =>
+  state.events.isUpdatingChat;
 export const selectEventsSearchCriteria = (state: RootState): EventSearchCriteria =>
   state.events.searchCriteria;
 export const seletcEventsUpdateAttendeesError = (state: RootState): Error | undefined =>
