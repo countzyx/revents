@@ -58,7 +58,7 @@ export const addCurrentUserAsEventAttendeeInFirestore = async (event: EventInfo)
 };
 
 export const addEventChatCommentAsCurrentUserInFirebase = (
-  eventId: number,
+  eventId: string,
   comment: string,
 ): ThenableReference => {
   const { uid, displayName, photoURL } = readCurrentUser();
