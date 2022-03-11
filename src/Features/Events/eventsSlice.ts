@@ -48,7 +48,7 @@ export const addCurrentUserAsAttendeeToEvent = createAsyncThunk<
 
 export const addEventChatCommentAsCurrentUser = createAsyncThunk<
   void,
-  { eventId: number; comment: string },
+  { eventId: string; comment: string },
   { dispatch: AppDispatch; state: RootState }
 >('events/addEventChatCommentAsCurrentUser', async (eventChatMessage, thunkApi) => {
   const { eventId, comment } = eventChatMessage;
