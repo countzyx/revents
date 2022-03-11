@@ -7,6 +7,9 @@ import {
 } from './Constants';
 import { ShortDateAndTime } from './Types';
 
+export const convertCatchToError = (error: unknown): Error =>
+  error instanceof Error ? error : new Error(String(error));
+
 export const delay = (ms: number): Promise<NodeJS.Timeout> =>
   Promise.resolve(
     setTimeout(() => {

@@ -21,17 +21,21 @@ import type {
   QuerySnapshot,
   Unsubscribe as FBUnsubscribe,
 } from 'firebase/firestore';
-import { push, ref, ThenableReference } from 'firebase/database';
+import {
+  DataSnapshot,
+  onValue,
+  orderByKey,
+  push,
+  query as fbQuery,
+  ref,
+  ThenableReference,
+} from 'firebase/database';
 import { eventConverter } from './FirestoreUtil';
 import { ChatComment, EventInfo, EventSearchCriteria, UserEventType } from '../Shared/Types';
 import { db, rtdb } from './Firebase';
 import { readCurrentUser } from './FirebaseAuthService';
 import { getPreciseDateTimeStringFromDate } from '../Shared/Utils';
 import { kUnknownUserImageUrl } from '../Shared/Constants';
-
-export type Unsubscribe = FBUnsubscribe;
-
-const eventsCollection = collection(db, 'events').withConverter(eventConverter);
 
 export type CollectionObserver = {
   next?: (snapshot: QuerySnapshot) => void;
@@ -44,6 +48,12 @@ export type DocumentObserver = {
   error?: (error: FirestoreError) => void;
   complete?: () => void; // Never gets executed by Firestore.
 };
+
+export type FirebaseObserver = (snapshot: DataSnapshot) => void;
+
+export type Unsubscribe = FBUnsubscribe;
+
+const eventsCollection = collection(db, 'events').withConverter(eventConverter);
 
 export const addCurrentUserAsEventAttendeeInFirestore = async (event: EventInfo): Promise<void> => {
   const user = readCurrentUser();
@@ -69,7 +79,7 @@ export const addEventChatCommentAsCurrentUserInFirebase = (
     photoUrl: photoURL || kUnknownUserImageUrl,
     text: comment,
   };
-  const chatRef = ref(rtdb, `/chat/${eventId}`);
+  const chatRef = ref(rtdb, `chat/${eventId}`);
   return push(chatRef, newComment);
 };
 
@@ -115,6 +125,15 @@ export const readAllEventsFromFirestore = (
 
   const allEventsQuery = query(eventsCollection, orderBy('date'), ...criteria);
   return onSnapshot(allEventsQuery, observer);
+};
+
+export const readChatCommentsFromFirebase = (
+  eventId: string,
+  observer: FirebaseObserver,
+): Unsubscribe => {
+  const chatRef = ref(rtdb, `chat/${eventId}`);
+  const chatQuery = fbQuery(chatRef, orderByKey());
+  return onValue(chatQuery, observer);
 };
 
 export const readEventsForUserFromFirestore = (

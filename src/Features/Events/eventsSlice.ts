@@ -3,18 +3,21 @@ import {
   addCurrentUserAsEventAttendeeInFirestore,
   addEventChatCommentAsCurrentUserInFirebase,
   readAllEventsFromFirestore,
+  readChatCommentsFromFirebase,
   readSingleEventFromFirestore,
   removeCurrentUserAsEventAttendeeInFirestore,
 } from '../../App/Firebase/FirestoreEventService';
 import type { Unsubscribe } from '../../App/Firebase/FirestoreEventService';
-import { EventInfo, EventSearchCriteria } from '../../App/Shared/Types';
+import { ChatComment, EventInfo, EventSearchCriteria } from '../../App/Shared/Types';
 import { AppDispatch, RootState } from '../../App/Store/store';
-import { getDateTimeStringFromDate } from '../../App/Shared/Utils';
+import { convertCatchToError, getDateTimeStringFromDate } from '../../App/Shared/Utils';
 
 type EventState = {
+  chatComments: ChatComment[];
   chatError?: Error;
   events: EventInfo[];
   eventsError?: Error;
+  isLoadingChat: boolean;
   isLoadingEvents: boolean;
   isUpdatingAttendees: boolean;
   isUpdatingChat: boolean;
@@ -28,9 +31,11 @@ const defaultSearchCriteria: EventSearchCriteria = {
 };
 
 const initialState: EventState = {
+  chatComments: [],
   chatError: undefined,
   events: [],
   eventsError: undefined,
+  isLoadingChat: false,
   isLoadingEvents: true,
   isUpdatingAttendees: false,
   isUpdatingChat: false,
@@ -55,23 +60,6 @@ export const addEventChatCommentAsCurrentUser = createAsyncThunk<
   await addEventChatCommentAsCurrentUserInFirebase(eventId, comment);
 });
 
-export const fetchSingleEvent = (dispatch: AppDispatch, eventId: string): Unsubscribe => {
-  const { fetchEventsPending, fetchEventsFulfilled, fetchEventsRejected } = eventsSlice.actions;
-  const unsubscribe = readSingleEventFromFirestore(
-    {
-      next: async (snapshot) => {
-        dispatch(fetchEventsPending());
-        const fetchedEvent = snapshot.data() as EventInfo;
-        dispatch(fetchEventsFulfilled([fetchedEvent]));
-      },
-      error: async (err) => dispatch(fetchEventsRejected(err)),
-    },
-    eventId,
-  );
-
-  return unsubscribe;
-};
-
 export const fetchAllEvents = (
   dispatch: AppDispatch,
   searchCriteria: EventSearchCriteria,
@@ -93,6 +81,42 @@ export const fetchAllEvents = (
   return unsubscribe;
 };
 
+export const fetchChatCommentsForEvent = (dispatch: AppDispatch, eventId: string): Unsubscribe => {
+  const { fetchChatFulfilled, fetchChatPending, fetchChatRejected } = eventsSlice.actions;
+  const unsubscribe = readChatCommentsFromFirebase(eventId, (snapshot) => {
+    dispatch(fetchChatPending());
+    try {
+      const chatComments: ChatComment[] = [];
+      snapshot.forEach((child) => {
+        const comment: ChatComment = { ...child.val(), id: child.key } as ChatComment;
+        chatComments.push(comment);
+      });
+      dispatch(fetchChatFulfilled(chatComments));
+    } catch (err) {
+      dispatch(fetchChatRejected(convertCatchToError(err)));
+    }
+  });
+
+  return unsubscribe;
+};
+
+export const fetchSingleEvent = (dispatch: AppDispatch, eventId: string): Unsubscribe => {
+  const { fetchEventsPending, fetchEventsFulfilled, fetchEventsRejected } = eventsSlice.actions;
+  const unsubscribe = readSingleEventFromFirestore(
+    {
+      next: async (snapshot) => {
+        dispatch(fetchEventsPending());
+        const fetchedEvent = snapshot.data() as EventInfo;
+        dispatch(fetchEventsFulfilled([fetchedEvent]));
+      },
+      error: async (err) => dispatch(fetchEventsRejected(err)),
+    },
+    eventId,
+  );
+
+  return unsubscribe;
+};
+
 export const removeCurrentUserAsAttendeeFromEvent = createAsyncThunk<
   void,
   EventInfo,
@@ -105,6 +129,22 @@ export const eventsSlice = createSlice({
   name: 'events',
   initialState,
   reducers: {
+    fetchChatFulfilled: (state, action: PayloadAction<ChatComment[]>) => ({
+      ...state,
+      chatError: undefined,
+      chatComments: action.payload,
+      isLoadingChat: false,
+    }),
+    fetchChatPending: (state) => ({
+      ...state,
+      chatError: undefined,
+      isLoadingChat: true,
+    }),
+    fetchChatRejected: (state, action: PayloadAction<Error>) => ({
+      ...state,
+      chatError: action.payload,
+      isLoadingChat: false,
+    }),
     fetchEventsFulfilled: (state, action: PayloadAction<EventInfo[]>) => ({
       ...state,
       eventsError: undefined,
@@ -176,6 +216,8 @@ export const eventsSlice = createSlice({
 // export const {} = eventsSlice.actions;
 export const { setSearchCriteria } = eventsSlice.actions;
 export const selectEvents = (state: RootState): EventInfo[] => state.events.events;
+export const selectEventsChatComments = (state: RootState): ChatComment[] =>
+  state.events.chatComments;
 export const selectEventsChatError = (state: RootState): Error | undefined =>
   state.events.chatError;
 export const selectEventsError = (state: RootState): Error | undefined => state.events.eventsError;

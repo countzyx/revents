@@ -6,10 +6,11 @@ export type Category = {
 
 export type ChatComment = {
   datetime: string;
-  uid: string;
+  id?: string;
   name: string;
   photoUrl: string;
   text: string;
+  uid: string;
 };
 
 export type EventAttendee = {
