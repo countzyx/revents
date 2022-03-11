@@ -21,10 +21,13 @@ import type {
   QuerySnapshot,
   Unsubscribe as FBUnsubscribe,
 } from 'firebase/firestore';
+import { push, ref, ThenableReference } from 'firebase/database';
 import { eventConverter } from './FirestoreUtil';
-import { EventInfo, EventSearchCriteria, UserEventType } from '../Shared/Types';
-import { db } from './Firebase';
+import { ChatComment, EventInfo, EventSearchCriteria, UserEventType } from '../Shared/Types';
+import { db, rtdb } from './Firebase';
 import { readCurrentUser } from './FirebaseAuthService';
+import { getStringFromDate } from '../Shared/Utils';
+import { kUnknownUserUrl } from '../Shared/Constants';
 
 export type Unsubscribe = FBUnsubscribe;
 
@@ -52,6 +55,22 @@ export const addCurrentUserAsEventAttendeeInFirestore = async (event: EventInfo)
     }),
     attendeeIds: arrayUnion(user.uid),
   });
+};
+
+export const addEventChatCommentAsCurrentUser = (
+  eventId: number,
+  comment: string,
+): ThenableReference => {
+  const { uid, displayName, photoURL } = readCurrentUser();
+  const newComment: ChatComment = {
+    date: getStringFromDate(new Date()),
+    uid,
+    name: displayName || '',
+    photoUrl: photoURL || kUnknownUserUrl,
+    text: comment,
+  };
+  const chatRef = ref(rtdb, `/chat/${eventId}`);
+  return push(chatRef, newComment);
 };
 
 export const createEventInFirestore = async (

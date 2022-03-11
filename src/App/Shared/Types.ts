@@ -4,6 +4,14 @@ export type Category = {
   value: string;
 };
 
+export type ChatComment = {
+  date: string;
+  uid: string;
+  name: string;
+  photoUrl: string;
+  text: string;
+};
+
 export type EventAttendee = {
   id: string;
   name: string;
