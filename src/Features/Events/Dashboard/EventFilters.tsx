@@ -2,7 +2,7 @@ import * as React from 'react';
 import Calendar from 'react-calendar';
 import { Header, Menu } from 'semantic-ui-react';
 import type { CriteriaKeys, FilterValues, EventSearchCriteria } from '../../../App/Shared/Types';
-import { getStringFromDate } from '../../../App/Shared/Utils';
+import { getDateTimeStringFromDate } from '../../../App/Shared/Utils';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import {
   selectEventsIsLoading,
@@ -47,7 +47,9 @@ const EventFilters: React.FC = () => {
       <Header attached color='teal' content='Select date' icon='calendar' />
       <Calendar
         className={styles.Calendar}
-        onChange={(date: Date) => onUpdateSearchCriteria('startDate', getStringFromDate(date))}
+        onChange={(date: Date) =>
+          onUpdateSearchCriteria('startDate', getDateTimeStringFromDate(date))
+        }
       />
     </>
   );

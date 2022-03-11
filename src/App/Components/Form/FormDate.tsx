@@ -4,7 +4,7 @@ import { FieldHookConfig, FieldInputProps, useField, useFormikContext } from 'fo
 import { FormField, Label } from 'semantic-ui-react';
 import DatePicker, { ReactDatePickerProps } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { kDateFormat } from '../../Shared/Constants';
+import { kStandardDateTimeFormat } from '../../Shared/Constants';
 import { getDateFromString } from '../../Shared/Utils';
 
 type OwnProps = {
@@ -28,7 +28,7 @@ const FormDate: React.FC<Props> = (props: Props) => {
       {label ? <label htmlFor={id || name}>{label}</label> : null}
       <DatePicker
         {...field}
-        dateFormat={kDateFormat}
+        dateFormat={kStandardDateTimeFormat}
         onChange={(data) => {
           let value: Date | null = null;
           if (data instanceof Array) {

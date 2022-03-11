@@ -26,7 +26,7 @@ import { eventConverter } from './FirestoreUtil';
 import { ChatComment, EventInfo, EventSearchCriteria, UserEventType } from '../Shared/Types';
 import { db, rtdb } from './Firebase';
 import { readCurrentUser } from './FirebaseAuthService';
-import { getStringFromDate } from '../Shared/Utils';
+import { getPreciseDateTimeStringFromDate } from '../Shared/Utils';
 import { kUnknownUserImageUrl } from '../Shared/Constants';
 
 export type Unsubscribe = FBUnsubscribe;
@@ -63,7 +63,7 @@ export const addEventChatCommentAsCurrentUserInFirebase = (
 ): ThenableReference => {
   const { uid, displayName, photoURL } = readCurrentUser();
   const newComment: ChatComment = {
-    date: getStringFromDate(new Date()),
+    datetime: getPreciseDateTimeStringFromDate(new Date()),
     uid,
     name: displayName || '',
     photoUrl: photoURL || kUnknownUserImageUrl,

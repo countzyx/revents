@@ -9,7 +9,7 @@ import {
 import type { Unsubscribe } from '../../App/Firebase/FirestoreEventService';
 import { EventInfo, EventSearchCriteria } from '../../App/Shared/Types';
 import { AppDispatch, RootState } from '../../App/Store/store';
-import { getStringFromDate } from '../../App/Shared/Utils';
+import { getDateTimeStringFromDate } from '../../App/Shared/Utils';
 
 type EventState = {
   chatError?: Error;
@@ -24,7 +24,7 @@ type EventState = {
 
 const defaultSearchCriteria: EventSearchCriteria = {
   filter: 'all',
-  startDate: getStringFromDate(new Date()),
+  startDate: getDateTimeStringFromDate(new Date()),
 };
 
 const initialState: EventState = {

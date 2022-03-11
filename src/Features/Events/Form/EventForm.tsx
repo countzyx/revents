@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Button, Confirm, Header, Segment } from 'semantic-ui-react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { Form, Formik } from 'formik';
+import { Form, Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { format } from 'date-fns';
 import { toast } from 'react-toastify';
@@ -15,7 +15,7 @@ import FormTextArea from '../../../App/Components/Form/FormTextArea';
 import FormTextInput from '../../../App/Components/Form/FormTextInput';
 import CategoryData from '../../../App/Api/CategoryData';
 import FormDate from '../../../App/Components/Form/FormDate';
-import { kDateFormat } from '../../../App/Shared/Constants';
+import { kStandardDateTimeFormat } from '../../../App/Shared/Constants';
 import { getDateFromString, getErrorStringForCatch } from '../../../App/Shared/Utils';
 import LoadingComponent from '../../../App/Layout/LoadingComponent';
 import {
@@ -34,7 +34,7 @@ type EventFormValues = {
   isCancelled: boolean;
 };
 
-const defaultValues: EventFormValues = {
+const initialValues: EventFormValues = {
   title: '',
   category: '',
   description: '',
@@ -103,7 +103,6 @@ const EventForm: React.FC = () => {
   const dispatch = useAppDispatch();
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [loadingCancelChange, setLoadingCancelChange] = React.useState(false);
-  const initialValues: EventFormValues = selectedEvent || defaultValues;
 
   React.useEffect(() => {
     if (!eventId) return undefined;
@@ -114,14 +113,15 @@ const EventForm: React.FC = () => {
 
   const onFormSubmitHandler = async (
     formValues: EventFormValues,
-    setSubmitting: (isSubmitting: boolean) => void,
+    formikHelpers: FormikHelpers<EventFormValues>,
   ) => {
+    const { setSubmitting } = formikHelpers;
     try {
       if (selectedEvent) {
         const updatedEvent: EventInfo = {
           ...blankEvent,
           ...formValues,
-          date: format(getDateFromString(formValues.date)!, kDateFormat), // FormDate is inconsistent with date string, need to fix
+          date: format(getDateFromString(formValues.date)!, kStandardDateTimeFormat), // FormDate is inconsistent with date string, need to fix
         };
         await updateEventInFirestore(updatedEvent);
         setSubmitting(false);
@@ -130,7 +130,7 @@ const EventForm: React.FC = () => {
         const newEvent: EventInfo = {
           ...blankEvent,
           ...formValues,
-          date: format(getDateFromString(formValues.date)!, kDateFormat), // FormDate is inconsistent with date string, need to fix
+          date: format(getDateFromString(formValues.date)!, kStandardDateTimeFormat), // FormDate is inconsistent with date string, need to fix
         };
         await createEventInFirestore(newEvent);
         setSubmitting(false);
@@ -173,11 +173,9 @@ const EventForm: React.FC = () => {
   return (
     <Segment clearing>
       <Formik
-        initialValues={initialValues}
+        initialValues={selectedEvent || initialValues}
         validationSchema={validationSchema}
-        onSubmit={async (values, { setSubmitting }) => {
-          await onFormSubmitHandler(values, setSubmitting);
-        }}
+        onSubmit={onFormSubmitHandler}
       >
         {(formik) => (
           <Form className='ui form'>

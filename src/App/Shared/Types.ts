@@ -5,7 +5,7 @@ export type Category = {
 };
 
 export type ChatComment = {
-  date: string;
+  datetime: string;
   uid: string;
   name: string;
   photoUrl: string;
