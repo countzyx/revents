@@ -1,6 +1,5 @@
 import { Form, Formik, FormikHelpers } from 'formik';
 import * as React from 'react';
-import { Button } from 'semantic-ui-react';
 import FormTextArea from '../../../App/Components/Form/FormTextArea';
 import { useAppDispatch } from '../../../App/Store/hooks';
 import { addEventChatCommentAsCurrentUser } from '../eventsSlice';
@@ -37,14 +36,16 @@ const EventDetailsChatForm: React.FC<Props> = (props) => {
     <Formik initialValues={initialValues} onSubmit={onFormSubmitHandler}>
       {(formik) => (
         <Form className='ui form'>
-          <FormTextArea name='comment' placeholder='enter comment here' rows={2} />
-          <Button
-            content='Post Comment'
-            labelPosition='left'
-            icon='edit'
-            loading={formik.isSubmitting}
-            primary
-            type='submit'
+          <FormTextArea
+            disabled={formik.isSubmitting}
+            name='comment'
+            onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                formik.handleSubmit();
+              }
+            }}
+            placeholder='enter comment here'
+            rows={2}
           />
         </Form>
       )}

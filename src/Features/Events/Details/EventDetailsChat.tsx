@@ -23,6 +23,7 @@ const EventDetailsChat: React.FC<Props> = (props) => {
       </Segment>
 
       <Segment attached>
+        <EventDetailsChatForm eventId={eventId} />
         <Comment.Group>
           {chatComments.map((c) => (
             <Comment key={c.id || c.datetime}>
@@ -34,7 +35,16 @@ const EventDetailsChat: React.FC<Props> = (props) => {
                 <Comment.Metadata>
                   <div>{c.datetime}</div>
                 </Comment.Metadata>
-                <Comment.Text>{c.text}</Comment.Text>
+                <Comment.Text>
+                  {c.text.split('\n').map((s, i) => (
+                    // disabling eslint check because we are just breaking down string in to an array of chunks
+                    // eslint-disable-next-line react/no-array-index-key
+                    <span key={`${c.id}-${i}`}>
+                      {s}
+                      <br />
+                    </span>
+                  ))}
+                </Comment.Text>
                 <Comment.Actions>
                   <Comment.Action>Reply</Comment.Action>
                 </Comment.Actions>
@@ -42,7 +52,6 @@ const EventDetailsChat: React.FC<Props> = (props) => {
             </Comment>
           ))}
         </Comment.Group>
-        <EventDetailsChatForm eventId={eventId} />
       </Segment>
     </>
   );
