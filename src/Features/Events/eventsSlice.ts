@@ -91,7 +91,7 @@ export const fetchChatCommentsForEvent = (dispatch: AppDispatch, eventId: string
         const comment: ChatComment = { ...child.val(), id: child.key } as ChatComment;
         chatComments.push(comment);
       });
-      dispatch(fetchChatFulfilled(chatComments));
+      dispatch(fetchChatFulfilled(chatComments.reverse())); // Firebase doesn't do descending order, so do it client-side.
     } catch (err) {
       dispatch(fetchChatRejected(convertCatchToError(err)));
     }
