@@ -1,5 +1,6 @@
-import { Form, Formik, FormikHelpers } from 'formik';
 import * as React from 'react';
+import { Form, Formik, FormikHelpers } from 'formik';
+import * as Yup from 'yup';
 import FormTextArea from '../../../App/Components/Form/FormTextArea';
 import { useAppDispatch } from '../../../App/Store/hooks';
 import { addEventChatCommentAsCurrentUser } from '../eventsSlice';
@@ -15,6 +16,10 @@ type ChatFormValues = {
 const initialValues: ChatFormValues = {
   comment: '',
 };
+
+const validationSchema: Yup.SchemaOf<ChatFormValues> = Yup.object({
+  comment: Yup.string().required('cannot submit empty comment'),
+});
 
 const EventDetailsChatForm: React.FC<Props> = (props) => {
   const { eventId } = props;
@@ -33,7 +38,13 @@ const EventDetailsChatForm: React.FC<Props> = (props) => {
   };
 
   return (
-    <Formik initialValues={initialValues} onSubmit={onFormSubmitHandler}>
+    <Formik
+      initialValues={initialValues}
+      onSubmit={onFormSubmitHandler}
+      validateOnBlur={false}
+      validateOnChange={false}
+      validationSchema={validationSchema}
+    >
       {(formik) => (
         <Form className='ui form'>
           <FormTextArea
@@ -41,7 +52,8 @@ const EventDetailsChatForm: React.FC<Props> = (props) => {
             name='comment'
             onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
               if (e.key === 'Enter' && !e.shiftKey) {
-                formik.handleSubmit();
+                e.preventDefault();
+                formik.isValid && formik.handleSubmit();
               }
             }}
             placeholder='enter comment here'

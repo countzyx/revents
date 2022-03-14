@@ -86,12 +86,12 @@ export const fetchChatCommentsForEvent = (dispatch: AppDispatch, eventId: string
   const unsubscribe = readChatCommentsFromFirebase(eventId, (snapshot) => {
     dispatch(fetchChatPending());
     try {
-      const chatComments: ChatComment[] = [];
+      const newChatComments: ChatComment[] = [];
       snapshot.forEach((child) => {
         const comment: ChatComment = { ...child.val(), id: child.key } as ChatComment;
-        chatComments.push(comment);
+        newChatComments.push(comment);
       });
-      dispatch(fetchChatFulfilled(chatComments.reverse())); // Firebase doesn't do descending order, so do it client-side.
+      dispatch(fetchChatFulfilled(newChatComments.reverse())); // Firebase doesn't do descending order, so do it client-side.
     } catch (err) {
       dispatch(fetchChatRejected(convertCatchToError(err)));
     }
@@ -129,6 +129,10 @@ export const eventsSlice = createSlice({
   name: 'events',
   initialState,
   reducers: {
+    clearChat: (state) => ({
+      ...state,
+      chatComments: [],
+    }),
     fetchChatFulfilled: (state, action: PayloadAction<ChatComment[]>) => ({
       ...state,
       chatError: undefined,
@@ -214,7 +218,7 @@ export const eventsSlice = createSlice({
 });
 
 // export const {} = eventsSlice.actions;
-export const { setSearchCriteria } = eventsSlice.actions;
+export const { clearChat, setSearchCriteria } = eventsSlice.actions;
 export const selectEvents = (state: RootState): EventInfo[] => state.events.events;
 export const selectEventsChatComments = (state: RootState): ChatComment[] =>
   state.events.chatComments;

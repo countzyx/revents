@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Comment, Header, Segment } from 'semantic-ui-react';
 import { kUnknownUserImageUrl } from '../../../App/Shared/Constants';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
-import { fetchChatCommentsForEvent, selectEventsChatComments } from '../eventsSlice';
+import { clearChat, fetchChatCommentsForEvent, selectEventsChatComments } from '../eventsSlice';
 import EventDetailsChatForm from './EventDetailsChatForm';
 
 type Props = {
@@ -15,7 +15,13 @@ const EventDetailsChat: React.FC<Props> = (props) => {
   const dispatch = useAppDispatch();
   const chatComments = useAppSelector(selectEventsChatComments);
 
-  React.useEffect(() => fetchChatCommentsForEvent(dispatch, eventId), [dispatch, eventId]);
+  React.useEffect(() => {
+    const unsubscribe = fetchChatCommentsForEvent(dispatch, eventId);
+    return () => {
+      unsubscribe();
+      dispatch(clearChat());
+    };
+  }, [dispatch, eventId]);
   return (
     <>
       <Segment textAlign='center' attached='top' inverted color='teal' style={{ border: 'none' }}>
