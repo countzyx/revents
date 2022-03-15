@@ -13,6 +13,7 @@
     "formik": "^2.2.9",
     "google-map-react": "^2.1.10",
     "lodash": "^4.17.21",
+    "performant-array-to-tree": "^1.11.0",
     "react": "^17.0.2",
     "react-calendar": "^3.6.0",
     "react-cropper": "^2.1.8",
