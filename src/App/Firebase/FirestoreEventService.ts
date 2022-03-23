@@ -70,17 +70,19 @@ export const addCurrentUserAsEventAttendeeInFirestore = async (event: EventInfo)
 export const addEventChatCommentAsCurrentUserInFirebase = (
   eventId: string,
   comment: string,
+  parentCommentId?: string,
 ): ThenableReference => {
   const { uid, displayName, photoURL } = readCurrentUser();
   const newComment: ChatComment = {
     datetime: getPreciseDateTimeStringFromDate(new Date()),
     uid,
     name: displayName || '',
+    parentId: parentCommentId || '',
     photoUrl: photoURL || kUnknownUserImageUrl,
     text: comment,
   };
   const chatRef = ref(rtdb, `chat/${eventId}`);
-  return push(chatRef, newComment);
+  return push(chatRef, { ...newComment, parentId: newComment.parentId || null }); // trick to keep ChatComment type null-less.
 };
 
 export const createEventInFirestore = async (

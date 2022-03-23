@@ -5,9 +5,11 @@ export type Category = {
 };
 
 export type ChatComment = {
+  children?: ChatComment[];
   datetime: string;
   id?: string;
   name: string;
+  parentId?: string;
   photoUrl: string;
   text: string;
   uid: string;

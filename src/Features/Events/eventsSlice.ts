@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { arrayToTree } from 'performant-array-to-tree';
 import {
   addCurrentUserAsEventAttendeeInFirestore,
   addEventChatCommentAsCurrentUserInFirebase,
@@ -53,11 +54,11 @@ export const addCurrentUserAsAttendeeToEvent = createAsyncThunk<
 
 export const addEventChatCommentAsCurrentUser = createAsyncThunk<
   void,
-  { eventId: string; comment: string },
+  { eventId: string; comment: string; parentCommentId?: string },
   { dispatch: AppDispatch; state: RootState }
 >('events/addEventChatCommentAsCurrentUser', async (eventChatMessage, thunkApi) => {
-  const { eventId, comment } = eventChatMessage;
-  await addEventChatCommentAsCurrentUserInFirebase(eventId, comment);
+  const { eventId, comment, parentCommentId } = eventChatMessage;
+  await addEventChatCommentAsCurrentUserInFirebase(eventId, comment, parentCommentId);
 });
 
 export const fetchAllEvents = (
@@ -88,10 +89,21 @@ export const fetchChatCommentsForEvent = (dispatch: AppDispatch, eventId: string
     try {
       const newChatComments: ChatComment[] = [];
       snapshot.forEach((child) => {
-        const comment: ChatComment = { ...child.val(), id: child.key } as ChatComment;
+        const comment: ChatComment = {
+          ...child.val(),
+          id: child.key,
+          parentId: child.val().parentId,
+        } as ChatComment;
         newChatComments.push(comment);
       });
-      dispatch(fetchChatFulfilled(newChatComments.reverse())); // Firebase doesn't do descending order, so do it client-side.
+      // Firebase doesn't do descending order, so do it client-side.
+      const chatTree = arrayToTree(newChatComments.reverse(), {
+        childrenField: 'children',
+        dataField: null,
+        id: 'id',
+        parentId: 'parentId',
+      }) as ChatComment[];
+      dispatch(fetchChatFulfilled(chatTree));
     } catch (err) {
       dispatch(fetchChatRejected(convertCatchToError(err)));
     }

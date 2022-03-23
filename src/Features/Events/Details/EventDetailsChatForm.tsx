@@ -7,6 +7,8 @@ import { addEventChatCommentAsCurrentUser } from '../eventsSlice';
 
 type Props = {
   eventId: string;
+  onClose?: () => void;
+  parentCommentId?: string;
 };
 
 type ChatFormValues = {
@@ -22,7 +24,7 @@ const validationSchema: Yup.SchemaOf<ChatFormValues> = Yup.object({
 });
 
 const EventDetailsChatForm: React.FC<Props> = (props) => {
-  const { eventId } = props;
+  const { eventId, onClose, parentCommentId } = props;
   const dispatch = useAppDispatch();
 
   const onFormSubmitHandler = async (
@@ -31,9 +33,10 @@ const EventDetailsChatForm: React.FC<Props> = (props) => {
   ) => {
     const { comment } = formValues;
     const { resetForm, setSubmitting } = formikHelpers;
-    await dispatch(addEventChatCommentAsCurrentUser({ eventId, comment }));
+    await dispatch(addEventChatCommentAsCurrentUser({ eventId, comment, parentCommentId }));
     setSubmitting(false);
     resetForm();
+    onClose && onClose();
     // displaying errors in parent
   };
 
@@ -63,6 +66,11 @@ const EventDetailsChatForm: React.FC<Props> = (props) => {
       )}
     </Formik>
   );
+};
+
+EventDetailsChatForm.defaultProps = {
+  onClose: undefined,
+  parentCommentId: undefined,
 };
 
 export default EventDetailsChatForm;
