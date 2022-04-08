@@ -12,6 +12,7 @@ import {
   updateUserProfilePhotoInFirestore,
   createPhotoInProfileCollection,
   deletePhotoInProfileCollection,
+  setFollowUserInFirestore,
 } from '../../App/Firebase/FirestoreUserProfileService';
 import { EventInfo, PhotoData, UserEventType, UserProfile } from '../../App/Shared/Types';
 import { AppDispatch, RootState } from '../../App/Store/store';
@@ -162,6 +163,14 @@ export const fetchUserProfilePhotos = (dispatch: AppDispatch, userId: string): U
   );
   return unsubscribe;
 };
+
+export const setFollowUser = createAsyncThunk<
+  void,
+  UserProfile,
+  { dispatch: AppDispatch; state: RootState }
+>('profile/setFollowUser', async (followedUser, thunkApi) => {
+  await setFollowUserInFirestore(followedUser);
+});
 
 export const updateUserProfilePhoto = createAsyncThunk<
   void,
@@ -337,6 +346,20 @@ export const profilesSlice = createSlice({
       .addCase(deletePhotoFromCurrentProfile.rejected, (state, action) => ({
         ...state,
         photosError: action.error as Error,
+      }))
+      .addCase(setFollowUser.fulfilled, (state) => ({
+        ...state,
+        isUpdatingProfile: false,
+      }))
+      .addCase(setFollowUser.pending, (state) => ({
+        ...state,
+        isUpdatingProfile: true,
+        profileError: undefined,
+      }))
+      .addCase(setFollowUser.rejected, (state, action) => ({
+        ...state,
+        isUpdatingProfile: false,
+        profileError: action.error as Error,
       }))
       .addCase(updateUserProfilePhoto.fulfilled, (state) => ({
         ...state,
