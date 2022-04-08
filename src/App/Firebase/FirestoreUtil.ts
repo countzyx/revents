@@ -46,10 +46,17 @@ export const userProfileConverter: FirestoreDataConverter<UserProfile> = {
 
     const returnData = docData && convertTimestampsToDateStrings(docData);
 
-    return {
+    const tempValue = {
       ...returnData,
       id: docSnap.id,
     } as UserProfile;
+
+    const returnValue: UserProfile = {
+      ...tempValue,
+      followerCount: tempValue.followerCount || 0,
+      followingCount: tempValue.followingCount || 0,
+    };
+    return returnValue;
   },
   toFirestore: (data: UserProfile) => {
     // Not called by updateDoc
