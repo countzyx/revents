@@ -33,10 +33,10 @@ export const createPasswordUserInFirebase = async (
   return regResult.user;
 };
 
-export const readCurrentUser = (): User => {
+export const readCurrentUser = (): User | undefined => {
   const auth = getAuth();
   const { currentUser } = auth;
-  if (!currentUser) throw new Error('No current user');
+  if (!currentUser) return undefined;
   return currentUser;
 };
 
@@ -74,6 +74,7 @@ export const updateAuthUserDisplayNameInFirebase = async (
   displayName: string | undefined,
 ): Promise<void> => {
   const currentUser = readCurrentUser();
+  if (!currentUser) throw new Error('No current user');
   if (displayName !== currentUser.displayName) {
     await updateProfile(currentUser, { displayName });
   }
@@ -81,6 +82,7 @@ export const updateAuthUserDisplayNameInFirebase = async (
 
 export const updateAuthUserPhotoInFirebase = async (newPhotoUrl: string): Promise<void> => {
   const currentUser = readCurrentUser();
+  if (!currentUser) throw new Error('No current user');
   if (newPhotoUrl !== currentUser.photoURL) {
     await updateProfile(currentUser, { photoURL: newPhotoUrl });
   }
@@ -88,6 +90,7 @@ export const updateAuthUserPhotoInFirebase = async (newPhotoUrl: string): Promis
 
 export const updatePwUserPasswordInFirebase = async (newPassword: string): Promise<void> => {
   const currentUser = readCurrentUser();
+  if (!currentUser) throw new Error('No current user');
   return updatePassword(currentUser, newPassword);
 };
 

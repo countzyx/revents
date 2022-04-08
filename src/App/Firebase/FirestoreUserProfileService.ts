@@ -77,6 +77,7 @@ const getProfilePhotoCollection = async (
 
 const readUserProfileFromFirestore = async () => {
   const currentUser = readCurrentUser();
+  if (!currentUser) throw new Error('No current user');
   const profileDoc = doc(userProfileCollection, currentUser.uid);
   const userProfile = await getDoc(profileDoc);
   return userProfile;
@@ -95,6 +96,7 @@ export const readUserProfilePhotosFromFirestore = (
 
 export const setFollowUserInFirestore = async (followedUser: UserProfile) => {
   const currentUser = readCurrentUser();
+  if (!currentUser) throw new Error('No current user');
   const currentUserRelationshipRef = doc(relationshipCollection, currentUser.uid);
   const userFollowingCollection = collection(
     db,
@@ -130,6 +132,7 @@ export const updateUserProfileInFirestore = async (profile: UserProfile): Promis
   const { displayName } = profile;
   await updateAuthUserDisplayNameInFirebase(displayName);
   const currentUser = readCurrentUser();
+  if (!currentUser) throw new Error('No current user');
   return updateDoc(doc(userProfileCollection, currentUser.uid), profile);
 };
 

@@ -56,14 +56,15 @@ export type Unsubscribe = FBUnsubscribe;
 const eventsCollection = collection(db, 'events').withConverter(eventConverter);
 
 export const addCurrentUserAsEventAttendeeInFirestore = async (event: EventInfo): Promise<void> => {
-  const user = readCurrentUser();
+  const currentUser = readCurrentUser();
+  if (!currentUser) throw new Error('No current user');
   return updateDoc(doc(eventsCollection, event.id), {
     attendees: arrayUnion({
-      id: user.uid,
-      name: user.displayName,
-      photoUrl: user.photoURL,
+      id: currentUser.uid,
+      name: currentUser.displayName,
+      photoUrl: currentUser.photoURL,
     }),
-    attendeeIds: arrayUnion(user.uid),
+    attendeeIds: arrayUnion(currentUser.uid),
   });
 };
 
@@ -72,7 +73,9 @@ export const addEventChatCommentAsCurrentUserInFirebase = (
   comment: string,
   parentCommentId?: string,
 ): ThenableReference => {
-  const { uid, displayName, photoURL } = readCurrentUser();
+  const currentUser = readCurrentUser();
+  if (!currentUser) throw new Error('No current user');
+  const { uid, displayName, photoURL } = currentUser;
   const newComment: ChatComment = {
     datetime: getPreciseDateTimeStringFromDate(new Date()),
     uid,
@@ -88,8 +91,9 @@ export const addEventChatCommentAsCurrentUserInFirebase = (
 export const createEventInFirestore = async (
   event: EventInfo,
 ): Promise<DocumentReference<EventInfo>> => {
-  const user = readCurrentUser();
-  const { displayName, photoURL, uid } = user;
+  const currentUser = readCurrentUser();
+  if (!currentUser) throw new Error('No current user');
+  const { uid, displayName, photoURL } = currentUser;
   return addDoc(eventsCollection, {
     ...event,
     hostUid: uid,
@@ -112,20 +116,25 @@ export const readAllEventsFromFirestore = (
   observer: CollectionObserver,
   searchCriteria: EventSearchCriteria,
 ): Unsubscribe => {
-  const { uid } = readCurrentUser();
-  const criteria = [where('date', '>=', searchCriteria.startDate)];
-  switch (searchCriteria.filter) {
-    case 'isGoing': {
-      criteria.push(where('attendeeIds', 'array-contains', uid));
-      break;
+  let allEventsQuery = query(eventsCollection, orderBy('date'));
+  const currentUser = readCurrentUser();
+  if (currentUser) {
+    const { uid } = currentUser;
+    const criteria = [where('date', '>=', searchCriteria.startDate)];
+    switch (searchCriteria.filter) {
+      case 'isGoing': {
+        criteria.push(where('attendeeIds', 'array-contains', uid));
+        break;
+      }
+      case 'isHost': {
+        criteria.push(where('hostUid', '==', uid));
+        break;
+      }
     }
-    case 'isHost': {
-      criteria.push(where('hostUid', '==', uid));
-      break;
-    }
+
+    allEventsQuery = query(eventsCollection, orderBy('date'), ...criteria);
   }
 
-  const allEventsQuery = query(eventsCollection, orderBy('date'), ...criteria);
   return onSnapshot(allEventsQuery, observer);
 };
 
@@ -176,14 +185,15 @@ export const readSingleEventFromFirestore = (
 export const removeCurrentUserAsEventAttendeeInFirestore = async (
   event: EventInfo,
 ): Promise<void> => {
-  const user = readCurrentUser();
+  const currentUser = readCurrentUser();
+  if (!currentUser) throw new Error('No current user');
   const eventRef = doc(eventsCollection, event.id);
   const eventDoc = await getDoc(eventRef);
   const oldEvent = eventDoc.data();
   if (!oldEvent) throw Error(`event ${event.id}: ${event.title} data not found`);
   return updateDoc(eventRef, {
-    attendees: oldEvent.attendees?.filter((a) => a.id !== user.uid),
-    attendeeIds: arrayRemove(user.uid),
+    attendees: oldEvent.attendees?.filter((a) => a.id !== currentUser.uid),
+    attendeeIds: arrayRemove(currentUser.uid),
   });
 };
 
