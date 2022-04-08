@@ -29,12 +29,12 @@ export const SampleData: EventInfo[] = [
     attendees: [
       {
         id: 'a',
-        name: 'Bobbie',
+        displayName: 'Bobbie',
         photoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
       },
       {
         id: 'b',
-        name: 'Tony',
+        displayName: 'Tony',
         photoUrl: 'https://randomuser.me/api/portraits/men/40.jpg',
       },
     ],
@@ -68,12 +68,12 @@ export const SampleData: EventInfo[] = [
     attendees: [
       {
         id: 'a',
-        name: 'Bobbie',
+        displayName: 'Bobbie',
         photoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
       },
       {
         id: 'b',
-        name: 'Tony',
+        displayName: 'Tony',
         photoUrl: 'https://randomuser.me/api/portraits/men/40.jpg',
       },
     ],

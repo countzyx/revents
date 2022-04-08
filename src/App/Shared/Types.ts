@@ -15,9 +15,9 @@ export type ChatComment = {
   uid: string;
 };
 
-export type EventAttendee = {
+export type UserBasicInfo = {
   id: string;
-  name: string;
+  displayName: string;
   photoUrl: string;
 };
 
@@ -32,7 +32,7 @@ export type EventInfo = {
   hostUid: string;
   hostedBy: string;
   hostPhotoUrl: string;
-  attendees?: EventAttendee[];
+  attendees?: UserBasicInfo[];
   attendeeIds: string[];
   isCancelled: boolean;
 };

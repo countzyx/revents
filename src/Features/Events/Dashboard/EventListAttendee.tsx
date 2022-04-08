@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Image, List } from 'semantic-ui-react';
-import type { EventAttendee } from '../../../App/Shared/Types';
+import type { UserBasicInfo } from '../../../App/Shared/Types';
 
 type Props = {
-  attendee: EventAttendee;
+  attendee: UserBasicInfo;
 };
 
 const EventListAttendee: React.FC<Props> = (props: Props) => {

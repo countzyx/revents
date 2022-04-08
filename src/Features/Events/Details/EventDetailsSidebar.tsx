@@ -2,10 +2,10 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Item, Label, Segment } from 'semantic-ui-react';
 import { kUnknownUserImageUrl } from '../../../App/Shared/Constants';
-import { EventAttendee } from '../../../App/Shared/Types';
+import { UserBasicInfo } from '../../../App/Shared/Types';
 
 type Props = {
-  attendees: EventAttendee[] | undefined;
+  attendees: UserBasicInfo[] | undefined;
   hostUid: string;
 };
 
@@ -53,7 +53,7 @@ const EventDetailsSidebar: React.FC<Props> = (props: Props) => {
               <Item.Image size='tiny' src={a.photoUrl || kUnknownUserImageUrl} />
               <Item.Content verticalAlign='middle'>
                 <Item.Header as='h3'>
-                  <span>{a.name}</span>
+                  <span>{a.displayName}</span>
                 </Item.Header>
               </Item.Content>
             </Item>
