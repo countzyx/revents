@@ -1,14 +1,25 @@
 import * as React from 'react';
 import { Button, Divider, Grid, Header, Item, Reveal, Segment, Statistic } from 'semantic-ui-react';
 import { kUnknownUserImageUrl } from '../../../App/Shared/Constants';
-import { useAppSelector } from '../../../App/Store/hooks';
+import type { UserProfile } from '../../../App/Shared/Types';
+import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { selectAuthUserInfo } from '../../Auth/authSlice';
-import { selectProfileSelectedProfile } from '../profilesSlice';
+import {
+  selectProfileIsUpdating,
+  selectProfileSelectedProfile,
+  setFollowUser,
+} from '../profilesSlice';
 
 const ProfileHeader: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const isUpdatingProfile = useAppSelector(selectProfileIsUpdating);
   const currentUser = useAppSelector(selectAuthUserInfo);
   const selectedProfile = useAppSelector(selectProfileSelectedProfile);
   const isCurrentUser = currentUser && currentUser.uid === selectedProfile?.id;
+
+  const handleFollowUser = () => {
+    if (selectedProfile) dispatch(setFollowUser(selectedProfile));
+  };
 
   if (!selectedProfile) return <div />;
 
@@ -44,7 +55,14 @@ const ProfileHeader: React.FC = () => {
                   <Button color='teal' content='Following' fluid />
                 </Reveal.Content>
                 <Reveal.Content hidden style={{ width: '100%' }}>
-                  <Button basic color='red' content='Unfollow' fluid />
+                  <Button
+                    basic
+                    color='green'
+                    content='Follow'
+                    fluid
+                    loading={isUpdatingProfile}
+                    onClick={handleFollowUser}
+                  />
                 </Reveal.Content>
               </Reveal>
             </>
