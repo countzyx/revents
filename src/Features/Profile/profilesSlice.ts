@@ -13,6 +13,7 @@ import {
   createPhotoInProfileCollection,
   deletePhotoInProfileCollection,
   setFollowUserInFirestore,
+  setUnfollowUserInFirestore,
 } from '../../App/Firebase/FirestoreUserProfileService';
 import { EventInfo, PhotoData, UserEventType, UserProfile } from '../../App/Shared/Types';
 import { AppDispatch, RootState } from '../../App/Store/store';
@@ -170,6 +171,14 @@ export const setFollowUser = createAsyncThunk<
   { dispatch: AppDispatch; state: RootState }
 >('profile/setFollowUser', async (followedUser, thunkApi) => {
   await setFollowUserInFirestore(followedUser);
+});
+
+export const setUnfollowUser = createAsyncThunk<
+  void,
+  string,
+  { dispatch: AppDispatch; state: RootState }
+>('profile/setFollowUser', async (followedUserId, thunkApi) => {
+  await setUnfollowUserInFirestore(followedUserId);
 });
 
 export const updateUserProfilePhoto = createAsyncThunk<
@@ -357,6 +366,20 @@ export const profilesSlice = createSlice({
         profileError: undefined,
       }))
       .addCase(setFollowUser.rejected, (state, action) => ({
+        ...state,
+        isUpdatingProfile: false,
+        profileError: action.error as Error,
+      }))
+      .addCase(setUnfollowUser.fulfilled, (state) => ({
+        ...state,
+        isUpdatingProfile: false,
+      }))
+      .addCase(setUnfollowUser.pending, (state) => ({
+        ...state,
+        isUpdatingProfile: true,
+        profileError: undefined,
+      }))
+      .addCase(setUnfollowUser.rejected, (state, action) => ({
         ...state,
         isUpdatingProfile: false,
         profileError: action.error as Error,
