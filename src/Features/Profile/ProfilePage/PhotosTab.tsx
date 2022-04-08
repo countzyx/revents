@@ -33,8 +33,8 @@ const PhotosTab: React.FC = () => {
   }, [dispatch, userId]);
 
   const onDeleteProfilePhoto = (photoData: PhotoData) => {
-    const { photoUrl } = photoData;
-    if (isCurrentUser && selectedProfile?.photoURL === photoUrl) return;
+    const { photoURL } = photoData;
+    if (isCurrentUser && selectedProfile?.photoURL === photoURL) return;
     dispatch(deletePhotoFromCurrentProfile(photoData));
   };
 
@@ -71,12 +71,12 @@ const PhotosTab: React.FC = () => {
             <Card.Group itemsPerRow={5}>
               {photos.map((p) => (
                 <Card key={p.photoName}>
-                  <Image src={p.photoUrl} />
+                  <Image src={p.photoURL} />
                   <Button.Group fluid widths={2}>
                     <Button
                       basic
                       color='green'
-                      disabled={selectedProfile.photoURL === p.photoUrl}
+                      disabled={selectedProfile.photoURL === p.photoURL}
                       icon='user'
                       loading={isUpdatingProfile}
                       onClick={() => onUpdateProfilePhoto(p)}
@@ -84,7 +84,7 @@ const PhotosTab: React.FC = () => {
                     <Button
                       basic
                       color='red'
-                      disabled={selectedProfile.photoURL === p.photoUrl}
+                      disabled={selectedProfile.photoURL === p.photoURL}
                       icon='trash'
                       onClick={() => onDeleteProfilePhoto(p)}
                     />

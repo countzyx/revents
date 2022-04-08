@@ -17,7 +17,7 @@ const EventListItem: React.FC<Props> = (props: Props) => {
       <Segment>
         <Item.Group>
           <Item>
-            <Item.Image size='tiny' src={event.hostPhotoUrl} />
+            <Item.Image size='tiny' src={event.hostPhotoURL} />
             <Item.Content>
               <Item.Header content={event.title} />
               <Item.Description>

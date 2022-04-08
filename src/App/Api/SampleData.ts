@@ -25,17 +25,17 @@ export const SampleData: EventInfo[] = [
     },
     hostUid: 'bobbie',
     hostedBy: 'Bobbie',
-    hostPhotoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
+    hostPhotoURL: 'https://randomuser.me/api/portraits/women/2.jpg',
     attendees: [
       {
         id: 'a',
         displayName: 'Bobbie',
-        photoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
+        photoURL: 'https://randomuser.me/api/portraits/women/2.jpg',
       },
       {
         id: 'b',
         displayName: 'Tony',
-        photoUrl: 'https://randomuser.me/api/portraits/men/40.jpg',
+        photoURL: 'https://randomuser.me/api/portraits/men/40.jpg',
       },
     ],
     attendeeIds: ['a', 'b'],
@@ -64,17 +64,17 @@ export const SampleData: EventInfo[] = [
     },
     hostUid: 'tony',
     hostedBy: 'Tony',
-    hostPhotoUrl: 'https://randomuser.me/api/portraits/men/40.jpg',
+    hostPhotoURL: 'https://randomuser.me/api/portraits/men/40.jpg',
     attendees: [
       {
         id: 'a',
         displayName: 'Bobbie',
-        photoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
+        photoURL: 'https://randomuser.me/api/portraits/women/2.jpg',
       },
       {
         id: 'b',
         displayName: 'Tony',
-        photoUrl: 'https://randomuser.me/api/portraits/men/40.jpg',
+        photoURL: 'https://randomuser.me/api/portraits/men/40.jpg',
       },
     ],
     attendeeIds: ['a', 'b'],

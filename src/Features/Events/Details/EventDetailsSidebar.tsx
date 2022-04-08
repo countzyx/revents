@@ -50,7 +50,7 @@ const EventDetailsSidebar: React.FC<Props> = (props: Props) => {
                   style={{ position: 'absolute' }}
                 />
               )}
-              <Item.Image size='tiny' src={a.photoUrl || kUnknownUserImageUrl} />
+              <Item.Image size='tiny' src={a.photoURL || kUnknownUserImageUrl} />
               <Item.Content verticalAlign='middle'>
                 <Item.Header as='h3'>
                   <span>{a.displayName}</span>

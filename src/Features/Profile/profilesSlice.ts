@@ -53,7 +53,7 @@ export const deletePhotoFromCurrentProfile = createAsyncThunk<
   PhotoData,
   { dispatch: AppDispatch; state: RootState }
 >('profile/deletePhotoFromCurrentProfile', async (photoData, thunkApi) => {
-  const { id, photoName: name, photoUrl } = photoData;
+  const { id, photoName, photoURL } = photoData;
   if (!id) {
     thunkApi.rejectWithValue(new Error('photo has no ID'));
     return;
@@ -64,13 +64,13 @@ export const deletePhotoFromCurrentProfile = createAsyncThunk<
     thunkApi.rejectWithValue(new Error('no current profile'));
     return;
   }
-  if (currentProfile?.photoURL === photoUrl) {
+  if (currentProfile?.photoURL === photoURL) {
     thunkApi.rejectWithValue(new Error('cannot delete active profile photo'));
     return;
   }
 
   await deletePhotoInProfileCollection(id);
-  await deleteImageInFirebase(name);
+  await deleteImageInFirebase(photoName);
 });
 
 export const fetchCurrentUserProfile = (dispatch: AppDispatch, userId: string): Unsubscribe => {
@@ -191,11 +191,11 @@ export const uploadPhotoToCurrentProfile = (
     },
     complete: async () => {
       try {
-        const photoUrl = await readDownloadUrl(uploadTask.snapshot.ref);
+        const photoURL = await readDownloadUrl(uploadTask.snapshot.ref);
 
         const photoData: PhotoData = {
           photoName,
-          photoUrl,
+          photoURL,
         };
         await createPhotoInProfileCollection(photoData);
         dispatch(uploadPhotosFulfilled());

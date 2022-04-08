@@ -45,7 +45,7 @@ const EventDetailsChat: React.FC<Props> = (props) => {
             (c) =>
               c.id && ( // c.id is not undefined or null
                 <Comment key={c.id}>
-                  <Comment.Avatar src={c.photoUrl || kUnknownUserImageUrl} />
+                  <Comment.Avatar src={c.photoURL || kUnknownUserImageUrl} />
                   <Comment.Content>
                     <Comment.Author as={Link} to={`/profile/${c.uid}`}>
                       {c.name}
@@ -80,7 +80,7 @@ const EventDetailsChat: React.FC<Props> = (props) => {
                     <Comment.Group>
                       {c.children.map((child) => (
                         <Comment key={child.id}>
-                          <Comment.Avatar src={child.photoUrl || kUnknownUserImageUrl} />
+                          <Comment.Avatar src={child.photoURL || kUnknownUserImageUrl} />
                           <Comment.Content>
                             <Comment.Author as={Link} to={`/profile/${child.uid}`}>
                               {child.name}

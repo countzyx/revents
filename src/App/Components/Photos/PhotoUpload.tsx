@@ -37,7 +37,7 @@ const PhotoUpload: React.FC<Props> = (props) => {
   const onPhotoDropHandler = (newPhotos: File[]) => {
     const photoPreviews = newPhotos.map<PhotoPreview>((file) => ({
       file,
-      previewUrl: URL.createObjectURL(file),
+      previewURL: URL.createObjectURL(file),
     }));
     setPhotoFile(photoPreviews[0]);
   };
@@ -76,7 +76,7 @@ const PhotoUpload: React.FC<Props> = (props) => {
       <Grid.Column width={4}>
         <Header color='teal' content='Step 2 - Resize' sub />
         {photoFile && (
-          <PhotoCropper onPhotoCrop={onPhotoCropHandler} photoPreviewUrl={photoFile.previewUrl} />
+          <PhotoCropper onPhotoCrop={onPhotoCropHandler} photoPreviewUrl={photoFile.previewURL} />
         )}
       </Grid.Column>
       <Grid.Column width={1} />

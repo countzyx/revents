@@ -78,7 +78,7 @@ export const addEventChatCommentAsCurrentUserInFirebase = (
     uid,
     name: displayName || '',
     parentId: parentCommentId || '',
-    photoUrl: photoURL || kUnknownUserImageUrl,
+    photoURL: photoURL || kUnknownUserImageUrl,
     text: comment,
   };
   const chatRef = ref(rtdb, `chat/${eventId}`);
@@ -94,7 +94,7 @@ export const createEventInFirestore = async (
     ...event,
     hostUid: uid,
     hostedBy: displayName || 'anonymous',
-    hostPhotoUrl: photoURL || kUnknownUserImageUrl,
+    hostPhotoURL: photoURL || kUnknownUserImageUrl,
     attendees: arrayUnion({
       id: uid,
       name: displayName || 'anonymous',

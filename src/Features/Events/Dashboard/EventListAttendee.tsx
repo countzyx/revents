@@ -13,7 +13,7 @@ const EventListAttendee: React.FC<Props> = (props: Props) => {
   return (
     <List.Item>
       <Link to={`/profile/${attendee.id}`}>
-        <Image size='mini' circular src={attendee.photoUrl} />
+        <Image size='mini' circular src={attendee.photoURL} />
       </Link>
     </List.Item>
   );

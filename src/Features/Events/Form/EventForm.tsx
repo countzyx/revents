@@ -79,7 +79,7 @@ const blankEvent: EventInfo = {
   },
   date: '',
   description: '',
-  hostPhotoUrl: '',
+  hostPhotoURL: '',
   hostUid: '',
   hostedBy: '',
   title: '',

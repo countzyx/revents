@@ -10,7 +10,7 @@ export type ChatComment = {
   id?: string;
   name: string;
   parentId?: string;
-  photoUrl: string;
+  photoURL: string;
   text: string;
   uid: string;
 };
@@ -18,7 +18,7 @@ export type ChatComment = {
 export type UserBasicInfo = {
   id: string;
   displayName: string;
-  photoUrl: string;
+  photoURL: string;
 };
 
 export type EventInfo = {
@@ -31,7 +31,7 @@ export type EventInfo = {
   venue: PlacesInfo;
   hostUid: string;
   hostedBy: string;
-  hostPhotoUrl: string;
+  hostPhotoURL: string;
   attendees?: UserBasicInfo[];
   attendeeIds: string[];
   isCancelled: boolean;
@@ -45,12 +45,12 @@ export type EventSearchCriteria = FilterEntry & { startDate: string };
 export type PhotoData = {
   id?: string;
   photoName: string;
-  photoUrl: string;
+  photoURL: string;
 };
 
 export type PhotoPreview = {
   file: File;
-  previewUrl: string;
+  previewURL: string;
 };
 
 export type PlacesInfo = {
