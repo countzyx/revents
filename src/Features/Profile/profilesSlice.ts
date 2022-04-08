@@ -53,7 +53,7 @@ export const deletePhotoFromCurrentProfile = createAsyncThunk<
   PhotoData,
   { dispatch: AppDispatch; state: RootState }
 >('profile/deletePhotoFromCurrentProfile', async (photoData, thunkApi) => {
-  const { id, name, photoUrl } = photoData;
+  const { id, photoName: name, photoUrl } = photoData;
   if (!id) {
     thunkApi.rejectWithValue(new Error('photo has no ID'));
     return;
@@ -194,7 +194,7 @@ export const uploadPhotoToCurrentProfile = (
         const photoUrl = await readDownloadUrl(uploadTask.snapshot.ref);
 
         const photoData: PhotoData = {
-          name: photoName,
+          photoName,
           photoUrl,
         };
         await createPhotoInProfileCollection(photoData);

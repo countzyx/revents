@@ -44,7 +44,7 @@ export type EventSearchCriteria = FilterEntry & { startDate: string };
 
 export type PhotoData = {
   id?: string;
-  name: string;
+  photoName: string;
   photoUrl: string;
 };
 
