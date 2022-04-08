@@ -70,7 +70,7 @@ const PhotosTab: React.FC = () => {
           ) : (
             <Card.Group itemsPerRow={5}>
               {photos.map((p) => (
-                <Card key={p.name}>
+                <Card key={p.photoName}>
                   <Image src={p.photoUrl} />
                   <Button.Group fluid widths={2}>
                     <Button
