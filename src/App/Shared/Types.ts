@@ -75,6 +75,8 @@ export type UserProfile = {
   description?: string;
   displayName?: string;
   email: string;
+  followerCount: number;
+  followingCount: number;
   id: string;
   photoURL?: string;
 };

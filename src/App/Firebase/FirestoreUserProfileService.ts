@@ -2,16 +2,18 @@ import type { User } from 'firebase/auth';
 import {
   addDoc,
   collection,
+  CollectionReference,
   deleteDoc,
   doc,
   getDoc,
+  increment,
   onSnapshot,
   serverTimestamp,
   setDoc,
   Unsubscribe as FBUnsubscribe,
   updateDoc,
 } from 'firebase/firestore';
-import { PhotoData, UserProfile } from '../Shared/Types';
+import { PhotoData, UserBasicInfo, UserProfile } from '../Shared/Types';
 import { db } from './Firebase';
 import {
   readCurrentUser,
@@ -19,25 +21,20 @@ import {
   updateAuthUserPhotoInFirebase,
 } from './FirebaseAuthService';
 import { CollectionObserver, DocumentObserver } from './FirestoreEventService';
-import { photoDataConverter, userProfileConverter } from './FirestoreUtil';
+import { userProfileConverter, WithIdDataConverter } from './FirestoreUtil';
 
 export type Unsubscribe = FBUnsubscribe;
 
+const photoDataConverter = WithIdDataConverter<PhotoData>();
+const userBasicInfoDataConverter = WithIdDataConverter<UserBasicInfo>();
+const relationshipCollection = collection(db, 'relationships');
 const userProfileCollection = collection(db, 'users').withConverter(userProfileConverter);
 
 export const createPhotoInProfileCollection = async (
   photoData: PhotoData,
   profilePath?: string,
 ): Promise<void> => {
-  let photoParentPath = profilePath;
-  if (!photoParentPath) {
-    const userProfile = await readUserProfileFromFirestore();
-    if (!userProfile) throw new Error('No user profile');
-    photoParentPath = userProfile.ref.path;
-  }
-  const photosCollection = collection(db, photoParentPath, 'photos').withConverter(
-    photoDataConverter,
-  );
+  const photosCollection = await getProfilePhotoCollection(profilePath);
   await addDoc(photosCollection, photoData);
 };
 
@@ -50,6 +47,8 @@ export const createUserProfileInFirestore = async (user: User): Promise<void> =>
     createdAt: serverTimestamp(),
     displayName: displayName || undefined,
     email,
+    followerCount: 0,
+    followingCount: 0,
     id: uid,
     photoURL: photoURL || undefined,
   });
@@ -59,18 +58,21 @@ export const deletePhotoInProfileCollection = async (
   photoId: string,
   profilePath?: string,
 ): Promise<void> => {
+  const photosCollection = await getProfilePhotoCollection(profilePath);
+  const photoToDeleteRef = doc(photosCollection, photoId);
+  await deleteDoc(photoToDeleteRef);
+};
+
+const getProfilePhotoCollection = async (
+  profilePath?: string,
+): Promise<CollectionReference<PhotoData>> => {
   let photoParentPath = profilePath;
   if (!photoParentPath) {
     const userProfile = await readUserProfileFromFirestore();
     if (!userProfile) throw new Error('No user profile');
     photoParentPath = userProfile.ref.path;
   }
-  const photosCollection = collection(db, photoParentPath, 'photos').withConverter(
-    photoDataConverter,
-  );
-
-  const photoToDeleteRef = doc(photosCollection, photoId);
-  await deleteDoc(photoToDeleteRef);
+  return collection(db, photoParentPath, 'photos').withConverter(photoDataConverter);
 };
 
 const readUserProfileFromFirestore = async () => {
@@ -91,6 +93,39 @@ export const readUserProfilePhotosFromFirestore = (
   return onSnapshot(photosCollection, observer);
 };
 
+export const setFollowUserInFirestore = async (followedUser: UserProfile) => {
+  const currentUser = readCurrentUser();
+  const currentUserRelationshipRef = doc(relationshipCollection, currentUser.uid);
+  const userFollowingCollection = collection(
+    db,
+    currentUserRelationshipRef.path,
+    'following',
+  ).withConverter(userBasicInfoDataConverter);
+  await setDoc(doc(userFollowingCollection, followedUser.id), {
+    id: followedUser.id,
+    displayName: followedUser.displayName,
+    photoURL: followedUser.photoURL,
+  });
+
+  const followedUserRelationshipRef = doc(relationshipCollection, followedUser.id);
+  const userFollowersCollection = collection(
+    db,
+    followedUserRelationshipRef.path,
+    'followers',
+  ).withConverter(userBasicInfoDataConverter);
+  await setDoc(doc(userFollowersCollection, currentUser.uid), {
+    id: currentUser.uid,
+    displayName: currentUser.displayName,
+    photoURL: currentUser.photoURL,
+  });
+
+  const currentUserProfileRef = doc(userProfileCollection, currentUser.uid);
+  await updateDoc(currentUserProfileRef, { followingCount: increment(1) });
+
+  const followedUserProfileRef = doc(userProfileCollection, followedUser.id);
+  await updateDoc(followedUserProfileRef, { followerCount: increment(1) });
+};
+
 export const updateUserProfileInFirestore = async (profile: UserProfile): Promise<void> => {
   const { displayName } = profile;
   await updateAuthUserDisplayNameInFirebase(displayName);
@@ -101,8 +136,8 @@ export const updateUserProfileInFirestore = async (profile: UserProfile): Promis
 export const updateUserProfilePhotoInFirestore = async (photoData: PhotoData): Promise<void> => {
   const userProfile = await readUserProfileFromFirestore();
   if (!userProfile) throw new Error('No user profile');
-  await updateDoc(userProfile.ref, { photoURL: photoData.photoUrl });
-  await updateAuthUserPhotoInFirebase(photoData.photoUrl);
+  await updateDoc(userProfile.ref, { photoURL: photoData.photoURL });
+  await updateAuthUserPhotoInFirebase(photoData.photoURL);
 };
 
 export const watchUserProfileFromFirestore = (

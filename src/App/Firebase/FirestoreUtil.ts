@@ -1,8 +1,22 @@
 import * as _ from 'lodash';
 import { Timestamp } from 'firebase/firestore';
 import type { DocumentData, DocumentSnapshot, FirestoreDataConverter } from 'firebase/firestore';
-import { EventInfo, PhotoData, UserProfile } from '../Shared/Types';
+import { EventInfo, UserProfile } from '../Shared/Types';
 import { getDateTimeStringFromDate } from '../Shared/Utils';
+
+const convertTimestampsToDateStrings = (data: DocumentData): DocumentData => {
+  const returnData: DocumentData = _.cloneDeep(data); // didn't know how to make an empty version
+
+  for (const prop in data) {
+    if (Object.prototype.hasOwnProperty.call(data, prop)) {
+      if (data[prop] instanceof Timestamp) {
+        returnData[prop] = getDateTimeStringFromDate(data[prop].toDate());
+      }
+    }
+  }
+
+  return returnData;
+};
 
 export const eventConverter: FirestoreDataConverter<EventInfo> = {
   fromFirestore: (docSnap: DocumentSnapshot): EventInfo => {
@@ -26,21 +40,6 @@ export const eventConverter: FirestoreDataConverter<EventInfo> = {
   },
 };
 
-export const photoDataConverter: FirestoreDataConverter<PhotoData> = {
-  fromFirestore: (docSnap: DocumentSnapshot): PhotoData => {
-    const photoData = docSnap.data();
-    return {
-      ...photoData,
-      id: docSnap.id,
-    } as PhotoData;
-  },
-  toFirestore: (data: PhotoData) => {
-    // Not called by updateDoc
-    const { id, ...returnData } = data;
-    return returnData as DocumentData;
-  },
-};
-
 export const userProfileConverter: FirestoreDataConverter<UserProfile> = {
   fromFirestore: (docSnap: DocumentSnapshot): UserProfile => {
     const docData = docSnap.data();
@@ -59,16 +58,17 @@ export const userProfileConverter: FirestoreDataConverter<UserProfile> = {
   },
 };
 
-const convertTimestampsToDateStrings = (data: DocumentData): DocumentData => {
-  const returnData: DocumentData = _.cloneDeep(data); // didn't know how to make an empty version
-
-  for (const prop in data) {
-    if (Object.prototype.hasOwnProperty.call(data, prop)) {
-      if (data[prop] instanceof Timestamp) {
-        returnData[prop] = getDateTimeStringFromDate(data[prop].toDate());
-      }
-    }
-  }
-
-  return returnData;
-};
+export const WithIdDataConverter = <T extends { id?: string }>(): FirestoreDataConverter<T> => ({
+  fromFirestore: (docSnap: DocumentSnapshot): T => {
+    const objData = docSnap.data();
+    return {
+      ...objData,
+      id: docSnap.id,
+    } as T;
+  },
+  toFirestore: (data: T) => {
+    // Not called by updateDoc
+    const { id, ...returnData } = data;
+    return returnData as DocumentData;
+  },
+});
