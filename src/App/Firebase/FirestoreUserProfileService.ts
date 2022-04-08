@@ -120,12 +120,32 @@ export const setFollowUserInFirestore = async (followedUser: UserProfile) => {
     displayName: currentUser.displayName,
     photoURL: currentUser.photoURL,
   });
+};
+
+export const setUnfollowUserInFirestore = async (followedUserId: string) => {
+  const currentUser = readCurrentUser();
+  if (!currentUser) throw new Error('No current user');
+  const currentUserRelationshipRef = doc(relationshipCollection, currentUser.uid);
+  const userFollowingCollection = collection(
+    db,
+    currentUserRelationshipRef.path,
+    'following',
+  ).withConverter(userBasicInfoDataConverter);
+  await deleteDoc(doc(userFollowingCollection, followedUserId));
+
+  const followedUserRelationshipRef = doc(relationshipCollection, followedUserId);
+  const userFollowersCollection = collection(
+    db,
+    followedUserRelationshipRef.path,
+    'followers',
+  ).withConverter(userBasicInfoDataConverter);
+  await deleteDoc(doc(userFollowersCollection, currentUser.uid));
 
   const currentUserProfileRef = doc(userProfileCollection, currentUser.uid);
-  await updateDoc(currentUserProfileRef, { followingCount: increment(1) });
+  await updateDoc(currentUserProfileRef, { followingCount: increment(-1) });
 
-  const followedUserProfileRef = doc(userProfileCollection, followedUser.id);
-  await updateDoc(followedUserProfileRef, { followerCount: increment(1) });
+  const followedUserProfileRef = doc(userProfileCollection, followedUserId);
+  await updateDoc(followedUserProfileRef, { followerCount: increment(-1) });
 };
 
 export const updateUserProfileInFirestore = async (profile: UserProfile): Promise<void> => {
