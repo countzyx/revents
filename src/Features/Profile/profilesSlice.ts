@@ -177,7 +177,7 @@ export const setUnfollowUser = createAsyncThunk<
   void,
   string,
   { dispatch: AppDispatch; state: RootState }
->('profile/setFollowUser', async (followedUserId, thunkApi) => {
+>('profile/setUnfollowUser', async (followedUserId, thunkApi) => {
   await setUnfollowUserInFirestore(followedUserId);
 });
 
