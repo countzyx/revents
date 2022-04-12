@@ -7,6 +7,7 @@ import {
   selectProfileIsUpdating,
   selectProfileSelectedProfile,
   setFollowUser,
+  setUnfollowUser,
 } from '../profilesSlice';
 
 const ProfileHeader: React.FC = () => {
@@ -18,6 +19,10 @@ const ProfileHeader: React.FC = () => {
 
   const handleFollowUser = () => {
     if (selectedProfile) dispatch(setFollowUser(selectedProfile));
+  };
+
+  const handleUnfollowUser = () => {
+    if (selectedProfile) dispatch(setUnfollowUser(selectedProfile.id));
   };
 
   if (!selectedProfile) return <div />;
@@ -64,6 +69,14 @@ const ProfileHeader: React.FC = () => {
                   />
                 </Reveal.Content>
               </Reveal>
+              <Button
+                basic
+                color='red'
+                content='Unfollow'
+                fluid
+                loading={isUpdatingProfile}
+                onClick={handleUnfollowUser}
+              />
             </>
           )}
         </Grid.Column>
