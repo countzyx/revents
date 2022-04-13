@@ -48,8 +48,8 @@ const ProfileHeader: React.FC = () => {
         </Grid.Column>
         <Grid.Column width={4}>
           <Statistic.Group>
-            <Statistic label='Followers' value={10} />
-            <Statistic label='Following' value={5} />
+            <Statistic label='Followers' value={selectedProfile.followerCount} />
+            <Statistic label='Following' value={selectedProfile.followingCount} />
           </Statistic.Group>
           {!isCurrentUser && (
             <>
