@@ -163,6 +163,19 @@ export const updateUserProfilePhotoInFirestore = async (photoData: PhotoData): P
   await updateAuthUserPhotoInFirebase(photoData.photoURL);
 };
 
+export const watchFollowersForProfileFromFirestore = (
+  observer: CollectionObserver,
+  profileId: string,
+): Unsubscribe => {
+  const profileRelationshipRef = doc(relationshipCollection, profileId);
+  return onSnapshot(
+    collection(db, profileRelationshipRef.path, 'followers').withConverter(
+      userBasicInfoDataConverter,
+    ),
+    observer,
+  );
+};
+
 export const watchUserProfileFromFirestore = (
   observer: DocumentObserver,
   userId: string,
