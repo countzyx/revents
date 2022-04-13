@@ -109,6 +109,9 @@ export const setFollowUserInFirestore = async (followedUser: UserProfile) => {
     photoURL: followedUser.photoURL,
   });
 
+  const currentUserProfileRef = doc(userProfileCollection, currentUser.uid);
+  await updateDoc(currentUserProfileRef, { followingCount: increment(1) });
+
   const followedUserRelationshipRef = doc(relationshipCollection, followedUser.id);
   const userFollowersCollection = collection(
     db,
@@ -120,6 +123,9 @@ export const setFollowUserInFirestore = async (followedUser: UserProfile) => {
     displayName: currentUser.displayName,
     photoURL: currentUser.photoURL,
   });
+
+  const followedUserProfileRef = doc(userProfileCollection, followedUser.id);
+  await updateDoc(followedUserProfileRef, { followerCount: increment(1) });
 };
 
 export const setUnfollowUserInFirestore = async (followedUserId: string) => {
@@ -133,6 +139,9 @@ export const setUnfollowUserInFirestore = async (followedUserId: string) => {
   ).withConverter(userBasicInfoDataConverter);
   await deleteDoc(doc(userFollowingCollection, followedUserId));
 
+  const currentUserProfileRef = doc(userProfileCollection, currentUser.uid);
+  await updateDoc(currentUserProfileRef, { followingCount: increment(-1) });
+
   const followedUserRelationshipRef = doc(relationshipCollection, followedUserId);
   const userFollowersCollection = collection(
     db,
@@ -140,9 +149,6 @@ export const setUnfollowUserInFirestore = async (followedUserId: string) => {
     'followers',
   ).withConverter(userBasicInfoDataConverter);
   await deleteDoc(doc(userFollowersCollection, currentUser.uid));
-
-  const currentUserProfileRef = doc(userProfileCollection, currentUser.uid);
-  await updateDoc(currentUserProfileRef, { followingCount: increment(-1) });
 
   const followedUserProfileRef = doc(userProfileCollection, followedUserId);
   await updateDoc(followedUserProfileRef, { followerCount: increment(-1) });
