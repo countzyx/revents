@@ -14,14 +14,28 @@ import {
   deletePhotoInProfileCollection,
   setFollowUserInFirestore,
   setUnfollowUserInFirestore,
+  watchFollowersForProfileFromFirestore,
+  watchFollowingForProfileFromFirestore,
 } from '../../App/Firebase/FirestoreUserProfileService';
-import { EventInfo, PhotoData, UserEventType, UserProfile } from '../../App/Shared/Types';
+import {
+  EventInfo,
+  PhotoData,
+  UserBasicInfo,
+  UserEventType,
+  UserProfile,
+} from '../../App/Shared/Types';
 import { AppDispatch, RootState } from '../../App/Store/store';
 
 type ProfileState = {
   currentProfile?: UserProfile;
   eventsError?: Error;
+  followers: UserBasicInfo[];
+  followersError?: Error;
+  following: UserBasicInfo[];
+  followingError?: Error;
   isLoadingEvents: boolean;
+  isLoadingFollowers: boolean;
+  isLoadingFollowing: boolean;
   isLoadingPhotos: boolean;
   isLoadingProfile: boolean;
   isUpdatingProfile: boolean;
@@ -37,7 +51,13 @@ type ProfileState = {
 const initialState: ProfileState = {
   currentProfile: undefined,
   eventsError: undefined,
+  followers: [],
+  followersError: undefined,
+  following: [],
+  followingError: undefined,
   isLoadingEvents: false,
+  isLoadingFollowers: false,
+  isLoadingFollowing: false,
   isLoadingPhotos: false,
   isLoadingProfile: false,
   isUpdatingProfile: false,
@@ -91,6 +111,52 @@ export const fetchCurrentUserProfile = (dispatch: AppDispatch, userId: string): 
       error: async (err) => dispatch(fetchCurrentUserProfileRejected(err)),
     },
     userId,
+  );
+
+  return unsubscribe;
+};
+
+export const fetchFollowersForProfile = (dispatch: AppDispatch, profileId: string): Unsubscribe => {
+  const {
+    fetchFollowersForProfileFulfilled,
+    fetchFollowersForProfilePending,
+    fetchFollowersForProfileRejected,
+  } = profilesSlice.actions;
+
+  const unsubscribe = watchFollowersForProfileFromFirestore(
+    {
+      next: async (snapshot) => {
+        dispatch(fetchFollowersForProfilePending());
+        const fetchedFollowers = snapshot.docs.map((docResult) => docResult.data());
+        const followers = fetchedFollowers.filter((e) => e !== undefined) as UserBasicInfo[];
+        dispatch(fetchFollowersForProfileFulfilled(followers));
+      },
+      error: async (err) => dispatch(fetchFollowersForProfileRejected(err)),
+    },
+    profileId,
+  );
+
+  return unsubscribe;
+};
+
+export const fetchFollowingForProfile = (dispatch: AppDispatch, profileId: string): Unsubscribe => {
+  const {
+    fetchFollowingForProfileFulfilled,
+    fetchFollowingForProfilePending,
+    fetchFollowingForProfileRejected,
+  } = profilesSlice.actions;
+
+  const unsubscribe = watchFollowingForProfileFromFirestore(
+    {
+      next: async (snapshot) => {
+        dispatch(fetchFollowingForProfilePending());
+        const fetchedFollowing = snapshot.docs.map((docResult) => docResult.data());
+        const following = fetchedFollowing.filter((e) => e !== undefined) as UserBasicInfo[];
+        dispatch(fetchFollowingForProfileFulfilled(following));
+      },
+      error: async (err) => dispatch(fetchFollowingForProfileRejected(err)),
+    },
+    profileId,
   );
 
   return unsubscribe;
@@ -260,6 +326,42 @@ export const profilesSlice = createSlice({
       currentProfile: undefined,
       profileError: action.payload,
       isLoadingProfile: false,
+    }),
+    fetchFollowersForProfilePending: (state) => ({
+      ...state,
+      followers: [],
+      followersError: undefined,
+      isLoadingFollowers: true,
+    }),
+    fetchFollowersForProfileFulfilled: (state, action: PayloadAction<UserBasicInfo[]>) => ({
+      ...state,
+      followers: action.payload,
+      followersError: undefined,
+      isLoadingFollowers: false,
+    }),
+    fetchFollowersForProfileRejected: (state, action: PayloadAction<Error>) => ({
+      ...state,
+      followers: [],
+      followersError: action.payload,
+      isLoadingFollowers: false,
+    }),
+    fetchFollowingForProfilePending: (state) => ({
+      ...state,
+      following: [],
+      followingError: undefined,
+      isLoadingFollowing: true,
+    }),
+    fetchFollowingForProfileFulfilled: (state, action: PayloadAction<UserBasicInfo[]>) => ({
+      ...state,
+      following: action.payload,
+      followingError: undefined,
+      isLoadingFollowing: false,
+    }),
+    fetchFollowingForProfileRejected: (state, action: PayloadAction<Error>) => ({
+      ...state,
+      following: [],
+      followingError: action.payload,
+      isLoadingFollowing: false,
     }),
     fetchSelectedUserProfilePending: (state) => ({
       ...state,
