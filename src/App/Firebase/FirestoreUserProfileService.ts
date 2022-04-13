@@ -176,6 +176,19 @@ export const watchFollowersForProfileFromFirestore = (
   );
 };
 
+export const watchFollowingForProfileFromFirestore = (
+  observer: CollectionObserver,
+  profileId: string,
+): Unsubscribe => {
+  const profileRelationshipRef = doc(relationshipCollection, profileId);
+  return onSnapshot(
+    collection(db, profileRelationshipRef.path, 'following').withConverter(
+      userBasicInfoDataConverter,
+    ),
+    observer,
+  );
+};
+
 export const watchUserProfileFromFirestore = (
   observer: DocumentObserver,
   userId: string,
