@@ -75,6 +75,19 @@ const getProfilePhotoCollection = async (
   return collection(db, photoParentPath, 'photos').withConverter(photoDataConverter);
 };
 
+export const readIsUserFollowedFromFirestore = async (followedUserId: string): Promise<boolean> => {
+  const currentUser = readCurrentUser();
+  if (!currentUser) throw new Error('No current user');
+  const currentUserRelationshipRef = doc(relationshipCollection, currentUser.uid);
+  const userFollowingCollection = collection(
+    db,
+    currentUserRelationshipRef.path,
+    'following',
+  ).withConverter(userBasicInfoDataConverter);
+  const snapshot = await getDoc(doc(userFollowingCollection, followedUserId));
+  return snapshot.exists();
+};
+
 const readUserProfileFromFirestore = async () => {
   const currentUser = readCurrentUser();
   if (!currentUser) throw new Error('No current user');
