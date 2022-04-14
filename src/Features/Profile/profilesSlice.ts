@@ -16,6 +16,7 @@ import {
   setUnfollowUserInFirestore,
   watchFollowersForProfileFromFirestore,
   watchFollowingForProfileFromFirestore,
+  readIsUserFollowedFromFirestore,
 } from '../../App/Firebase/FirestoreUserProfileService';
 import {
   EventInfo,
@@ -29,6 +30,7 @@ import { AppDispatch, RootState } from '../../App/Store/store';
 type ProfileState = {
   currentProfile?: UserProfile;
   eventsError?: Error;
+  followedError?: Error;
   followers: UserBasicInfo[];
   followersError?: Error;
   following: UserBasicInfo[];
@@ -38,6 +40,7 @@ type ProfileState = {
   isLoadingFollowing: boolean;
   isLoadingPhotos: boolean;
   isLoadingProfile: boolean;
+  isSelectedProfileFollowed: boolean;
   isUpdatingProfile: boolean;
   isUploadingPhoto: boolean;
   photos: PhotoData[];
@@ -51,6 +54,7 @@ type ProfileState = {
 const initialState: ProfileState = {
   currentProfile: undefined,
   eventsError: undefined,
+  followedError: undefined,
   followers: [],
   followersError: undefined,
   following: [],
@@ -60,6 +64,7 @@ const initialState: ProfileState = {
   isLoadingFollowing: false,
   isLoadingPhotos: false,
   isLoadingProfile: false,
+  isSelectedProfileFollowed: false,
   isUpdatingProfile: false,
   isUploadingPhoto: false,
   photos: [],
@@ -230,6 +235,18 @@ export const fetchUserProfilePhotos = (dispatch: AppDispatch, userId: string): U
   );
   return unsubscribe;
 };
+
+export const getIsSelectedProfileFollowed = createAsyncThunk<
+  boolean,
+  void,
+  { dispatch: AppDispatch; state: RootState }
+>('profile/getIsSelectedProfileFollowed', async (_, thunkApi) => {
+  const { currentProfile, selectedProfile } = thunkApi.getState().profiles;
+  if (!currentProfile) return false;
+  if (!selectedProfile) return false;
+  if (currentProfile.id === selectedProfile.id) return false;
+  return readIsUserFollowedFromFirestore(selectedProfile.id);
+});
 
 export const setFollowUser = createAsyncThunk<
   void,
@@ -458,6 +475,20 @@ export const profilesSlice = createSlice({
         ...state,
         photosError: action.error as Error,
       }))
+      .addCase(getIsSelectedProfileFollowed.fulfilled, (state, action) => ({
+        ...state,
+        isSelectedProfileFollowed: action.payload,
+      }))
+      .addCase(getIsSelectedProfileFollowed.pending, (state) => ({
+        ...state,
+        isSelectedProfileFollowed: false,
+        followedError: undefined,
+      }))
+      .addCase(getIsSelectedProfileFollowed.rejected, (state, action) => ({
+        ...state,
+        isSelectedProfileFollowed: false,
+        followedError: action.error as Error,
+      }))
       .addCase(setFollowUser.fulfilled, (state) => ({
         ...state,
         isUpdatingProfile: false,
@@ -512,6 +543,8 @@ export const selectProfileEvents = (state: RootState): EventInfo[] | undefined =
   state.profiles.profileEvents;
 export const selectProfileEventsError = (state: RootState): Error | undefined =>
   state.profiles.eventsError;
+export const selectProfileFollowedError = (state: RootState): Error | undefined =>
+  state.profiles.followedError;
 export const selectProfileFollowers = (state: RootState): UserBasicInfo[] =>
   state.profiles.followers;
 export const selectProfileFollowersError = (state: RootState): Error | undefined =>
@@ -530,6 +563,8 @@ export const selectProfileIsLoadingFollowing = (state: RootState): boolean =>
   state.profiles.isLoadingFollowing;
 export const selectProfileIsLoadingPhotos = (state: RootState): boolean =>
   state.profiles.isLoadingPhotos;
+export const selectProfileIsSelectedProfileFollowed = (state: RootState): boolean =>
+  state.profiles.isSelectedProfileFollowed;
 export const selectProfileIsUpdating = (state: RootState): boolean =>
   state.profiles.isUpdatingProfile;
 export const selectProfileIsUploadingPhoto = (state: RootState): boolean =>
