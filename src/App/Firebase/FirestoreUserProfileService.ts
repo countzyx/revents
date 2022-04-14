@@ -12,6 +12,7 @@ import {
   setDoc,
   Unsubscribe as FBUnsubscribe,
   updateDoc,
+  writeBatch,
 } from 'firebase/firestore';
 import { PhotoData, UserBasicInfo, UserProfile } from '../Shared/Types';
 import { db } from './Firebase';
@@ -110,20 +111,22 @@ export const readUserProfilePhotosFromFirestore = (
 export const setFollowUserInFirestore = async (followedUser: UserProfile) => {
   const currentUser = readCurrentUser();
   if (!currentUser) throw new Error('No current user');
+  const batch = writeBatch(db);
+
   const currentUserRelationshipRef = doc(relationshipCollection, currentUser.uid);
   const userFollowingCollection = collection(
     db,
     currentUserRelationshipRef.path,
     'following',
   ).withConverter(userBasicInfoDataConverter);
-  await setDoc(doc(userFollowingCollection, followedUser.id), {
+  batch.set(doc(userFollowingCollection, followedUser.id), {
     id: followedUser.id,
     displayName: followedUser.displayName,
     photoURL: followedUser.photoURL,
   });
 
   const currentUserProfileRef = doc(userProfileCollection, currentUser.uid);
-  await updateDoc(currentUserProfileRef, { followingCount: increment(1) });
+  batch.update(currentUserProfileRef, { followingCount: increment(1) });
 
   const followedUserRelationshipRef = doc(relationshipCollection, followedUser.id);
   const userFollowersCollection = collection(
@@ -131,29 +134,33 @@ export const setFollowUserInFirestore = async (followedUser: UserProfile) => {
     followedUserRelationshipRef.path,
     'followers',
   ).withConverter(userBasicInfoDataConverter);
-  await setDoc(doc(userFollowersCollection, currentUser.uid), {
+  batch.set(doc(userFollowersCollection, currentUser.uid), {
     id: currentUser.uid,
     displayName: currentUser.displayName,
     photoURL: currentUser.photoURL,
   });
 
   const followedUserProfileRef = doc(userProfileCollection, followedUser.id);
-  await updateDoc(followedUserProfileRef, { followerCount: increment(1) });
+  batch.update(followedUserProfileRef, { followerCount: increment(1) });
+
+  await batch.commit();
 };
 
 export const setUnfollowUserInFirestore = async (followedUserId: string) => {
   const currentUser = readCurrentUser();
   if (!currentUser) throw new Error('No current user');
+  const batch = writeBatch(db);
+
   const currentUserRelationshipRef = doc(relationshipCollection, currentUser.uid);
   const userFollowingCollection = collection(
     db,
     currentUserRelationshipRef.path,
     'following',
   ).withConverter(userBasicInfoDataConverter);
-  await deleteDoc(doc(userFollowingCollection, followedUserId));
+  batch.delete(doc(userFollowingCollection, followedUserId));
 
   const currentUserProfileRef = doc(userProfileCollection, currentUser.uid);
-  await updateDoc(currentUserProfileRef, { followingCount: increment(-1) });
+  batch.update(currentUserProfileRef, { followingCount: increment(-1) });
 
   const followedUserRelationshipRef = doc(relationshipCollection, followedUserId);
   const userFollowersCollection = collection(
@@ -161,10 +168,12 @@ export const setUnfollowUserInFirestore = async (followedUserId: string) => {
     followedUserRelationshipRef.path,
     'followers',
   ).withConverter(userBasicInfoDataConverter);
-  await deleteDoc(doc(userFollowersCollection, currentUser.uid));
+  batch.delete(doc(userFollowersCollection, currentUser.uid));
 
   const followedUserProfileRef = doc(userProfileCollection, followedUserId);
-  await updateDoc(followedUserProfileRef, { followerCount: increment(-1) });
+  batch.update(followedUserProfileRef, { followerCount: increment(-1) });
+
+  batch.commit();
 };
 
 export const updateUserProfileInFirestore = async (profile: UserProfile): Promise<void> => {
