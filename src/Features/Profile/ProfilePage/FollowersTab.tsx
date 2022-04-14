@@ -28,7 +28,7 @@ const FollowersTab: React.FC = () => {
     <Tab.Pane loading={isLoadingFollowers}>
       <Grid>
         <Grid.Column width={16}>
-          <Header content='Followers' floated='left' icon='user' />
+          <Header content='Followers' floated='left' icon='users' />
         </Grid.Column>
         <Grid.Column width={16}>
           <Card.Group itemsPerRow={5}>
