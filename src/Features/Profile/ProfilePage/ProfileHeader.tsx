@@ -4,6 +4,8 @@ import { kUnknownUserImageUrl } from '../../../App/Shared/Constants';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { selectAuthUserInfo } from '../../Auth/authSlice';
 import {
+  getIsSelectedProfileFollowed,
+  selectProfileIsSelectedProfileFollowed,
   selectProfileIsUpdating,
   selectProfileSelectedProfile,
   setFollowUser,
@@ -16,6 +18,11 @@ const ProfileHeader: React.FC = () => {
   const currentUser = useAppSelector(selectAuthUserInfo);
   const selectedProfile = useAppSelector(selectProfileSelectedProfile);
   const isCurrentUser = currentUser && currentUser.uid === selectedProfile?.id;
+  const isSelectedProfileFollowed = useAppSelector(selectProfileIsSelectedProfileFollowed);
+
+  React.useEffect(() => {
+    if (currentUser && selectedProfile && !isCurrentUser) dispatch(getIsSelectedProfileFollowed());
+  }, [dispatch, currentUser, isCurrentUser, selectedProfile]);
 
   const handleFollowUser = () => {
     if (selectedProfile) dispatch(setFollowUser(selectedProfile));
@@ -56,27 +63,34 @@ const ProfileHeader: React.FC = () => {
               <Divider />
               <Reveal animated='move'>
                 <Reveal.Content style={{ width: '100%' }} visible>
-                  <Button color='teal' content='Following' fluid />
-                </Reveal.Content>
-                <Reveal.Content hidden style={{ width: '100%' }}>
                   <Button
-                    basic
-                    color='green'
-                    content='Follow'
+                    color='teal'
+                    content={isSelectedProfileFollowed ? 'Following' : 'Not Following'}
                     fluid
-                    loading={isUpdatingProfile}
-                    onClick={handleFollowUser}
                   />
                 </Reveal.Content>
+                <Reveal.Content hidden style={{ width: '100%' }}>
+                  {isSelectedProfileFollowed ? (
+                    <Button
+                      basic
+                      color='red'
+                      content='Unfollow'
+                      fluid
+                      loading={isUpdatingProfile}
+                      onClick={handleUnfollowUser}
+                    />
+                  ) : (
+                    <Button
+                      basic
+                      color='green'
+                      content='Follow'
+                      fluid
+                      loading={isUpdatingProfile}
+                      onClick={handleFollowUser}
+                    />
+                  )}
+                </Reveal.Content>
               </Reveal>
-              <Button
-                basic
-                color='red'
-                content='Unfollow'
-                fluid
-                loading={isUpdatingProfile}
-                onClick={handleUnfollowUser}
-              />
             </>
           )}
         </Grid.Column>
