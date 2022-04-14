@@ -512,10 +512,22 @@ export const selectProfileEvents = (state: RootState): EventInfo[] | undefined =
   state.profiles.profileEvents;
 export const selectProfileEventsError = (state: RootState): Error | undefined =>
   state.profiles.eventsError;
+export const selectProfileFollowers = (state: RootState): UserBasicInfo[] =>
+  state.profiles.followers;
+export const selectProfileFollowersError = (state: RootState): Error | undefined =>
+  state.profiles.followersError;
+export const selectProfileFollowingError = (state: RootState): Error | undefined =>
+  state.profiles.followingError;
+export const selectProfileFollowing = (state: RootState): UserBasicInfo[] =>
+  state.profiles.following;
 export const selectProfileIsLoading = (state: RootState): boolean =>
   state.profiles.isLoadingProfile;
 export const selectProfileIsLoadingEvents = (state: RootState): boolean =>
   state.profiles.isLoadingEvents;
+export const selectProfileIsLoadingFollowers = (state: RootState): boolean =>
+  state.profiles.isLoadingFollowers;
+export const selectProfileIsLoadingFollowing = (state: RootState): boolean =>
+  state.profiles.isLoadingFollowing;
 export const selectProfileIsLoadingPhotos = (state: RootState): boolean =>
   state.profiles.isLoadingPhotos;
 export const selectProfileIsUpdating = (state: RootState): boolean =>
