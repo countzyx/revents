@@ -128,21 +128,6 @@ export const setFollowUserInFirestore = async (followedUser: UserProfile) => {
   const currentUserProfileRef = doc(userProfileCollection, currentUser.uid);
   batch.update(currentUserProfileRef, { followingCount: increment(1) });
 
-  const followedUserRelationshipRef = doc(relationshipCollection, followedUser.id);
-  const userFollowersCollection = collection(
-    db,
-    followedUserRelationshipRef.path,
-    'followers',
-  ).withConverter(userBasicInfoDataConverter);
-  batch.set(doc(userFollowersCollection, currentUser.uid), {
-    id: currentUser.uid,
-    displayName: currentUser.displayName,
-    photoURL: currentUser.photoURL,
-  });
-
-  const followedUserProfileRef = doc(userProfileCollection, followedUser.id);
-  batch.update(followedUserProfileRef, { followerCount: increment(1) });
-
   await batch.commit();
 };
 
@@ -161,17 +146,6 @@ export const setUnfollowUserInFirestore = async (followedUserId: string) => {
 
   const currentUserProfileRef = doc(userProfileCollection, currentUser.uid);
   batch.update(currentUserProfileRef, { followingCount: increment(-1) });
-
-  const followedUserRelationshipRef = doc(relationshipCollection, followedUserId);
-  const userFollowersCollection = collection(
-    db,
-    followedUserRelationshipRef.path,
-    'followers',
-  ).withConverter(userBasicInfoDataConverter);
-  batch.delete(doc(userFollowersCollection, currentUser.uid));
-
-  const followedUserProfileRef = doc(userProfileCollection, followedUserId);
-  batch.update(followedUserProfileRef, { followerCount: increment(-1) });
 
   batch.commit();
 };
