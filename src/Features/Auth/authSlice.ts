@@ -15,14 +15,14 @@ import {
 type AuthState = {
   error?: Error;
   isAppLoaded: boolean;
-  isAuth: boolean;
+  isAuthed: boolean;
   userInfo?: UserInfo;
 };
 
 const initialState: AuthState = {
   error: undefined,
   isAppLoaded: false,
-  isAuth: false,
+  isAuthed: false,
   userInfo: undefined,
 };
 
@@ -97,7 +97,7 @@ export const authSlice = createSlice({
     authUser: (state, action: PayloadAction<UserInfo>) => ({
       ...state,
       userInfo: action.payload,
-      isAuth: true,
+      isAuthed: true,
     }),
     clearError: (state) => ({
       ...state,
@@ -114,7 +114,7 @@ export const authSlice = createSlice({
     unauthUser: (state) => ({
       ...state,
       error: undefined,
-      isAuth: false,
+      isAuthed: false,
       userInfo: undefined,
     }),
   },
@@ -158,7 +158,7 @@ export const authSlice = createSlice({
 export const { clearError } = authSlice.actions;
 export const selectAuthError = (state: RootState): Error | undefined => state.auth.error;
 export const selectAuthIsAppLoaded = (state: RootState): boolean => state.auth.isAppLoaded;
-export const selectAuthIsAuth = (state: RootState): boolean => state.auth.isAuth;
+export const selectAuthIsAuthed = (state: RootState): boolean => state.auth.isAuthed;
 export const selectAuthUserInfo = (state: RootState): UserInfo | undefined => state.auth.userInfo;
 
 export default authSlice.reducer;

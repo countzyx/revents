@@ -5,7 +5,7 @@ import { Button, Divider, Label } from 'semantic-ui-react';
 import ModalWrapper from '../../App/Components/Modals/ModalWrapper';
 import FormTextInput from '../../App/Components/Form/FormTextInput';
 import { useAppDispatch, useAppSelector } from '../../App/Store/hooks';
-import { clearError, registerPasswordUser, selectAuthError, selectAuthIsAuth } from './authSlice';
+import { clearError, registerPasswordUser, selectAuthError, selectAuthIsAuthed } from './authSlice';
 import { UserRegistrationInfo } from '../../App/Shared/Types';
 import { closeModal } from '../../App/Components/Modals/modalsSlice';
 import SocialLogin from './SocialLogin';
@@ -37,15 +37,15 @@ const validationSchema: Yup.SchemaOf<RegistrationFormValues> = Yup.object({
 const RegisterForm: React.FC = () => {
   const dispatch = useAppDispatch();
   const authError = useAppSelector(selectAuthError);
-  const isAuth = useAppSelector(selectAuthIsAuth);
+  const isAuthed = useAppSelector(selectAuthIsAuthed);
 
   React.useEffect(() => {
     dispatch(clearError());
   }, [dispatch]);
 
   React.useEffect(() => {
-    isAuth && dispatch(closeModal());
-  }, [dispatch, isAuth]);
+    isAuthed && dispatch(closeModal());
+  }, [dispatch, isAuthed]);
 
   return (
     <ModalWrapper header='Register with Re-vents' size='mini'>

@@ -2,12 +2,12 @@ import * as React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Button, Container, Menu } from 'semantic-ui-react';
 import { useAppSelector } from '../../App/Store/hooks';
-import { selectAuthIsAuth } from '../Auth/authSlice';
+import { selectAuthIsAuthed } from '../Auth/authSlice';
 import SignedInMenu from './SignedInMenu';
 import SignedOutMenu from './SignedOutMenu';
 
 const NavBar: React.FC = () => {
-  const isAuth = useAppSelector(selectAuthIsAuth);
+  const isAuthed = useAppSelector(selectAuthIsAuthed);
 
   return (
     <Menu inverted fixed='top'>
@@ -19,12 +19,12 @@ const NavBar: React.FC = () => {
         <Menu.Item as={NavLink} to='/events' name='Events' />
         <Menu.Item as={NavLink} to='/sandbox' name='Sandbox' />
 
-        {isAuth && (
+        {isAuthed && (
           <Menu.Item as={NavLink} to='/createEvent'>
             <Button positive inverted content='Create Event' />
           </Menu.Item>
         )}
-        {isAuth ? <SignedInMenu /> : <SignedOutMenu />}
+        {isAuthed ? <SignedInMenu /> : <SignedOutMenu />}
       </Container>
     </Menu>
   );
