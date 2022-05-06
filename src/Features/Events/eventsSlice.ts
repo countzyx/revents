@@ -3,10 +3,10 @@ import { arrayToTree } from 'performant-array-to-tree';
 import {
   addCurrentUserAsEventAttendeeInFirestore,
   addEventChatCommentAsCurrentUserInFirebase,
-  readAllEventsFromFirestore,
-  readChatCommentsFromFirebase,
-  readSingleEventFromFirestore,
   removeCurrentUserAsEventAttendeeInFirestore,
+  watchAllEventsFromFirestore,
+  watchChatCommentsFromFirebase,
+  watchSingleEventFromFirestore,
 } from '../../App/Firebase/FirestoreEventService';
 import type { Unsubscribe } from '../../App/Firebase/FirestoreEventService';
 import { ChatComment, EventInfo, EventSearchCriteria } from '../../App/Shared/Types';
@@ -66,7 +66,7 @@ export const fetchAllEvents = (
   searchCriteria: EventSearchCriteria,
 ): Unsubscribe => {
   const { fetchEventsPending, fetchEventsFulfilled, fetchEventsRejected } = eventsSlice.actions;
-  const unsubscribe = readAllEventsFromFirestore(
+  const unsubscribe = watchAllEventsFromFirestore(
     {
       next: async (snapshot) => {
         dispatch(fetchEventsPending());
@@ -84,7 +84,7 @@ export const fetchAllEvents = (
 
 export const fetchChatCommentsForEvent = (dispatch: AppDispatch, eventId: string): Unsubscribe => {
   const { fetchChatFulfilled, fetchChatPending, fetchChatRejected } = eventsSlice.actions;
-  const unsubscribe = readChatCommentsFromFirebase(eventId, (snapshot) => {
+  const unsubscribe = watchChatCommentsFromFirebase(eventId, (snapshot) => {
     dispatch(fetchChatPending());
     try {
       const newChatComments: ChatComment[] = [];
@@ -114,7 +114,7 @@ export const fetchChatCommentsForEvent = (dispatch: AppDispatch, eventId: string
 
 export const fetchSingleEvent = (dispatch: AppDispatch, eventId: string): Unsubscribe => {
   const { fetchEventsPending, fetchEventsFulfilled, fetchEventsRejected } = eventsSlice.actions;
-  const unsubscribe = readSingleEventFromFirestore(
+  const unsubscribe = watchSingleEventFromFirestore(
     {
       next: async (snapshot) => {
         dispatch(fetchEventsPending());

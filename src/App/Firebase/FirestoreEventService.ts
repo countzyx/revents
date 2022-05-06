@@ -112,7 +112,30 @@ export const createEventInFirestore = async (
 export const deleteEventInFirestore = async (eventId: string): Promise<void> =>
   deleteDoc(doc(eventsCollection, eventId));
 
-export const readAllEventsFromFirestore = (
+export const removeCurrentUserAsEventAttendeeInFirestore = async (
+  event: EventInfo,
+): Promise<void> => {
+  const currentUser = readCurrentUser();
+  if (!currentUser) throw new Error('No current user');
+  const eventRef = doc(eventsCollection, event.id);
+  const eventDoc = await getDoc(eventRef);
+  const oldEvent = eventDoc.data();
+  if (!oldEvent) throw Error(`event ${event.id}: ${event.title} data not found`);
+  return updateDoc(eventRef, {
+    attendees: oldEvent.attendees?.filter((a) => a.id !== currentUser.uid),
+    attendeeIds: arrayRemove(currentUser.uid),
+  });
+};
+
+export const toggleCancelEventInFirestore = async (event: EventInfo): Promise<void> =>
+  updateDoc(doc(eventsCollection, event.id), {
+    isCancelled: !event.isCancelled,
+  });
+
+export const updateEventInFirestore = async (event: EventInfo): Promise<void> =>
+  setDoc(doc(eventsCollection, event.id), event);
+
+export const watchAllEventsFromFirestore = (
   observer: CollectionObserver,
   searchCriteria: EventSearchCriteria,
 ): Unsubscribe => {
@@ -138,7 +161,7 @@ export const readAllEventsFromFirestore = (
   return onSnapshot(allEventsQuery, observer);
 };
 
-export const readChatCommentsFromFirebase = (
+export const watchChatCommentsFromFirebase = (
   eventId: string,
   observer: FirebaseObserver,
 ): Unsubscribe => {
@@ -147,7 +170,7 @@ export const readChatCommentsFromFirebase = (
   return onValue(chatQuery, observer);
 };
 
-export const readEventsForUserFromFirestore = (
+export const watchEventsForUserFromFirestore = (
   observer: CollectionObserver,
   eventType: UserEventType,
   uid: string,
@@ -177,30 +200,7 @@ export const readEventsForUserFromFirestore = (
   return onSnapshot(userEventsQuery, observer);
 };
 
-export const readSingleEventFromFirestore = (
+export const watchSingleEventFromFirestore = (
   observer: DocumentObserver,
   eventId: string,
 ): Unsubscribe => onSnapshot(doc(eventsCollection, eventId), observer);
-
-export const removeCurrentUserAsEventAttendeeInFirestore = async (
-  event: EventInfo,
-): Promise<void> => {
-  const currentUser = readCurrentUser();
-  if (!currentUser) throw new Error('No current user');
-  const eventRef = doc(eventsCollection, event.id);
-  const eventDoc = await getDoc(eventRef);
-  const oldEvent = eventDoc.data();
-  if (!oldEvent) throw Error(`event ${event.id}: ${event.title} data not found`);
-  return updateDoc(eventRef, {
-    attendees: oldEvent.attendees?.filter((a) => a.id !== currentUser.uid),
-    attendeeIds: arrayRemove(currentUser.uid),
-  });
-};
-
-export const toggleCancelEventInFirestore = async (event: EventInfo): Promise<void> =>
-  updateDoc(doc(eventsCollection, event.id), {
-    isCancelled: !event.isCancelled,
-  });
-
-export const updateEventInFirestore = async (event: EventInfo): Promise<void> =>
-  setDoc(doc(eventsCollection, event.id), event);

@@ -4,7 +4,7 @@ import {
   deleteImageInFirebase,
   readDownloadUrl,
 } from '../../App/Firebase/FirebaseStorageService';
-import { readEventsForUserFromFirestore } from '../../App/Firebase/FirestoreEventService';
+import { watchEventsForUserFromFirestore } from '../../App/Firebase/FirestoreEventService';
 import {
   readUserProfilePhotosFromFirestore,
   watchUserProfileFromFirestore,
@@ -199,7 +199,7 @@ export const fetchUserEvents = (
     fetchUserProfileEventsRejected,
   } = profilesSlice.actions;
 
-  const unsubscribe = readEventsForUserFromFirestore(
+  const unsubscribe = watchEventsForUserFromFirestore(
     {
       next: async (snapshot) => {
         dispatch(fetchUserProfileEventsPending());
