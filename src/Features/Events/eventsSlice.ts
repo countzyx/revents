@@ -6,10 +6,11 @@ import {
   removeCurrentUserAsEventAttendeeInFirestore,
   watchAllEventsFromFirestore,
   watchChatCommentsFromFirebase,
+  watchNewsFeedForCurrentUserFromFirebase,
   watchSingleEventFromFirestore,
 } from '../../App/Firebase/FirestoreEventService';
 import type { Unsubscribe } from '../../App/Firebase/FirestoreEventService';
-import { ChatComment, EventInfo, EventSearchCriteria } from '../../App/Shared/Types';
+import { ChatComment, EventInfo, EventSearchCriteria, NewsFeedPost } from '../../App/Shared/Types';
 import { AppDispatch, RootState } from '../../App/Store/store';
 import { convertCatchToError, getDateTimeStringFromDate } from '../../App/Shared/Utils';
 
@@ -20,8 +21,11 @@ type EventState = {
   eventsError?: Error;
   isLoadingChat: boolean;
   isLoadingEvents: boolean;
+  isLoadingNewsFeed: boolean;
   isUpdatingAttendees: boolean;
   isUpdatingChat: boolean;
+  newsFeed: NewsFeedPost[];
+  newsFeedError?: Error;
   searchCriteria: EventSearchCriteria;
   updateAttendeesError?: Error;
 };
@@ -38,8 +42,11 @@ const initialState: EventState = {
   eventsError: undefined,
   isLoadingChat: false,
   isLoadingEvents: true,
+  isLoadingNewsFeed: false,
   isUpdatingAttendees: false,
   isUpdatingChat: false,
+  newsFeed: [],
+  newsFeedError: undefined,
   searchCriteria: { ...defaultSearchCriteria },
   updateAttendeesError: undefined,
 };
@@ -112,6 +119,30 @@ export const fetchChatCommentsForEvent = (dispatch: AppDispatch, eventId: string
   return unsubscribe;
 };
 
+export const fetchNewsFeedForCurrentUser = (dispatch: AppDispatch): Unsubscribe => {
+  const { fetchNewsFeedFulfilled, fetchNewsFeedPending, fetchNewsFeedRejected } =
+    eventsSlice.actions;
+  const unsubscribe = watchNewsFeedForCurrentUserFromFirebase((snapshot) => {
+    dispatch(fetchNewsFeedPending());
+    try {
+      const newPosts: NewsFeedPost[] = [];
+      snapshot.forEach((child) => {
+        const post: NewsFeedPost = {
+          ...child.val(),
+          id: child.key,
+        } as NewsFeedPost;
+        newPosts.push(post);
+      });
+
+      dispatch(fetchNewsFeedFulfilled(newPosts.reverse()));
+    } catch (err) {
+      dispatch(fetchNewsFeedRejected(convertCatchToError(err)));
+    }
+  });
+
+  return unsubscribe;
+};
+
 export const fetchSingleEvent = (dispatch: AppDispatch, eventId: string): Unsubscribe => {
   const { fetchEventsPending, fetchEventsFulfilled, fetchEventsRejected } = eventsSlice.actions;
   const unsubscribe = watchSingleEventFromFirestore(
@@ -160,6 +191,22 @@ export const eventsSlice = createSlice({
       ...state,
       chatError: action.payload,
       isLoadingChat: false,
+    }),
+    fetchNewsFeedFulfilled: (state, action: PayloadAction<NewsFeedPost[]>) => ({
+      ...state,
+      newsFeedError: undefined,
+      newsFeed: action.payload,
+      isLoadingNewsFeed: false,
+    }),
+    fetchNewsFeedPending: (state) => ({
+      ...state,
+      newsFeedError: undefined,
+      isLoadingNewsFeed: true,
+    }),
+    fetchNewsFeedRejected: (state, action: PayloadAction<Error>) => ({
+      ...state,
+      newsFeedError: action.payload,
+      isLoadingNewsFeed: false,
     }),
     fetchEventsFulfilled: (state, action: PayloadAction<EventInfo[]>) => ({
       ...state,
@@ -238,10 +285,16 @@ export const selectEventsChatError = (state: RootState): Error | undefined =>
   state.events.chatError;
 export const selectEventsError = (state: RootState): Error | undefined => state.events.eventsError;
 export const selectEventsIsLoading = (state: RootState): boolean => state.events.isLoadingEvents;
+export const selectEventsIsLoadingChat = (state: RootState): boolean => state.events.isLoadingChat;
+export const selectEventsIsLoadingNewsFeed = (state: RootState): boolean =>
+  state.events.isLoadingNewsFeed;
 export const selectEventsIsUpdatingAttendees = (state: RootState): boolean =>
   state.events.isUpdatingAttendees;
 export const selectEventsIsUpdatingChat = (state: RootState): boolean =>
   state.events.isUpdatingChat;
+export const selectEventsNewsFeed = (state: RootState): NewsFeedPost[] => state.events.newsFeed;
+export const selectEventsNewsFeedError = (state: RootState): Error | undefined =>
+  state.events.newsFeedError;
 export const selectEventsSearchCriteria = (state: RootState): EventSearchCriteria =>
   state.events.searchCriteria;
 export const seletcEventsUpdateAttendeesError = (state: RootState): Error | undefined =>

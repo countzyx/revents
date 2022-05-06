@@ -69,13 +69,16 @@ export const deleteFollowerOnDeleteFollowing = functions.firestore
 export const createNewsFeedPostOnUpdateEvent = functions.firestore
   .document(kEventPath)
   .onUpdate(async (snap, context) => {
+    const eventId = context.params.eventId as string;
+    if (!eventId) return console.log('eventId is undefined');
+
     const beforeData = snap.before.data() as EventInfo;
     if (!beforeData || !beforeData.attendees)
-      return console.log('Before update event info or its attendees are undefined');
+      return console.log(`Before update event info or its attendees are undefined for ${eventId}`);
 
     const afterData = snap.after.data() as EventInfo;
     if (!afterData || !afterData.attendees)
-      return console.log('After update event info or its attendees are undefined');
+      return console.log(`After update event info or its attendees are undefined for ${eventId}`);
 
     if (beforeData.attendees.length < afterData.attendees.length) {
       const addedAttendee = afterData.attendees.filter(
@@ -83,7 +86,8 @@ export const createNewsFeedPostOnUpdateEvent = functions.firestore
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         (aftAtt) => !beforeData.attendees!.some((befAtt) => befAtt.id === aftAtt.id),
       )[0];
-      console.log(`added ${addedAttendee} to event ${context.params.eventId}`);
+      const post = makeEventsNewsFeedPost(addedAttendee, 'joined-event', afterData, eventId);
+      console.log('post', JSON.stringify(post));
       try {
         const followerDocs = await db
           .collection(kRelationshipsCollection)
@@ -91,12 +95,9 @@ export const createNewsFeedPostOnUpdateEvent = functions.firestore
           .collection(kFollowersCollection)
           .get();
         followerDocs.forEach((follower) => {
-          admin
-            .database()
-            .ref(`/newsfeed/${follower.id}`)
-            .push(makeEventsNewsFeedPost(addedAttendee, 'joined-event', context.params.eventId));
+          admin.database().ref(`/newsfeed/${follower.id}`).push(post);
         });
-        return console.log(`notified followers of ${addedAttendee}`);
+        return console.log(`notified followers of ${JSON.stringify(addedAttendee)}`);
       } catch (err) {
         return console.log(err);
       }
@@ -106,7 +107,8 @@ export const createNewsFeedPostOnUpdateEvent = functions.firestore
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         (befAtt) => !afterData.attendees!.some((aftAtt) => befAtt.id === aftAtt.id),
       )[0];
-      console.log(`removed ${removedAttendee} from event ${context.params.eventId}`);
+      const post = makeEventsNewsFeedPost(removedAttendee, 'left-event', afterData, eventId);
+      console.log('post', JSON.stringify(post));
       try {
         const followerDocs = await db
           .collection(kRelationshipsCollection)
@@ -114,12 +116,9 @@ export const createNewsFeedPostOnUpdateEvent = functions.firestore
           .collection(kFollowersCollection)
           .get();
         followerDocs.forEach((follower) => {
-          admin
-            .database()
-            .ref(`/newsfeed/${follower.id}`)
-            .push(makeEventsNewsFeedPost(removedAttendee, 'left-event', context.params.eventId));
+          admin.database().ref(`/newsfeed/${follower.id}`).push(post);
         });
-        return console.log(`notified followers of ${removedAttendee}`);
+        return console.log(`notified followers of ${JSON.stringify(removedAttendee)}`);
       } catch (err) {
         return console.log(err);
       }
@@ -129,14 +128,16 @@ export const createNewsFeedPostOnUpdateEvent = functions.firestore
 const makeEventsNewsFeedPost = (
   attendee: UserBasicInfo,
   code: NewsFeedPostCode,
-  eventId: string,
+  event: EventInfo,
+  eventId: string, // event ID is usually the key for the event doc, so is not returned in the doc
 ): NewsFeedPost => {
   const { displayName, id, photoURL } = attendee;
   return {
     code,
     date: admin.database.ServerValue.TIMESTAMP,
     displayName,
-    eventId,
+    eventId: event.id || eventId,
+    eventTitle: event.title,
     photoURL,
     userId: id,
   };

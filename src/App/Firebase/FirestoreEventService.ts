@@ -23,6 +23,7 @@ import type {
 } from 'firebase/firestore';
 import {
   DataSnapshot,
+  limitToLast,
   onValue,
   orderByKey,
   push,
@@ -31,7 +32,13 @@ import {
   ThenableReference,
 } from 'firebase/database';
 import { eventConverter } from './FirestoreUtil';
-import { ChatComment, EventInfo, EventSearchCriteria, UserEventType } from '../Shared/Types';
+import {
+  ChatComment,
+  EventInfo,
+  EventSearchCriteria,
+  UserBasicInfo,
+  UserEventType,
+} from '../Shared/Types';
 import { db, rtdb } from './Firebase';
 import { readCurrentUser } from './FirebaseAuthService';
 import { getPreciseDateTimeStringFromDate } from '../Shared/Utils';
@@ -61,9 +68,9 @@ export const addCurrentUserAsEventAttendeeInFirestore = async (event: EventInfo)
   return updateDoc(doc(eventsCollection, event.id), {
     attendees: arrayUnion({
       id: currentUser.uid,
-      name: currentUser.displayName,
-      photoUrl: currentUser.photoURL,
-    }),
+      displayName: currentUser.displayName,
+      photoURL: currentUser.photoURL,
+    } as UserBasicInfo), // casted to enfore data consistency
     attendeeIds: arrayUnion(currentUser.uid),
   });
 };
@@ -101,9 +108,9 @@ export const createEventInFirestore = async (
     hostPhotoURL: photoURL || kUnknownUserImageUrl,
     attendees: arrayUnion({
       id: uid,
-      name: displayName || 'anonymous',
-      photoUrl: photoURL || kUnknownUserImageUrl,
-    }),
+      displayName: displayName || 'anonymous',
+      photoURL: photoURL || kUnknownUserImageUrl,
+    } as UserBasicInfo), // casted to enfore data consistency
     attendeeIds: arrayUnion(uid),
     isCancelled: false,
   });
@@ -198,6 +205,16 @@ export const watchEventsForUserFromFirestore = (
 
   const userEventsQuery = query(eventsCollection, ...criteria);
   return onSnapshot(userEventsQuery, observer);
+};
+
+export const watchNewsFeedForCurrentUserFromFirebase = (
+  observer: FirebaseObserver,
+): Unsubscribe => {
+  const currentUser = readCurrentUser();
+  if (!currentUser) throw new Error('No current user');
+  const newsFeedRef = ref(rtdb, `newsfeed/${currentUser.uid}`);
+  const newsFeedQuery = fbQuery(newsFeedRef, orderByKey(), limitToLast(5));
+  return onValue(newsFeedQuery, observer);
 };
 
 export const watchSingleEventFromFirestore = (

@@ -5,7 +5,7 @@ import { selectAuthIsAuthed } from '../../Auth/authSlice';
 import { fetchAllEvents, selectEventsIsLoading, selectEventsSearchCriteria } from '../eventsSlice';
 import EventFilters from './EventFilters';
 import EventListItemPlaceholder from './EventListItemPlaceholder';
-import EventsFeed from './EventsFeed';
+import EventNewsFeed from './EventNewsFeed';
 import EventList from './EventsList';
 
 const EventDashboard: React.FC = () => {
@@ -31,7 +31,7 @@ const EventDashboard: React.FC = () => {
         <EventList />
       </Grid.Column>
       <Grid.Column width={6}>
-        {isAuthed && <EventsFeed />}
+        {isAuthed && <EventNewsFeed />}
         <EventFilters />
       </Grid.Column>
     </Grid>

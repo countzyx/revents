@@ -45,6 +45,8 @@ export type NewsFeedPost = {
   date: number | Object;
   displayName: string;
   eventId: string;
+  eventTitle: string;
+  id?: string;
   photoURL: string;
   userId: string;
 };
