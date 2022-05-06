@@ -1,9 +1,16 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { Comment, Header, Segment } from 'semantic-ui-react';
 import { kUnknownUserImageUrl } from '../../../App/Shared/Constants';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
-import { clearChat, fetchChatCommentsForEvent, selectEventsChatComments } from '../eventsSlice';
+import {
+  clearChat,
+  fetchChatCommentsForEvent,
+  selectEventsChatComments,
+  selectEventsChatError,
+  selectEventsIsLoadingChat,
+} from '../eventsSlice';
 import EventDetailsChatForm from './EventDetailsChatForm';
 
 type Props = {
@@ -14,6 +21,8 @@ const EventDetailsChat: React.FC<Props> = (props) => {
   const { eventId } = props;
   const dispatch = useAppDispatch();
   const chatComments = useAppSelector(selectEventsChatComments);
+  const chatError = useAppSelector(selectEventsChatError);
+  const isLoadingChat = useAppSelector(selectEventsIsLoadingChat);
   const [replyFormTarget, setReplyFormTarget] = React.useState<string | undefined>(undefined);
 
   React.useEffect(() => {
@@ -23,6 +32,11 @@ const EventDetailsChat: React.FC<Props> = (props) => {
       dispatch(clearChat());
     };
   }, [dispatch, eventId]);
+
+  React.useEffect(() => {
+    if (!chatError) return;
+    toast.error(chatError.message);
+  }, [chatError]);
 
   const handleCloseReplyForm = () => {
     setReplyFormTarget(undefined);
@@ -38,7 +52,7 @@ const EventDetailsChat: React.FC<Props> = (props) => {
         <Header>Chat about this event</Header>
       </Segment>
 
-      <Segment attached>
+      <Segment attached loading={isLoadingChat}>
         <EventDetailsChatForm eventId={eventId} />
         <Comment.Group>
           {chatComments.map(
