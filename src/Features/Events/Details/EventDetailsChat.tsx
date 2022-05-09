@@ -6,7 +6,7 @@ import { kUnknownUserImageUrl } from '../../../App/Shared/Constants';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import {
   clearChat,
-  fetchChatCommentsForEvent,
+  listenToChatCommentsForEvent,
   selectEventsChatComments,
   selectEventsChatError,
   selectEventsIsLoadingChat,
@@ -26,7 +26,7 @@ const EventDetailsChat: React.FC<Props> = (props) => {
   const [replyFormTarget, setReplyFormTarget] = React.useState<string | undefined>(undefined);
 
   React.useEffect(() => {
-    const unsubscribe = fetchChatCommentsForEvent(dispatch, eventId);
+    const unsubscribe = listenToChatCommentsForEvent(dispatch, eventId);
     return () => {
       unsubscribe();
       dispatch(clearChat());
