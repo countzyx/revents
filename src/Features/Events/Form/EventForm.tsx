@@ -8,7 +8,12 @@ import { format } from 'date-fns';
 import { toast } from 'react-toastify';
 import type { EventInfo, PlacesInfo } from '../../../App/Shared/Types';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
-import { fetchSingleEvent, selectEventsError, selectEventsIsLoading } from '../eventsSlice';
+import {
+  fetchSingleEvent,
+  selectEventsDetailedEvent,
+  selectEventsDetailedEventError,
+  selectEventsIsLoadingDetailedEvent,
+} from '../eventsSlice';
 import FormPlacesInput from '../../../App/Components/Form/FormPlacesInput';
 import FormSelect from '../../../App/Components/Form/FormSelect';
 import FormTextArea from '../../../App/Components/Form/FormTextArea';
@@ -95,11 +100,9 @@ const blankEvent: EventInfo = {
 const EventForm: React.FC = () => {
   const navigate = useNavigate();
   const { eventId } = useParams();
-  const selectedEvent = useAppSelector((state) =>
-    state.events.events.find((e) => e.id === eventId),
-  );
-  const eventsError = useAppSelector(selectEventsError);
-  const isLoadingEvents = useAppSelector(selectEventsIsLoading);
+  const selectedEvent = useAppSelector(selectEventsDetailedEvent);
+  const eventError = useAppSelector(selectEventsDetailedEventError);
+  const isLoadingEvent = useAppSelector(selectEventsIsLoadingDetailedEvent);
   const dispatch = useAppDispatch();
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [loadingCancelChange, setLoadingCancelChange] = React.useState(false);
@@ -166,9 +169,9 @@ const EventForm: React.FC = () => {
     }
   };
 
-  if (isLoadingEvents) return <LoadingComponent />;
+  if (isLoadingEvent) return <LoadingComponent />;
 
-  if (eventsError) return <Navigate to='/error' state={eventsError} />;
+  if (eventError) return <Navigate to='/error' state={eventError} />;
 
   return (
     <Segment clearing>

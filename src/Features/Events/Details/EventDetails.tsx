@@ -3,7 +3,12 @@ import { Navigate, useParams } from 'react-router-dom';
 import { Grid } from 'semantic-ui-react';
 import LoadingComponent from '../../../App/Layout/LoadingComponent';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
-import { fetchSingleEvent, selectEventsError, selectEventsIsLoading } from '../eventsSlice';
+import {
+  fetchSingleEvent,
+  selectEventsDetailedEvent,
+  selectEventsDetailedEventError,
+  selectEventsIsLoadingDetailedEvent,
+} from '../eventsSlice';
 import EventDetailsChat from './EventDetailsChat';
 import EventDetailsHeader from './EventDetailsHeader';
 import EventDetailsInfo from './EventDetailsInfo';
@@ -11,9 +16,9 @@ import EventDetailsSidebar from './EventDetailsSidebar';
 
 const EventDetails: React.FC = () => {
   const { eventId } = useParams();
-  const event = useAppSelector((state) => state.events.events.find((e) => e.id === eventId));
-  const eventsError = useAppSelector(selectEventsError);
-  const isLoadingEvents = useAppSelector(selectEventsIsLoading);
+  const event = useAppSelector(selectEventsDetailedEvent);
+  const eventError = useAppSelector(selectEventsDetailedEventError);
+  const isLoadingEvent = useAppSelector(selectEventsIsLoadingDetailedEvent);
   const dispatch = useAppDispatch();
   React.useEffect(() => {
     if (!eventId) return undefined;
@@ -22,9 +27,9 @@ const EventDetails: React.FC = () => {
     return unsubscribed;
   }, [dispatch, eventId]);
 
-  if (isLoadingEvents) return <LoadingComponent />;
+  if (isLoadingEvent) return <LoadingComponent />;
 
-  if (eventsError) return <Navigate to='/error' state={eventsError} />;
+  if (eventError) return <Navigate to='/error' state={eventError} />;
 
   if (!event) {
     return <h1>No event found</h1>;

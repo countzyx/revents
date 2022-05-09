@@ -18,9 +18,12 @@ type EventState = {
   areMoreEventsAvailable: boolean;
   chatComments: ChatComment[];
   chatError?: Error;
+  detailedEvent?: EventInfo;
+  detailedEventError?: Error;
   events: EventInfo[];
   eventsError?: Error;
   isLoadingChat: boolean;
+  isLoadingDetailedEvent: boolean;
   isLoadingEvents: boolean;
   isLoadingNewsFeed: boolean;
   isUpdatingAttendees: boolean;
@@ -42,9 +45,12 @@ const initialState: EventState = {
   areMoreEventsAvailable: false,
   chatComments: [],
   chatError: undefined,
+  detailedEvent: undefined,
+  detailedEventError: undefined,
   events: [],
   eventsError: undefined,
   isLoadingChat: false,
+  isLoadingDetailedEvent: false,
   isLoadingEvents: true,
   isLoadingNewsFeed: false,
   isUpdatingAttendees: false,
@@ -196,19 +202,19 @@ export const eventsSlice = createSlice({
     }),
     fetchEventFulfilled: (state, action: PayloadAction<EventInfo>) => ({
       ...state,
-      eventsError: undefined,
-      events: [action.payload],
-      isLoadingEvents: false,
+      detailedEventError: undefined,
+      detailedEvent: action.payload,
+      isLoadingDetailedEvent: false,
     }),
     fetchEventPending: (state) => ({
       ...state,
-      eventsError: undefined,
-      isLoadingEvents: true,
+      detailedEvent: undefined,
+      isLoadingDetailedEvent: true,
     }),
     fetchEventRejected: (state, action: PayloadAction<Error>) => ({
       ...state,
-      eventsError: action.payload,
-      isLoadingEvents: false,
+      detailedEventError: action.payload,
+      isLoadingDetailedEvent: false,
     }),
     fetchNewsFeedFulfilled: (state, action: PayloadAction<NewsFeedPost[]>) => ({
       ...state,
@@ -319,9 +325,13 @@ export const selectEventsAreMoreAvailable = (state: RootState) =>
   state.events.areMoreEventsAvailable;
 export const selectEventsChatComments = (state: RootState) => state.events.chatComments;
 export const selectEventsChatError = (state: RootState) => state.events.chatError;
+export const selectEventsDetailedEvent = (state: RootState) => state.events.detailedEvent;
+export const selectEventsDetailedEventError = (state: RootState) => state.events.detailedEventError;
 export const selectEventsError = (state: RootState) => state.events.eventsError;
 export const selectEventsIsLoading = (state: RootState) => state.events.isLoadingEvents;
 export const selectEventsIsLoadingChat = (state: RootState) => state.events.isLoadingChat;
+export const selectEventsIsLoadingDetailedEvent = (state: RootState) =>
+  state.events.isLoadingDetailedEvent;
 export const selectEventsIsLoadingNewsFeed = (state: RootState) => state.events.isLoadingNewsFeed;
 export const selectEventsIsUpdatingAttendees = (state: RootState) =>
   state.events.isUpdatingAttendees;
