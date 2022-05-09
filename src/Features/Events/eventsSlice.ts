@@ -276,7 +276,7 @@ export const eventsSlice = createSlice({
       .addCase(getAllEvents.fulfilled, (state, action) => ({
         ...state,
         eventsError: undefined,
-        events: action.payload,
+        events: [...state.events, ...action.payload],
         isLoadingEvents: false,
       }))
       .addCase(getAllEvents.pending, (state) => ({
@@ -315,7 +315,7 @@ export const {
   setSearchCriteria,
 } = eventsSlice.actions;
 export const selectEvents = (state: RootState) => state.events.events;
-export const selectAreMoreEventsAvailable = (state: RootState) =>
+export const selectEventsAreMoreAvailable = (state: RootState) =>
   state.events.areMoreEventsAvailable;
 export const selectEventsChatComments = (state: RootState) => state.events.chatComments;
 export const selectEventsChatError = (state: RootState) => state.events.chatError;
