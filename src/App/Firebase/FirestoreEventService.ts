@@ -6,11 +6,14 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
+  limit,
   onSnapshot,
   orderBy,
   query,
   QueryConstraint,
   setDoc,
+  startAfter,
   updateDoc,
   where,
 } from 'firebase/firestore';
@@ -119,6 +122,39 @@ export const createEventInFirestore = async (
 export const deleteEventInFirestore = async (eventId: string): Promise<void> =>
   deleteDoc(doc(eventsCollection, eventId));
 
+export const readAllEventsFromFirestore = async (
+  searchCriteria: EventSearchCriteria,
+  lastVisibleEvent?: EventInfo,
+  perPageLimit = 2,
+): Promise<QuerySnapshot<EventInfo>> => {
+  const lastVisibleDoc = lastVisibleEvent
+    ? await getDoc(doc(eventsCollection, lastVisibleEvent.id))
+    : null;
+  const criteria: QueryConstraint[] = [
+    orderBy('date'),
+    limit(perPageLimit),
+    startAfter(lastVisibleDoc),
+  ];
+  const currentUser = readCurrentUser();
+  if (currentUser) {
+    const { uid } = currentUser;
+    criteria.push(where('date', '>=', searchCriteria.startDate));
+    switch (searchCriteria.filter) {
+      case 'isGoing': {
+        criteria.push(where('attendeeIds', 'array-contains', uid));
+        break;
+      }
+      case 'isHost': {
+        criteria.push(where('hostUid', '==', uid));
+        break;
+      }
+    }
+  }
+
+  const allEventsQuery = query(eventsCollection, ...criteria);
+  return getDocs(allEventsQuery);
+};
+
 export const removeCurrentUserAsEventAttendeeInFirestore = async (
   event: EventInfo,
 ): Promise<void> => {
@@ -142,32 +178,6 @@ export const toggleCancelEventInFirestore = async (event: EventInfo): Promise<vo
 export const updateEventInFirestore = async (event: EventInfo): Promise<void> =>
   setDoc(doc(eventsCollection, event.id), event);
 
-export const watchAllEventsFromFirestore = (
-  observer: CollectionObserver,
-  searchCriteria: EventSearchCriteria,
-): Unsubscribe => {
-  let allEventsQuery = query(eventsCollection, orderBy('date'));
-  const currentUser = readCurrentUser();
-  if (currentUser) {
-    const { uid } = currentUser;
-    const criteria = [where('date', '>=', searchCriteria.startDate)];
-    switch (searchCriteria.filter) {
-      case 'isGoing': {
-        criteria.push(where('attendeeIds', 'array-contains', uid));
-        break;
-      }
-      case 'isHost': {
-        criteria.push(where('hostUid', '==', uid));
-        break;
-      }
-    }
-
-    allEventsQuery = query(eventsCollection, orderBy('date'), ...criteria);
-  }
-
-  return onSnapshot(allEventsQuery, observer);
-};
-
 export const watchChatCommentsFromFirebase = (
   eventId: string,
   observer: FirebaseObserver,
@@ -182,7 +192,7 @@ export const watchEventsForUserFromFirestore = (
   eventType: UserEventType,
   uid: string,
 ): Unsubscribe => {
-  const criteria: QueryConstraint[] = [];
+  const criteria: QueryConstraint[] = [limit(2)];
   switch (eventType) {
     case 'hosting': {
       criteria.push(where('hostUid', '==', uid));

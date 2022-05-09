@@ -4,7 +4,7 @@ import {
   addCurrentUserAsEventAttendeeInFirestore,
   addEventChatCommentAsCurrentUserInFirebase,
   removeCurrentUserAsEventAttendeeInFirestore,
-  watchAllEventsFromFirestore,
+  readAllEventsFromFirestore,
   watchChatCommentsFromFirebase,
   watchNewsFeedForCurrentUserFromFirebase,
   watchSingleEventFromFirestore,
@@ -15,6 +15,7 @@ import { AppDispatch, RootState } from '../../App/Store/store';
 import { convertCatchToError, getDateTimeStringFromDate } from '../../App/Shared/Utils';
 
 type EventState = {
+  areMoreEventsAvailable: boolean;
   chatComments: ChatComment[];
   chatError?: Error;
   events: EventInfo[];
@@ -24,8 +25,10 @@ type EventState = {
   isLoadingNewsFeed: boolean;
   isUpdatingAttendees: boolean;
   isUpdatingChat: boolean;
+  lastVisibleEvent?: EventInfo;
   newsFeed: NewsFeedPost[];
   newsFeedError?: Error;
+  perPageLimit: number;
   searchCriteria: EventSearchCriteria;
   updateAttendeesError?: Error;
 };
@@ -36,6 +39,7 @@ const defaultSearchCriteria: EventSearchCriteria = {
 };
 
 const initialState: EventState = {
+  areMoreEventsAvailable: false,
   chatComments: [],
   chatError: undefined,
   events: [],
@@ -45,8 +49,10 @@ const initialState: EventState = {
   isLoadingNewsFeed: false,
   isUpdatingAttendees: false,
   isUpdatingChat: false,
+  lastVisibleEvent: undefined,
   newsFeed: [],
   newsFeedError: undefined,
+  perPageLimit: 2,
   searchCriteria: { ...defaultSearchCriteria },
   updateAttendeesError: undefined,
 };
@@ -68,28 +74,41 @@ export const addEventChatCommentAsCurrentUser = createAsyncThunk<
   await addEventChatCommentAsCurrentUserInFirebase(eventId, comment, parentCommentId);
 });
 
-export const fetchAllEvents = (
-  dispatch: AppDispatch,
-  searchCriteria: EventSearchCriteria,
-): Unsubscribe => {
-  const { fetchEventsPending, fetchEventsFulfilled, fetchEventsRejected } = eventsSlice.actions;
-  const unsubscribe = watchAllEventsFromFirestore(
+export const fetchSingleEvent = (dispatch: AppDispatch, eventId: string): Unsubscribe => {
+  const { fetchEventPending, fetchEventFulfilled, fetchEventRejected } = eventsSlice.actions;
+  const unsubscribe = watchSingleEventFromFirestore(
     {
       next: async (snapshot) => {
-        dispatch(fetchEventsPending());
-        const fetchedEvents = snapshot.docs.map((docResult) => docResult.data());
-        const events = fetchedEvents.filter((e) => e !== undefined) as EventInfo[];
-        dispatch(fetchEventsFulfilled(events));
+        dispatch(fetchEventPending());
+        const fetchedEvent = snapshot.data() as EventInfo;
+        dispatch(fetchEventFulfilled(fetchedEvent));
       },
-      error: async (err) => dispatch(fetchEventsRejected(err)),
+      error: async (err) => dispatch(fetchEventRejected(err)),
     },
-    searchCriteria,
+    eventId,
   );
 
   return unsubscribe;
 };
 
-export const fetchChatCommentsForEvent = (dispatch: AppDispatch, eventId: string): Unsubscribe => {
+export const getAllEvents = createAsyncThunk<
+  EventInfo[],
+  void,
+  { dispatch: AppDispatch; state: RootState }
+>('events/getAllEvents', async (_, thunkApi) => {
+  const { lastVisibleEvent, perPageLimit, searchCriteria } = thunkApi.getState().events;
+  const snapshot = await readAllEventsFromFirestore(searchCriteria, lastVisibleEvent, perPageLimit);
+  const fetchedEvents = snapshot.docs.map((docResult) => docResult.data());
+  const events = fetchedEvents.filter((e) => e !== undefined) as EventInfo[];
+  thunkApi.dispatch(setLastVisibleEvent(events.length > 0 ? events[events.length - 1] : undefined));
+  thunkApi.dispatch(setAreMoreEventsAvailable(events.length >= perPageLimit));
+  return events;
+});
+
+export const listenToChatCommentsForEvent = (
+  dispatch: AppDispatch,
+  eventId: string,
+): Unsubscribe => {
   const { fetchChatFulfilled, fetchChatPending, fetchChatRejected } = eventsSlice.actions;
   const unsubscribe = watchChatCommentsFromFirebase(eventId, (snapshot) => {
     dispatch(fetchChatPending());
@@ -143,23 +162,6 @@ export const fetchNewsFeedForCurrentUser = (dispatch: AppDispatch): Unsubscribe 
   return unsubscribe;
 };
 
-export const fetchSingleEvent = (dispatch: AppDispatch, eventId: string): Unsubscribe => {
-  const { fetchEventsPending, fetchEventsFulfilled, fetchEventsRejected } = eventsSlice.actions;
-  const unsubscribe = watchSingleEventFromFirestore(
-    {
-      next: async (snapshot) => {
-        dispatch(fetchEventsPending());
-        const fetchedEvent = snapshot.data() as EventInfo;
-        dispatch(fetchEventsFulfilled([fetchedEvent]));
-      },
-      error: async (err) => dispatch(fetchEventsRejected(err)),
-    },
-    eventId,
-  );
-
-  return unsubscribe;
-};
-
 export const removeCurrentUserAsAttendeeFromEvent = createAsyncThunk<
   void,
   EventInfo,
@@ -192,6 +194,22 @@ export const eventsSlice = createSlice({
       chatError: action.payload,
       isLoadingChat: false,
     }),
+    fetchEventFulfilled: (state, action: PayloadAction<EventInfo>) => ({
+      ...state,
+      eventsError: undefined,
+      events: [action.payload],
+      isLoadingEvents: false,
+    }),
+    fetchEventPending: (state) => ({
+      ...state,
+      eventsError: undefined,
+      isLoadingEvents: true,
+    }),
+    fetchEventRejected: (state, action: PayloadAction<Error>) => ({
+      ...state,
+      eventsError: action.payload,
+      isLoadingEvents: false,
+    }),
     fetchNewsFeedFulfilled: (state, action: PayloadAction<NewsFeedPost[]>) => ({
       ...state,
       newsFeedError: undefined,
@@ -208,21 +226,17 @@ export const eventsSlice = createSlice({
       newsFeedError: action.payload,
       isLoadingNewsFeed: false,
     }),
-    fetchEventsFulfilled: (state, action: PayloadAction<EventInfo[]>) => ({
+    setAreMoreEventsAvailable: (state, action: PayloadAction<boolean>) => ({
       ...state,
-      eventsError: undefined,
-      events: action.payload,
-      isLoadingEvents: false,
+      areMoreEventsAvailable: action.payload,
     }),
-    fetchEventsPending: (state) => ({
+    setLastVisibleEvent: (state, action: PayloadAction<EventInfo | undefined>) => ({
       ...state,
-      eventsError: undefined,
-      isLoadingEvents: true,
+      lastVisibleEvent: action.payload,
     }),
-    fetchEventsRejected: (state, action: PayloadAction<Error>) => ({
+    setPerPageLimit: (state, action: PayloadAction<number>) => ({
       ...state,
-      eventsError: action.payload,
-      isLoadingEvents: false,
+      perPageLimit: action.payload,
     }),
     setSearchCriteria: (state, action: PayloadAction<EventSearchCriteria>) => ({
       ...state,
@@ -259,6 +273,22 @@ export const eventsSlice = createSlice({
         ...state,
         isUpdatingChat: false,
       }))
+      .addCase(getAllEvents.fulfilled, (state, action) => ({
+        ...state,
+        eventsError: undefined,
+        events: action.payload,
+        isLoadingEvents: false,
+      }))
+      .addCase(getAllEvents.pending, (state) => ({
+        ...state,
+        eventsError: undefined,
+        isLoadingEvents: true,
+      }))
+      .addCase(getAllEvents.rejected, (state, action) => ({
+        ...state,
+        eventsError: action.error as Error,
+        isLoadingEvents: false,
+      }))
       .addCase(removeCurrentUserAsAttendeeFromEvent.pending, (state) => ({
         ...state,
         isUpdatingAttendees: true,
@@ -277,27 +307,31 @@ export const eventsSlice = createSlice({
 });
 
 // export const {} = eventsSlice.actions;
-export const { clearChat, setSearchCriteria } = eventsSlice.actions;
-export const selectEvents = (state: RootState): EventInfo[] => state.events.events;
-export const selectEventsChatComments = (state: RootState): ChatComment[] =>
-  state.events.chatComments;
-export const selectEventsChatError = (state: RootState): Error | undefined =>
-  state.events.chatError;
-export const selectEventsError = (state: RootState): Error | undefined => state.events.eventsError;
-export const selectEventsIsLoading = (state: RootState): boolean => state.events.isLoadingEvents;
-export const selectEventsIsLoadingChat = (state: RootState): boolean => state.events.isLoadingChat;
-export const selectEventsIsLoadingNewsFeed = (state: RootState): boolean =>
-  state.events.isLoadingNewsFeed;
-export const selectEventsIsUpdatingAttendees = (state: RootState): boolean =>
+export const {
+  clearChat,
+  setAreMoreEventsAvailable,
+  setLastVisibleEvent,
+  setPerPageLimit,
+  setSearchCriteria,
+} = eventsSlice.actions;
+export const selectEvents = (state: RootState) => state.events.events;
+export const selectAreMoreEventsAvailable = (state: RootState) =>
+  state.events.areMoreEventsAvailable;
+export const selectEventsChatComments = (state: RootState) => state.events.chatComments;
+export const selectEventsChatError = (state: RootState) => state.events.chatError;
+export const selectEventsError = (state: RootState) => state.events.eventsError;
+export const selectEventsIsLoading = (state: RootState) => state.events.isLoadingEvents;
+export const selectEventsIsLoadingChat = (state: RootState) => state.events.isLoadingChat;
+export const selectEventsIsLoadingNewsFeed = (state: RootState) => state.events.isLoadingNewsFeed;
+export const selectEventsIsUpdatingAttendees = (state: RootState) =>
   state.events.isUpdatingAttendees;
-export const selectEventsIsUpdatingChat = (state: RootState): boolean =>
-  state.events.isUpdatingChat;
-export const selectEventsNewsFeed = (state: RootState): NewsFeedPost[] => state.events.newsFeed;
-export const selectEventsNewsFeedError = (state: RootState): Error | undefined =>
-  state.events.newsFeedError;
-export const selectEventsSearchCriteria = (state: RootState): EventSearchCriteria =>
-  state.events.searchCriteria;
-export const seletcEventsUpdateAttendeesError = (state: RootState): Error | undefined =>
+export const selectEventsIsUpdatingChat = (state: RootState) => state.events.isUpdatingChat;
+export const selectEventsLastVisible = (state: RootState) => state.events.lastVisibleEvent;
+export const selectEventsNewsFeed = (state: RootState) => state.events.newsFeed;
+export const selectEventsNewsFeedError = (state: RootState) => state.events.newsFeedError;
+export const selectEventsPerPageLimit = (state: RootState) => state.events.perPageLimit;
+export const selectEventsSearchCriteria = (state: RootState) => state.events.searchCriteria;
+export const seletcEventsUpdateAttendeesError = (state: RootState) =>
   state.events.updateAttendeesError;
 
 export default eventsSlice.reducer;
