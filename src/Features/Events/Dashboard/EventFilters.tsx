@@ -5,6 +5,8 @@ import type { CriteriaKeys, FilterValues, EventSearchCriteria } from '../../../A
 import { getDateTimeStringFromDate } from '../../../App/Shared/Utils';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import {
+  clearEvents,
+  getAllEvents,
   selectEventsIsLoading,
   selectEventsSearchCriteria,
   setSearchCriteria,
@@ -19,6 +21,8 @@ const EventFilters: React.FC = () => {
   const onUpdateSearchCriteria = (key: CriteriaKeys, value: FilterValues | string) => {
     const newCriteria: EventSearchCriteria = { ...searchCriteria, [key]: value };
     dispatch(setSearchCriteria(newCriteria));
+    dispatch(clearEvents());
+    dispatch(getAllEvents());
   };
 
   return (

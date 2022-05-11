@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Grid, GridColumn, Loader } from 'semantic-ui-react';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { selectAuthIsAuthed } from '../../Auth/authSlice';
-import { getAllEvents, selectEventsIsLoading } from '../eventsSlice';
+import { clearEvents, getAllEvents, selectEventsIsLoading } from '../eventsSlice';
 import EventFilters from './EventFilters';
 import EventListItemPlaceholder from './EventListItemPlaceholder';
 import EventNewsFeed from './EventNewsFeed';
@@ -17,6 +17,9 @@ const EventDashboard: React.FC = () => {
   React.useEffect(() => {
     dispatch(getAllEvents());
     setIsLoadingInitial(false);
+    return () => {
+      dispatch(clearEvents());
+    };
   }, [dispatch]);
 
   return (

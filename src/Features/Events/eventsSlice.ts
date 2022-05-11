@@ -184,6 +184,13 @@ export const eventsSlice = createSlice({
       ...state,
       chatComments: [],
     }),
+    clearEvents: (state) => ({
+      ...state,
+      areMoreEventsAvailable: true,
+      events: [],
+      eventsError: undefined,
+      lastVisibleEvent: undefined,
+    }),
     fetchChatFulfilled: (state, action: PayloadAction<ChatComment[]>) => ({
       ...state,
       chatError: undefined,
@@ -315,6 +322,7 @@ export const eventsSlice = createSlice({
 // export const {} = eventsSlice.actions;
 export const {
   clearChat,
+  clearEvents,
   setAreMoreEventsAvailable,
   setLastVisibleEvent,
   setPerPageLimit,
