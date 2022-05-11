@@ -63,7 +63,7 @@ export type FirebaseObserver = (snapshot: DataSnapshot) => void;
 
 export type Unsubscribe = FBUnsubscribe;
 
-const eventsCollection = collection(db, 'events').withConverter(eventConverter);
+export const eventsCollection = collection(db, 'events').withConverter(eventConverter);
 
 export const addCurrentUserAsEventAttendeeInFirestore = async (event: EventInfo): Promise<void> => {
   const currentUser = readCurrentUser();

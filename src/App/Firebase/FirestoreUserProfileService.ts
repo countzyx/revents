@@ -6,22 +6,26 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
   increment,
   onSnapshot,
+  query,
   serverTimestamp,
   setDoc,
   Unsubscribe as FBUnsubscribe,
   updateDoc,
+  where,
   writeBatch,
 } from 'firebase/firestore';
-import { PhotoData, UserBasicInfo, UserProfile } from '../Shared/Types';
+import { EventInfo, PhotoData, UserBasicInfo, UserProfile } from '../Shared/Types';
+import { getDateTimeStringFromDate } from '../Shared/Utils';
 import { db } from './Firebase';
 import {
   readCurrentUser,
   updateAuthUserDisplayNameInFirebase,
   updateAuthUserPhotoInFirebase,
 } from './FirebaseAuthService';
-import { CollectionObserver, DocumentObserver } from './FirestoreEventService';
+import { CollectionObserver, DocumentObserver, eventsCollection } from './FirestoreEventService';
 import { userProfileConverter, WithIdDataConverter } from './FirestoreUtil';
 
 export type Unsubscribe = FBUnsubscribe;
@@ -161,7 +165,62 @@ export const updateUserProfileInFirestore = async (profile: UserProfile): Promis
 export const updateUserProfilePhotoInFirestore = async (photoData: PhotoData): Promise<void> => {
   const userProfile = await readUserProfileFromFirestore();
   if (!userProfile) throw new Error('No user profile');
-  await updateDoc(userProfile.ref, { photoURL: photoData.photoURL });
+
+  const { photoURL } = photoData;
+
+  // Update the user photo everywhere or nowhere.
+  const batch = writeBatch(db);
+
+  // Update the main photo in the user profile.
+  batch.update(userProfile.ref, { photoURL });
+
+  // Update the user photo in all upcoming events.
+  const now = getDateTimeStringFromDate(new Date()); // we are storing dates as strings
+  const eventDocQuery = query(
+    eventsCollection,
+    where('attendeeIds', 'array-contains', userProfile.id),
+    where('date', '>=', now),
+  );
+  const eventDocsSnap = await getDocs(eventDocQuery);
+  eventDocsSnap.forEach((eventDoc) => {
+    const event = eventDoc.data() as EventInfo;
+
+    // Update the host photo if user is hosting.
+    if (event.hostUid === userProfile.id) {
+      batch.update(eventDoc.ref, { hostPhotoURL: photoURL });
+    }
+
+    // Update attendee photo if user is attending event.
+    const updatedAttendees =
+      event.attendees &&
+      event.attendees.map((a) => ({
+        ...a,
+        photoURL: a.id === userProfile.id ? photoURL : a.photoURL,
+      }));
+    updatedAttendees &&
+      batch.update(eventDoc.ref, {
+        attendees: updatedAttendees,
+      });
+  });
+
+  // Update the user photo in the relationships for all the people the user follows.
+  const userRelationshipRef = doc(relationshipCollection, userProfile.id);
+  const userFollowingCollection = collection(
+    db,
+    userRelationshipRef.path,
+    'following',
+  ).withConverter(userBasicInfoDataConverter);
+  const userFollowingDocsSnap = await getDocs(userFollowingCollection);
+  userFollowingDocsSnap.forEach((followedInfoRef) => {
+    const followedDocRef = doc(relationshipCollection, followedInfoRef.id);
+    const userFollowerDocRef = doc(db, followedDocRef.path, 'followers', userProfile.id);
+    batch.update(userFollowerDocRef, { photoURL });
+  });
+
+  await batch.commit();
+
+  // This can't be part of the batch because it doesn't work with updating the user auth record.
+  // If the batch fails, this won't run, so it's effectively part of the batch.
   await updateAuthUserPhotoInFirebase(photoData.photoURL);
 };
 
