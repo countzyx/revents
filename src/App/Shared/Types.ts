@@ -1,4 +1,4 @@
-import type {
+export type {
   ChatComment,
   EventInfo,
   NewsFeedPost,
@@ -8,17 +8,6 @@ import type {
   UserBasicInfo,
   UserProfile,
 } from '@functions/Types';
-
-export {
-  ChatComment,
-  EventInfo,
-  NewsFeedPost,
-  NewsFeedPostCode,
-  PhotoData,
-  PlacesInfo,
-  UserBasicInfo,
-  UserProfile,
-};
 
 export type Category = {
   key: string;
