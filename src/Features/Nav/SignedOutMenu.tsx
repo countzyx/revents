@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button, Menu } from 'semantic-ui-react';
-import { openModal } from '../../App/Components/Modals/modalsSlice';
-import { useAppDispatch } from '../../App/Store/hooks';
+import { openModal } from 'src/App/Components/Modals/modalsSlice';
+import { useAppDispatch } from 'src/App/Store/hooks';
 
 const SignedOutMenu: React.FC = () => {
   const dispatch = useAppDispatch();
