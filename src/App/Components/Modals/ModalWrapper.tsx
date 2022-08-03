@@ -20,7 +20,7 @@ const ModalWrapper: React.FC<ModalProps> = (props: ModalProps) => {
       }
       open={isOpen}
     >
-      {header && <Modal.Header>{header}</Modal.Header>}
+      {header && <Modal.Header>{header as React.ReactNode}</Modal.Header>}
       <Modal.Content>{children}</Modal.Content>
     </Modal>
   );

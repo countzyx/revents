@@ -4,7 +4,11 @@ import { selectAuthIsAuthed } from 'src/Features/Auth/authSlice';
 import { openModal } from '../Components/Modals/modalsSlice';
 import { useAppDispatch, useAppSelector } from '../Store/hooks';
 
-const AuthRouteGuard: React.FC = (props) => {
+type Props = {
+  children?: React.ReactNode;
+};
+
+const AuthRouteGuard: React.FC<Props> = (props) => {
   const { children } = props;
   const isAuthed = useAppSelector(selectAuthIsAuthed);
   const dispatch = useAppDispatch();
@@ -14,6 +18,10 @@ const AuthRouteGuard: React.FC = (props) => {
 
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{children}</>; // this fragment is no useless; it's an easy fix for the type
+};
+
+AuthRouteGuard.defaultProps = {
+  children: undefined,
 };
 
 export default AuthRouteGuard;
