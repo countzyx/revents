@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Button, Header, Image, Item, Label, Segment } from 'semantic-ui-react';
+import { openModal } from 'src/App/Components/Modals/modalsSlice';
 import { EventInfo } from '../../../App/Shared/Types';
 import { useAppDispatch, useAppSelector } from '../../../App/Store/hooks';
 import { selectAuthUserInfo } from '../../Auth/authSlice';
@@ -31,6 +32,10 @@ const EventDetailsHeader: React.FC<Props> = (props: Props) => {
 
   const userIsHost = event.hostUid === user?.uid;
   const userIsAttending = event.attendeeIds.some((id) => id === user?.uid);
+
+  const onOpenUnAuthModal = () => {
+    dispatch(openModal({ modalType: 'UnauthModalNoRedirect' }));
+  };
 
   const onAddCurrentUserAsAttendee = () => {
     dispatch(addCurrentUserAsAttendeeToEvent(event));
@@ -81,7 +86,11 @@ const EventDetailsHeader: React.FC<Props> = (props: Props) => {
               Cancel My Place
             </Button>
           ) : (
-            <Button color='teal' loading={isUpdatingAttendees} onClick={onAddCurrentUserAsAttendee}>
+            <Button
+              color='teal'
+              loading={isUpdatingAttendees}
+              onClick={user ? onAddCurrentUserAsAttendee : () => onOpenUnAuthModal()}
+            >
               JOIN THIS EVENT
             </Button>
           ))}

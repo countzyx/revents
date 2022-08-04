@@ -15,7 +15,7 @@ const AuthRouteGuard: React.FC<Props> = (props) => {
 
   // If the user is not authenticated, launch a modal dialog to challenge when this component loads.
   React.useEffect(() => {
-    !isAuthed && dispatch(openModal({ modalType: 'UnauthModal' }));
+    !isAuthed && dispatch(openModal({ modalType: 'UnauthModalRedirect' }));
   }, [isAuthed, dispatch]);
 
   return isAuthed ? <>{children}</> : null;

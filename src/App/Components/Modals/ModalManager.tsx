@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import * as React from 'react';
-import UnauthModal from 'src/Features/Auth/UnauthModal';
+import UnauthModalNoRedirect from 'src/Features/Auth/UnAuthModalNoRedirect';
+import UnauthModalRedirect from 'src/Features/Auth/UnAuthModalRedirect';
 import LoginForm from 'src/Features/Auth/LoginForm';
 import RegisterForm from 'src/Features/Auth/RegisterForm';
 import TestModal from 'src/Features/Sandbox/TestModal';
@@ -14,7 +15,8 @@ const modalLookup: ModalDictionary = {
   LoginForm,
   RegisterForm,
   TestModal,
-  UnauthModal,
+  UnauthModalNoRedirect,
+  UnauthModalRedirect,
 };
 
 const ModalManager: React.FC = () => {
