@@ -54,6 +54,9 @@ rules:
         - .ts
         - .tsx
   react/jsx-indent: 'off'
+  react/jsx-no-useless-fragment:
+    - 2
+    - allowExpressions: true
   react/jsx-one-expression-per-line: 'off'
   '@typescript-eslint/indent': 'off'
   '@typescript-eslint/no-empty-function':

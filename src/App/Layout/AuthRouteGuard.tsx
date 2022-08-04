@@ -18,8 +18,7 @@ const AuthRouteGuard: React.FC<Props> = (props) => {
     !isAuthed && dispatch(openModal({ modalType: 'UnauthModal' }));
   }, [isAuthed, dispatch]);
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
-  return <>{children}</>; // this fragment is not useless; it's an easy fix for the type
+  return isAuthed ? <>{children}</> : null;
 };
 
 AuthRouteGuard.defaultProps = {
