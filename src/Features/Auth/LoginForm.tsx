@@ -41,7 +41,7 @@ const LoginForm: React.FC = () => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={async (formValues, actions) => {
-          await dispatch(signInPasswordUser(formValues));
+          dispatch(signInPasswordUser(formValues));
           actions.setSubmitting(false);
         }}
       >
