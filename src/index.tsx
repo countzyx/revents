@@ -1,26 +1,26 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
+import { createRoot } from 'react-dom/client';
 import 'fomantic-ui-css/semantic.min.css';
 import 'react-toastify/dist/ReactToastify.min.css';
 import 'react-calendar/dist/Calendar.css';
 import './index.css';
 import { Provider } from 'react-redux';
 import { Store } from '@reduxjs/toolkit';
+import { HistoryRouter } from 'redux-first-history/rr6';
 import App from './App/Layout/App';
 import reportWebVitals from './reportWebVitals';
-import store from './App/Store/store';
+import store, { history } from './App/Store/store';
 import ScrollToTop from './App/Layout/ScrollToTop';
 
-const render = (reduxStore: Store, element: HTMLElement) => {
-  ReactDOM.render(
+const render = (reduxStore: Store, container: HTMLElement) => {
+  const root = createRoot(container);
+  root.render(
     <Provider store={reduxStore}>
-      <BrowserRouter>
+      <HistoryRouter history={history}>
         <ScrollToTop />
         <App />
-      </BrowserRouter>
+      </HistoryRouter>
     </Provider>,
-    element,
   );
 };
 
