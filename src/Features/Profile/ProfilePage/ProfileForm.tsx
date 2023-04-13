@@ -14,7 +14,7 @@ type ProfileFormValues = {
   displayName: string;
 };
 
-const validationSchema: Yup.SchemaOf<ProfileFormValues> = Yup.object({
+const validationSchema: Yup.ObjectSchema<ProfileFormValues> = Yup.object({
   description: Yup.string(),
   displayName: Yup.string().required(),
 });

@@ -16,7 +16,7 @@ const initialValues: ChangePasswordFormValues = {
   newPasswordConfirmation: '',
 };
 
-const validationSchema: Yup.SchemaOf<ChangePasswordFormValues> = Yup.object({
+const validationSchema: Yup.ObjectSchema<ChangePasswordFormValues> = Yup.object({
   newPassword: Yup.string().required(),
   newPasswordConfirmation: Yup.string()
     .required()

@@ -19,7 +19,7 @@ const initialValues: ChatFormValues = {
   comment: '',
 };
 
-const validationSchema: Yup.SchemaOf<ChatFormValues> = Yup.object({
+const validationSchema: Yup.ObjectSchema<ChatFormValues> = Yup.object({
   comment: Yup.string().required('cannot submit empty comment'),
 });
 

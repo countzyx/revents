@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Calendar from 'react-calendar';
+import type { Value } from 'react-calendar/dist/cjs/shared/types';
 import { Header, Menu } from 'semantic-ui-react';
 import { selectAuthIsAuthed } from 'src/Features/Auth/authSlice';
 import type { CriteriaKeys, FilterValues, EventSearchCriteria } from '../../../App/Shared/Types';
@@ -55,9 +56,15 @@ const EventFilters: React.FC = () => {
       <Header attached color='teal' content='Select date' icon='calendar' />
       <Calendar
         className={styles.Calendar}
-        onChange={(date: Date) =>
-          onUpdateSearchCriteria('startDate', getDateTimeStringFromDate(date))
-        }
+        onChange={(value: Value) => {
+          if (!value) {
+            return;
+          }
+          if (value instanceof Date) {
+            const date: Date = value;
+            onUpdateSearchCriteria('startDate', getDateTimeStringFromDate(date));
+          }
+        }}
       />
     </>
   );

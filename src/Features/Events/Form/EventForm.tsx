@@ -55,17 +55,17 @@ const initialValues: EventFormValues = {
   isCancelled: false,
 };
 
-const latLngSchema: Yup.SchemaOf<google.maps.LatLngLiteral> = Yup.object({
+const latLngSchema: Yup.ObjectSchema<google.maps.LatLngLiteral> = Yup.object({
   lat: Yup.number().required(),
   lng: Yup.number().required(),
 });
 
-const placesInfoSchema: Yup.SchemaOf<PlacesInfo> = Yup.object({
+const placesInfoSchema: Yup.ObjectSchema<PlacesInfo> = Yup.object({
   address: Yup.string().required(),
   latLng: latLngSchema.required(),
 });
 
-const validationSchema: Yup.SchemaOf<EventFormValues> = Yup.object({
+const validationSchema: Yup.ObjectSchema<EventFormValues> = Yup.object({
   title: Yup.string().required(),
   category: Yup.string().required(),
   city: placesInfoSchema.required(),

@@ -17,7 +17,7 @@ const initialValues: LoginFormValues = {
   password: '',
 };
 
-const validationSchema: Yup.SchemaOf<LoginFormValues> = Yup.object({
+const validationSchema: Yup.ObjectSchema<LoginFormValues> = Yup.object({
   email: Yup.string().email().required(),
   password: Yup.string().required(),
 });
